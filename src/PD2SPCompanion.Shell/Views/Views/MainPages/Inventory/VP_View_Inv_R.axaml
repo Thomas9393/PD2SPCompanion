@@ -1,0 +1,1127 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:data="using:PD2SPCompanion.Core.Items"
+			 xmlns:controls="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Inv_R"
+			 x:DataType="vm:VP_ViewModel_Inv_R"
+
+			 CornerRadius="{DynamicResource [UI] MainViewPage_R CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Inv_R/>
+	</Design.DataContext>
+
+	<UserControl.Resources>
+		<!-- Fluent's own placeholder brush, which is what a watermark is painted with -
+		     its default is dim enough to disappear against these panels. -->
+
+		<!-- A property's number and its steppers and die, once: on the name's line for a row whose
+		     only field is the number, on a field line of its own otherwise. -->
+		<DataTemplate x:Key="ValueControls" x:DataType="vm:StatRowViewModel">
+			<StackPanel Orientation="Horizontal"
+						Spacing="4" HorizontalAlignment="Right"
+						ToolTip.Tip="{Binding LimitsText}">
+				<!-- The rows written with this one take its number. First, so a row without
+				     it keeps its box where every other row has it: the stack stands from the right. -->
+				<Button Classes="spend" Command="{Binding AskFellowsCommand}"
+						IsVisible="{Binding HasFellows}"
+						ToolTip.Tip="{Binding FellowsHint}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Link}"/>
+				</Button>
+				<Button Classes="spend" Command="{Binding LowerCommand}"
+						Tag="value:down"
+						ToolTip.Tip="{Binding LowerHint}"
+						IsEnabled="{Binding CanLower}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+				</Button>
+				<!-- Alt + Enter: the rows written with it take its number, as its link button (StatRowViewModel.AskFellows). -->
+				<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Value}"
+										  Minimum="{Binding Minimum}"
+										  Maximum="{Binding Maximum}"
+										  Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}">
+					<controls:NumericTextBox.KeyBindings>
+						<KeyBinding Gesture="Alt+Enter" Command="{Binding AskFellowsCommand}"/>
+					</controls:NumericTextBox.KeyBindings>
+				</controls:NumericTextBox>
+				<Button Classes="spend" Command="{Binding RaiseCommand}"
+						Tag="value:up"
+						ToolTip.Tip="{Binding RaiseHint}"
+						IsEnabled="{Binding CanRaise}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+				</Button>
+				<base:RollButton Kind="Dice" Command="{Binding RerollCommand}"
+						Classes.idle="{Binding !CanReroll}"
+						ToolTip.Tip="{Binding RerollHint}"/>
+			</StackPanel>
+		</DataTemplate>
+	</UserControl.Resources>
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PickField.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Alert.axaml"/>
+
+		<!-- The item's summary through the card's foot as well (SummaryRoom). Here, not on the panel: a row
+		     span written on it would be a value no style could take back for the Forge. -->
+		<!-- As tall as the two rows were before it ran through both - the art's 140, the foot's gap of 10 and its
+		     28: spanning a row that sizes itself, it would otherwise stretch the card to all of an item's lines,
+		     and the card is one height whatever is in it. -->
+		<!-- Its height is the page's to set, with what the grip under the holder adds (SummaryHeight). -->
+		<Style Selector="Panel#SummaryRoom.tall">
+			<Setter Property="Grid.RowSpan" Value="2"/>
+			<Setter Property="VerticalAlignment" Value="Top"/>
+		</Style>
+		<!-- The grip under the holder: the one grip there is, the vault's three dots (PaneEdge; not a short bar of its
+		     own) - in the 10 the holder's margin had, so nothing moved for it. -->
+		<StyleInclude Source="/Styles/CommonControls/PaneEdge.axaml"/>
+		<Style Selector="Border#SummaryGrip">
+			<Setter Property="Height" Value="10"/>
+		</Style>
+		<StyleInclude Source="/Styles/CommonControls/Tick.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ComboBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemMarks.axaml"/>
+
+
+		<!-- A socket, listed rather than drawn over art: the cell it came from is on the
+		     other page, so here it wants a name beside it. -->
+		<Style Selector="Border.socketbox">
+			<Setter Property="Width" Value="30"/>
+			<Setter Property="Height" Value="30"/>
+			<Setter Property="CornerRadius" Value="3"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+			<Setter Property="Background" Value="Black"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<Style Selector="Border.socketbox.empty">
+			<Setter Property="BorderBrush" Value="#3CA79066"/>
+		</Style>
+
+		<!-- A socket of the Sockets section's row (the sockets in a row, one selected by a
+		     click): a button that is nothing but its box, a cell's size; the box framed in the bright gold while it is
+		     the one selected, lit under the pointer, faint while it or what is in it is on its way out. -->
+		<Style Selector="Button.socketcell">
+			<Setter Property="Padding" Value="0"/>
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="Cursor" Value="Hand"/>
+		</Style>
+		<Style Selector="Button.socketcell /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+		</Style>
+		<!-- Round, as a socket is drawn in the game (not a square). The one selected is framed in the bright gold at
+		     twice the others' thickness, with a glow
+		     about it: at one thickness it was "a bit hard to read". -->
+		<Style Selector="Button.socketcell > Border.socketbox">
+			<Setter Property="Width" Value="36"/>
+			<Setter Property="Height" Value="36"/>
+			<Setter Property="CornerRadius" Value="18"/>
+			<!-- The glow's room, inside the button: drawn past the button's edge it was cut square. -->
+			<Setter Property="Margin" Value="4"/>
+		</Style>
+		<Style Selector="Button.socketcell:pointerover > Border.socketbox, Button.socketcell:focus-visible > Border.socketbox">
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+		</Style>
+		<Style Selector="Button.socketcell.on > Border.socketbox">
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+			<Setter Property="BorderThickness" Value="2"/>
+			<Setter Property="BoxShadow" Value="0 0 4 0 #B3BFAC69"/>
+		</Style>
+		<Style Selector="Button.socketcell.going, Button.socketcell.cut">
+			<Setter Property="Opacity" Value="0.4"/>
+		</Style>
+		<!-- The Sockets section while what the Items page carries would go into its item: framed as a folder's row
+		     is under a carry. -->
+		<Style Selector="Border.section.socketdrop">
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		</Style>
+		<!-- The rule between the tools for the one selected and those for them all. -->
+		<Style Selector="Border.socketrule">
+			<Setter Property="Width" Value="1"/>
+			<Setter Property="Height" Value="16"/>
+			<Setter Property="Margin" Value="2,0"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Opacity" Value="0.55"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		</Style>
+
+		<!-- The same small square steppers the attributes use. -->
+		<!-- Chrome in Styles/CommonControls/SpendButton.axaml; only the glyph is local. -->
+		<!-- A toggle that is on: Button.spend.on, in Styles/CommonControls/SpendButton.axaml. -->
+		<!-- A button that cannot act is dimmed whole, by the one number (SpendButton.axaml). Its glyph and its
+		     sprite are not dimmed again here: dimmed twice, to a sixteenth, the button stood as an empty frame. -->
+
+		<!-- The affix range, and the same line when the value has left it. Scoped to
+		     the class it is on: a selector that matched every TextBlock without the class
+		     would have recoloured the item's name and every heading with it. -->
+		<!-- What the game would have rolled, under Defense and Max durability (BasicSection): muted, and in
+		     the warning's color once the value has left it. -->
+		<Style Selector="TextBlock.roll">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+		</Style>
+		<Style Selector="TextBlock.roll.outside">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+		</Style>
+
+		<!-- A property row's head draws its own words (StatRowHead), so it is handed here what their text
+		     blocks' classes said: the name in the magic blue; the dim line muted (dim, roll); a roll the value
+		     has left, a retired stat's note and the "?" in the warning's color, the roll bold; "(corrupted)"
+		     in the corruption's red; "(runeword)" and "(maps)" as plain items; "(set)" and its pieces green. -->
+		<Style Selector="base|StatRowHead">
+			<Setter Property="NameBrush" Value="{DynamicResource [Brush] Rarity - Magic items}"/>
+			<Setter Property="DimBrush" Value="{DynamicResource [Text] Muted}"/>
+			<Setter Property="WarningBrush" Value="{DynamicResource [Text] Warning}"/>
+			<Setter Property="CorruptBrush" Value="{DynamicResource [Text] Corrupted}"/>
+			<Setter Property="MarkBrush" Value="{DynamicResource [Brush] Rarity - Normal items}"/>
+			<Setter Property="SetBrush" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+			<Setter Property="NameSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="SmallSize" Value="{StaticResource [Type] Small}"/>
+		</Style>
+
+		<!-- The default template paints its own background over the one above. -->
+
+		<!-- A question, not a refusal: orange rather than the red a broken item wears,
+		     and it explains itself on hover rather than on the row. -->
+		<Style Selector="Border.question">
+			<Setter Property="Width" Value="15"/>
+			<Setter Property="Height" Value="15"/>
+			<Setter Property="CornerRadius" Value="8"/>
+			<Setter Property="BorderThickness" Value="1.2"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Caution}"/>
+			<Setter Property="Background" Value="#33B48CFF"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Margin" Value="0,0,6,0"/>
+		</Style>
+		<Style Selector="Border.question TextBlock">
+			<Setter Property="Text" Value="?"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+
+		<!-- A socket being closed, or a gem on its way to the inventory. The same
+		     treatment a property gets when it is marked for removal. -->
+		<Style Selector="Grid.going">
+			<Setter Property="Opacity" Value="0.45"/>
+		</Style>
+		<Style Selector="Grid.going TextBlock">
+			<Setter Property="TextDecorations" Value="Strikethrough"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Danger}"/>
+		</Style>
+		<Style Selector="Grid.going ToolTip TextBlock">
+			<Setter Property="TextDecorations" Value="{x:Null}"/>
+		</Style>
+
+		<!-- An affix in the colour of a magic item, since that is what one is. The
+		     rare item's own name is the exception: it is the rare colour, because it
+		     is the whole item being named rather than one thing added to it. -->
+		<Style Selector="TextBlock.affix">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="TextWrapping" Value="Wrap"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Magic items}"/>
+		</Style>
+		<!-- Staged and not yet written. Gold, because gold is what this panel already uses
+		     for the thing it is sitting on - red would collide with the mark a corruption
+		     leaves on a property, which means something else entirely. -->
+		<!-- Out of the item's reach, not out of the question. Orange is what this app
+		     already uses for a number the game would not have rolled, and an affix the item
+		     is too low for is the same kind of thing: allowed, and worth knowing. -->
+		<Style Selector="TextBlock.needslevel">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+		</Style>
+		<Style Selector="TextBlock.affix.dash">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+		</Style>
+		<Style Selector="TextBlock.affix.rarename">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Rare items}"/>
+		</Style>
+		<!-- A crafted item names itself from the same two lists a rare does, and the
+		     game still prints that name in the craft orange. -->
+		<Style Selector="TextBlock.affix.crafted">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Crafted items}"/>
+		</Style>
+
+		<!-- After the rule above, not before it: a descendant selector is not beaten by a
+		     more specific one, only by a later one, and the rule above was painting the
+		     rare name in the unique tan. -->
+		<!-- An affix is a magic property whatever the item's own rarity, so it is written
+		     in the magic colour - the dash between the pair is not one, and stays plain. -->
+		<!-- One side of one slot, as something to aim the list at. Wide enough to be hit
+		     when it is empty, which is exactly when it needs hitting. -->
+		<Style Selector="Button.affixslot">
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="MinHeight" Value="22"/>
+			<Setter Property="Padding" Value="8,2"/>
+			<Setter Property="Cursor" Value="Hand"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Field}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="2"/>
+		</Style>
+		<!-- Hovered, and the one the list is aimed at. A row that only changes colour
+		     says what it means to someone who knows both states; a frame says it to
+		     someone looking at one. -->
+		<!-- The frame lives on the templated presenter, not on the button: setting it on
+		     the button alone leaves the theme's own presenter border in front of it, and
+		     the hover read as nothing at all. -->
+		<Style Selector="Button.affixslot /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Field}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+			<Setter Property="CornerRadius" Value="2"/>
+		</Style>
+		<Style Selector="Button.affixslot:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.affixslot:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+		</Style>
+		<!-- The slot the list is aimed at: gold, as every "current" (it was red). -->
+		<Style Selector="Button.affixslot.aimed /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary Hover Edge}"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Selection - Current}"/>
+		</Style>
+
+		<Style Selector="Button.affixslot TextBlock.magic">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Magic items}"/>
+		</Style>
+		<!-- On the aimed slot's gold wash the plain blue was hard to read: lifted. -->
+		<Style Selector="Button.affixslot.aimed TextBlock.magic">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Magic items Lit}"/>
+		</Style>
+		<Style Selector="Button.pickone TextBlock.magic">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Magic items}"/>
+		</Style>
+		<Style Selector="Button.pickfield TextBlock.magic">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Magic items}"/>
+		</Style>
+		<!-- Under the pointer the field takes the hover wash, and the plain blue was hard to read on it: lifted, as
+		     on the aimed affix slot. -->
+		<Style Selector="Button.pickfield:pointerover TextBlock.magic, Button.pickfield:pressed TextBlock.magic, Button.pickfield:focus-visible TextBlock.magic">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Magic items Lit}"/>
+		</Style>
+		<Style Selector="Button.pickfield TextBlock.rarename">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Rare items}"/>
+		</Style>
+		<!-- Later still than the rarename rule, so a crafted item takes the craft
+		     orange where both classes are on the same name. The crafting line's
+		     family reads in it too, being the same kind of fact about the item. -->
+		<Style Selector="Button.pickfield TextBlock.crafted">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Crafted items}"/>
+		</Style>
+
+		<!-- The list itself: a class per section, and one more for the rest. -->
+		<Style Selector="TextBlock.pickhead">
+			<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Heading}"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+			<Setter Property="Margin" Value="4,8,0,4"/>
+		</Style>
+
+		<Style Selector="Button.pickone TextBlock">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		</Style>
+		<!-- After the rule above, not before it. A descendant selector declared later wins
+		     however specific the earlier one was, so the orange set on the class alone was
+		     painted straight back over by the plain row colour. -->
+		<Style Selector="Button.pickone TextBlock.needslevel">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+		</Style>
+		<!-- And after that one in turn: a craft family names itself in the craft
+		     colour, the way the item it would make does. -->
+		<Style Selector="Button.pickone TextBlock.crafted">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Crafted items}"/>
+		</Style>
+		<!-- And a runeword names itself in the unique gold, as the game prints one. Written on the row's
+		     own text it was painted over by the plain row colour above, and the builder's list read all
+		     in one colour. -->
+		<Style Selector="Button.pickone TextBlock.runeword">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		</Style>
+
+		<Style Selector="Button.spend.bin.restore Path">
+			<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+		</Style>
+		<Style Selector="Grid.statrow.going">
+			<Setter Property="Opacity" Value="0.45"/>
+		</Style>
+
+		<!-- Picked but not kept. Outlined rather than dimmed: this one is arriving, and a
+		     row that reads as faded would say the opposite of what it is. -->
+		<Style Selector="Grid.statrow.coming">
+			<Setter Property="Background" Value="#14FFFFFF"/>
+		</Style>
+
+		<!-- From a corruption. The game paints these red and marks them with an asterisk;
+		     red alone says it here, where the whole row belongs to one property. -->
+		<Style Selector="TextBlock.corruptmark">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Corrupted}"/>
+		</Style>
+		<Style Selector="Grid.statrow.going TextBlock">
+			<Setter Property="TextDecorations" Value="Strikethrough"/>
+		</Style>
+		<Style Selector="Grid.statrow.going ToolTip TextBlock">
+			<Setter Property="TextDecorations" Value="{x:Null}"/>
+		</Style>
+
+		<!-- A die with nothing to roll - the affix fixes the value, or no range is known - keeps its
+		     place, so the steppers line up down the list, and is dimmed as every button that cannot act
+		     just now (the mode allows it and this row has nothing to roll, so it
+		     is dimmed, not hidden). -->
+		<Style Selector="Button.spend.dice.idle">
+			<Setter Property="Opacity" Value="{StaticResource [UI] Disabled Opacity}"/>
+			<Setter Property="IsHitTestVisible" Value="False"/>
+		</Style>
+		<!-- On a field line under the name the controls end at the row's right edge, as the boxes
+		     there do, so a die with nothing to roll takes no room (no gaps). -->
+		<Style Selector="ContentControl.fieldline Button.spend.dice.idle">
+			<Setter Property="IsVisible" Value="False"/>
+		</Style>
+	</UserControl.Styles>
+
+	<Panel>
+	<!-- The panel's own, out of sight while a jewel of the item's sockets is open in the layer over it. -->
+	<Panel IsVisible="{Binding Nested, Converter={x:Static ObjectConverters.IsNull}}">
+		<!-- With nothing chosen the page wears the watermark and says why it is empty - drawn by the page that
+		     hosts this panel (VP_View_Vault_R), over the whole page: here they were centred under its title, lower
+		     than the landing page's. -->
+		<DockPanel Margin="16">
+			<!-- The item's holder (first on the Forge, then here for every item): black, as the
+			     inventory's cells and the vault's list are. The item summed up as the page has it - staged
+			     edits and all, with why a change cannot be kept said under its name - over a foot: the tools
+			     centred under the art, and the page's actions in the corner - what a page of its own puts there (the
+			     Forge's FORGE and RESET). One height whatever is in it: the tallest art - four cells of 28 -
+			     with the room its row of sockets takes under it, kept with sockets or without (ItemSummary), and a
+			     foot as tall as its tallest button with tools or without; the art and the sections under it do
+			     not move as items, sockets and tools come and go (taller by six to hold it). -->
+			<Border DockPanel.Dock="Top" Name="Holder"
+					Background="Black" CornerRadius="3"
+					BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}" BorderThickness="1"
+					Padding="12,10">
+				<!-- With nothing chosen only a page of its own still shows it, and says what it waits for. -->
+				<Border.IsVisible>
+					<MultiBinding Converter="{x:Static BoolConverters.Or}">
+						<Binding Path="HasItem"/>
+						<Binding Path="$parent[views:VP_View_Inv_R].IsBare"/>
+					</MultiBinding>
+				</Border.IsVisible>
+				<Grid Name="HolderRows" RowDefinitions="140,Auto">
+					<TextBlock Grid.Row="0" Classes="dim" HorizontalAlignment="Center" VerticalAlignment="Center"
+							   IsVisible="{Binding !HasItem}"
+							   Text="{Binding $parent[views:VP_View_Inv_R].EmptyText}"/>
+
+					<!-- The foot's right column holds nothing of the panel's own: the
+					     summary runs down through it, the item's lines having the room, instead of a gap. Its art keeps
+					     the 140 it
+					     had, so the tools stay under it. Not where a host puts something of its own in that
+					     corner - the Forge's FORGE: there the summary ends above the foot. -->
+					<Panel Grid.Row="0" Name="SummaryRoom" IsVisible="{Binding HasItem}"
+						   Classes.tall="{Binding $parent[views:VP_View_Inv_R].Actions, Converter={x:Static ObjectConverters.IsNull}}">
+						<views:ItemSummary Name="SummaryView" DataContext="{Binding Summary}" ArtHeight="140"
+										   ShowsId="{Binding !$parent[views:VP_View_Inv_R].IsBare}"
+										   Warning="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).ChangeNote}"/>
+					</Panel>
+
+					<!-- The foot, in the summary's own two columns: the tools under the art, centred as it is. -->
+					<Grid Grid.Row="1" ColumnDefinitions="1*,2*" Margin="0,10,0,0" MinHeight="28">
+						<views:ItemTools Grid.Column="0" Margin="2,0,10,0"
+										 HorizontalAlignment="Center" VerticalAlignment="Center"
+										 IsVisible="{Binding HasItem}"/>
+
+						<!-- Nothing between the tools and the buttons: "(corrupted)" wrapped in
+						     what room was left, and the summary above says "Corrupted" itself, in red, as the game
+						     does. Why a change cannot be kept is said up there too (ItemSummary.Warning). -->
+						<Grid Grid.Column="1" ColumnDefinitions="*,Auto">
+							<Panel Grid.Column="1" VerticalAlignment="Center">
+								<!-- No KEEP and no UNDO here: every change is kept as it is made, and
+								     the session's undo takes it back. What a host's page adds - the Forge's Make - is this. -->
+								<ContentControl Content="{Binding $parent[views:VP_View_Inv_R].Actions}"
+												IsVisible="{Binding $parent[views:VP_View_Inv_R].Actions, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+							</Panel>
+						</Grid>
+					</Grid>
+				</Grid>
+			</Border>
+
+			<!-- The grip: drag it for more of the item's lines, up to 45% of the page, and double-click it for the holder's own
+			     height (the display is useful and often used). In the 10 the holder's
+			     margin was, so nothing moves; its bar shown with an item. -->
+			<Border DockPanel.Dock="Top" Name="SummaryGrip" Classes="paneedge across"
+					AutomationProperties.AutomationId="Item_Grip" AutomationProperties.AccessibilityView="Control"
+					IsVisible="{Binding #Holder.IsVisible}"
+					ToolTip.Tip="{L 'Drag to resize. Double-click: default height.'}">
+				<StackPanel IsVisible="{Binding HasItem}"><Border/><Border/><Border/></StackPanel>
+			</Border>
+
+			<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+				<!-- With nothing chosen only a bare panel still scrolls: its lead is how something is chosen. -->
+				<ScrollViewer.IsVisible>
+					<MultiBinding Converter="{x:Static BoolConverters.Or}">
+						<Binding Path="HasItem"/>
+						<Binding Path="$parent[views:VP_View_Inv_R].IsBare"/>
+					</MultiBinding>
+				</ScrollViewer.IsVisible>
+				<!-- No gutter held for a scrollbar: the bar takes its own room only when it shows. -->
+				<StackPanel>
+					<ContentControl Content="{Binding $parent[views:VP_View_Inv_R].Lead}"
+									IsVisible="{Binding $parent[views:VP_View_Inv_R].Lead, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+
+					<StackPanel IsVisible="{Binding HasItem}">
+
+						<!-- Basic: the section and its view model are their own (BasicEditor). -->
+						<views:BasicSection DataContext="{Binding Basic}"/>
+				
+
+						<!-- Sockets: the section and its view model are their own (SocketsEditor). -->
+						<views:SocketsSection DataContext="{Binding Sockets}"/>
+
+						<!-- Affixes: the section and its view model are their own (AffixEditor). -->
+						<views:AffixesSection DataContext="{Binding Affixes}"/>
+
+						<!-- What the item claims about itself, against what the game could have made.
+						     Red only for what the game could not hold at all; everything else takes the
+						     caution colour the rest of the page uses for allowed-but-worth-knowing.
+						     Hidden when there is nothing to say, and when the setting is off. -->
+						<Border Classes="section" Margin="0,0,0,10" Padding="10,8"
+								IsVisible="{Binding HasFindings}">
+							<StackPanel>
+								<Button Classes="fold" Command="{Binding ToggleFindingsCommand}">
+									<Grid ColumnDefinitions="Auto,*">
+										<Path Grid.Column="0" Classes="chevron"
+											  Classes.open="{Binding FindingsOpen}"
+											  Data="{StaticResource [Glyph] Chevron}"/>
+										<TextBlock Grid.Column="1" Classes="section"
+												   Text="{Binding FindingsHeader}"/>
+									</Grid>
+								</Button>
+
+								<ItemsControl ItemsSource="{Binding Findings}" Margin="0,6,0,0"
+										      IsVisible="{Binding FindingsOpen}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate x:DataType="vm:FindingRow">
+											<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,4">
+												<TextBlock Grid.Column="0" FontSize="{StaticResource [Type] Small}" Margin="0,1,8,0"
+														   VerticalAlignment="Top"
+														   Foreground="{Binding Colour}"
+														   Text="{Binding Kind}"/>
+												<TextBlock Grid.Column="1" FontSize="{StaticResource [Type] Small}" TextWrapping="Wrap"
+														   Foreground="{Binding Colour}"
+														   Text="{Binding Said}"/>
+											</Grid>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</StackPanel>
+						</Border>
+
+						<!-- What it gives whatever it goes into. Three lines, as the game's own
+						     tooltip has them, because a rune is a different thing in each. -->
+						<Border Classes="section" Margin="0,0,0,10" Padding="10,8"
+								IsVisible="{Binding IsSocketFiller}">
+							<StackPanel>
+								<TextBlock Classes="section" Text="{L 'In a socket'}"/>
+
+								<Grid ColumnDefinitions="96,*" Margin="0,8,0,0"
+									  IsVisible="{Binding HasWeaponEffect}">
+									<TextBlock Grid.Column="0" Classes="fieldname" Margin="0" Text="{L 'Weapon'}"/>
+									<ItemsControl Grid.Column="1" ItemsSource="{Binding WeaponEffect}">
+										<ItemsControl.ItemTemplate>
+											<DataTemplate x:DataType="x:String">
+												<TextBlock Text="{Binding}" Classes="affix"/>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</Grid>
+
+								<Grid ColumnDefinitions="96,*" Margin="0,6,0,0"
+									  IsVisible="{Binding HasArmorEffect}">
+									<!-- Body armour and helms share one column in the table, and the game
+									     lists them as two lines saying the same thing. -->
+									<TextBlock Grid.Column="0" Classes="fieldname" Margin="0" Text="{L 'Armor, Helm'}"/>
+									<ItemsControl Grid.Column="1" ItemsSource="{Binding ArmorEffect}">
+										<ItemsControl.ItemTemplate>
+											<DataTemplate x:DataType="x:String">
+												<TextBlock Text="{Binding}" Classes="affix"/>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</Grid>
+
+								<Grid ColumnDefinitions="96,*" Margin="0,6,0,0"
+									  IsVisible="{Binding HasShieldEffect}">
+									<TextBlock Grid.Column="0" Classes="fieldname" Margin="0" Text="{L 'Shield'}"/>
+									<ItemsControl Grid.Column="1" ItemsSource="{Binding ShieldEffect}">
+										<ItemsControl.ItemTemplate>
+											<DataTemplate x:DataType="x:String">
+												<TextBlock Text="{Binding}" Classes="affix"/>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</Grid>
+							</StackPanel>
+						</Border>
+
+						<!-- The editable properties. -->
+						<Border Classes="section" Margin="0,0,0,10" Padding="10,8"
+								IsVisible="{Binding HasStats}">
+							<StackPanel>
+								<Grid ColumnDefinitions="*,Auto,Auto">
+									<Button Grid.Column="0" Classes="fold"
+											Command="{Binding ToggleStatsCommand}">
+										<Grid ColumnDefinitions="Auto,*">
+											<Path Grid.Column="0" Classes="chevron"
+												  Classes.open="{Binding StatsOpen}"
+												  Data="{StaticResource [Glyph] Chevron}"/>
+											<TextBlock Grid.Column="1" Classes="section"
+													   Text="{Binding StatsHeader}"/>
+										</Grid>
+									</Button>
+
+
+									<!-- Offered only where a property can go: a simple item has
+									     no record to hold one. -->
+									<Panel Grid.Column="2" IsVisible="{Binding Rules.EditsProperties}">
+										<Button Classes="spend" Margin="6,0,0,0"
+												IsVisible="{Binding CanAddStat}"
+												Command="{Binding OpenStatPickerCommand}"
+												ToolTip.Tip="{L 'Add property'}">
+											<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+										</Button>
+									</Panel>
+								</Grid>
+
+								<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Margin="6,6,0,2"
+										   IsVisible="{Binding NoStats}"
+										   Text="{Binding NoStatsNote}"/>
+
+								<!-- The rows recycled from one item to the next rather than built again - a select built
+								     about a thousand controls and allocated 30 MB. The cache - two viewports
+								     each way, the most it takes - keeps an item's rows realized, as a plain stack did. -->
+								<ItemsControl Name="StatRows" ItemsSource="{Binding Stats}"
+											  IsVisible="{Binding StatsOpen}"
+											  Margin="0,8,0,2">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<VirtualizingStackPanel CacheLength="2"/>
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+									<ItemsControl.ItemTemplate>
+										<DataTemplate x:DataType="vm:StatRowViewModel">
+											<Grid Classes="statrow"
+												  Classes.going="{Binding IsDeleted}"
+												  Classes.coming="{Binding IsAdded}"
+												  Margin="0,0,0,14">
+												<ToolTip.Tip>
+													<Binding Path="RowTooltip"/>
+												</ToolTip.Tip>
+
+												<StackPanel>
+													<!-- Where the item's own properties end and the runeword's begin.
+													     The game keeps them in two lists and this is that line, drawn. -->
+													<!-- Every part of a row is read off the presenter's parent, never its own
+													     DataContext: a presenter sets that to its content, null included, and
+													     would not hear the part come back (see ContainerGrid). -->
+													<ContentPresenter Content="{Binding $parent.((vm:StatRowViewModel)DataContext).GroupPart}">
+														<ContentPresenter.ContentTemplate>
+															<DataTemplate x:DataType="vm:StatRowViewModel">
+																<Grid ColumnDefinitions="*,Auto,*" Margin="0,4,0,10">
+																	<Border Grid.Column="0" Height="1" Margin="0,0,10,0"
+																			VerticalAlignment="Center"
+																			Background="{DynamicResource [Brush] Rarity - Normal items}"/>
+
+																	<TextBlock Grid.Column="1" FontSize="{StaticResource [Type] Body}"
+																			   VerticalAlignment="Center"
+																			   Foreground="{DynamicResource [Text] Body}"
+																			   IsVisible="{Binding !IsSetBonus}"
+																			   Text="{Binding GroupHeading}"/>
+
+																	<!-- A set is green, as the game prints it. -->
+																	<TextBlock Grid.Column="1" FontSize="{StaticResource [Type] Body}"
+																			   VerticalAlignment="Center"
+																			   Foreground="{DynamicResource [Brush] Rarity - Set items}"
+																			   IsVisible="{Binding IsSetBonus}"
+																			   Text="{Binding GroupHeading}"/>
+
+																	<Border Grid.Column="2" Height="1" Margin="10,0,0,0"
+																			VerticalAlignment="Center"
+																			Background="{DynamicResource [Brush] Rarity - Normal items}"/>
+																</Grid>
+															</DataTemplate>
+														</ContentPresenter.ContentTemplate>
+													</ContentPresenter>
+
+													<!-- The name, with remove beside it. Taking a property off the item is
+													     about the property rather than about any one of its fields, so it
+													     belongs on the line that names it - and so does the number, where
+													     it is the row's only field (two lines, not four). -->
+													<Grid ColumnDefinitions="*,Auto,Auto">
+														<!-- The name - how the game words it, which is what says whether a number is a
+														     count or a percentage - and under it one dim line: the id and what else the
+														     file keeps, what the affixes and the game would roll ("stat 7 · affix 10-20 ·
+														     game 10-400"), then what kind of property it is and where it came from - all
+														     short, all about the one property; a stack of them pushed the fields down the
+														     page. Said rather than painted over the whole row - the property is ordinary,
+														     its origin is not. Drawn by one control (StatRowHead): as controls they were
+														     eighteen of a row's fifty-nine. -->
+														<base:StatRowHead Grid.Column="0" Margin="0,0,8,0"
+																		  Row="{Binding}"
+																		  EditsProperties="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_R)DataContext).Rules.EditsProperties}"/>
+
+														<!-- The compact row's number, on this line. -->
+														<Panel Grid.Column="1" VerticalAlignment="Top"
+															   IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_R)DataContext).Rules.EditsProperties}">
+															<ContentPresenter Content="{Binding $parent.((vm:StatRowViewModel)DataContext).CompactPart}"
+																			  ContentTemplate="{StaticResource ValueControls}"/>
+															<!-- A switch: its tick here, no "On" line under it. -->
+															<ToggleButton Classes="tick" HorizontalAlignment="Right"
+																		  IsVisible="{Binding ShowsToggle}"
+																		  IsChecked="{Binding IsOn, Mode=OneWay}"
+																		  Command="{Binding ToggleOnCommand}"
+																		  ToolTip.Tip="{Binding ToggleHint}">
+																<Path Data="{StaticResource [Glyph] Tick}"
+																	  IsVisible="{Binding IsOn}"/>
+															</ToggleButton>
+														</Panel>
+
+														<!-- 32 wide, the bin at its right: the field lines below leave the same 32 clear,
+														     so every row's controls end at one edge. -->
+														<Panel Grid.Column="2" Width="32" VerticalAlignment="Top" IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_R)DataContext).Rules.EditsProperties}">
+															<!-- Not the bin, which always asks twice: a property is taken
+															     off the item at once, with no question -
+															     the brush, what takes a thing off everywhere (the cross
+															     is Close alone; it was a cross). It wears the bin's manner - as the icons beside
+															     it at rest, red under the pointer: red at rest, a row of them down the list, was
+															     noisy. -->
+															<Button Classes="spend bin" HorizontalAlignment="Right"
+																	VerticalAlignment="Center"
+																	AutomationProperties.AutomationId="Stat_Remove"
+																	IsVisible="{Binding CanDelete}"
+																	Command="{Binding DeleteCommand}"
+																	ToolTip.Tip="{Binding DeleteHint}">
+																<Path Classes="pin"
+																	  Data="{StaticResource [Glyph] Clean}"/>
+															</Button>
+															<Button Classes="spend bin restore" HorizontalAlignment="Right"
+																	VerticalAlignment="Center"
+																	IsVisible="{Binding CanRestore}"
+																	Command="{Binding RestoreCommand}"
+																	ToolTip.Tip="{L 'Keep property'}">
+																<!-- The shared undo: keeping a property on its way out is going back. -->
+																<Path Classes="pin" Data="{StaticResource [Glyph] Undo}" Stroke="{DynamicResource [Brush] Rarity - Set items}"/>
+															</Button>
+														</Panel>
+													</Grid>
+
+													<!-- The parts that set a value - the play mode's: in Legit a property reads as its
+													     wording above and nothing more. -->
+													<!-- The row's whole width: every control on these lines ends where the bins do -
+													     boxes and steppers alike, right-aligned with the lines above, no gaps. -->
+													<StackPanel
+																IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_R)DataContext).Rules.EditsProperties}">
+														<!-- A stat that names a skill has two things to set, each on a line of
+														     its own and named, since a bare number beside a skill reads as
+														     neither one nor the other. -->
+														<!-- The boxes right-aligned, sized to what they hold, not stretched over
+														     half the row. -->
+														<ContentPresenter Content="{Binding $parent.((vm:StatRowViewModel)DataContext).SkillPart}">
+															<ContentPresenter.ContentTemplate>
+																<DataTemplate x:DataType="vm:StatRowViewModel">
+																	<Grid
+																		  ColumnDefinitions="*,Auto,Auto" Margin="0,8,0,0">
+																		<TextBlock Grid.Column="0" Classes="fieldname" Text="{L 'Skill'}"/>
+																		<!-- A skill drawn at random from a range by its
+																		     source has a die beside the box (Spirit
+																		     Keeper). The die, as the number's: it is this
+																		     property's own
+																		     roll, not a choice of another property - it wore the Flawless Skull, and the
+																		     Demonic Cube left it. -->
+																		<base:RollButton Kind="Dice" Grid.Column="2" Margin="4,0,0,0"
+																				IsVisible="{Binding SkillIsDrawn}"
+																				Command="{Binding RerollSkillCommand}"
+																				ToolTip.Tip="{L 'Reroll skill'}"/>
+																		<Panel Grid.Column="1">
+																			<Button Name="SkillPickButton" Classes="pickfield" Width="260"
+																					Command="{Binding TogglePickerCommand}"
+																					ToolTip.Tip="{Binding SkillPickHint}"
+																					ToolTip.Placement="BottomEdgeAlignedLeft">
+																				<TextBlock Text="{Binding SkillDisplay}"
+																						   VerticalAlignment="Center"
+																						   TextTrimming="CharacterEllipsis"/>
+																			</Button>
+																		</Panel>
+																	</Grid>
+																</DataTemplate>
+															</ContentPresenter.ContentTemplate>
+														</ContentPresenter>
+
+														<!-- The same, for a parameter that names something other than a skill:
+														     a class's skill tree, a class, or an element. -->
+														<!-- A drop box rather than the skill panel: these lists are
+														     five, seven and twenty-one long, and a page of their own
+														     for seven classes is more ceremony than choosing needs. -->
+														<!-- The long ones - seven hundred monsters, two hundred states -
+														     open the page instead, which is where the search is. -->
+														<ContentPresenter Content="{Binding $parent.((vm:StatRowViewModel)DataContext).IndexPanelPart}">
+															<ContentPresenter.ContentTemplate>
+																<DataTemplate x:DataType="vm:StatRowViewModel">
+																	<Grid
+																		  ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+																		<TextBlock Grid.Column="0" Classes="fieldname"
+																				   Text="{Binding IndexLabel}"/>
+																		<Panel Grid.Column="1">
+																			<Button Classes="pickfield" Width="260"
+																					Command="{Binding TogglePickerCommand}">
+																				<TextBlock Text="{Binding IndexDisplay}"
+																						   VerticalAlignment="Center"
+																						   TextTrimming="CharacterEllipsis"/>
+																			</Button>
+																		</Panel>
+																	</Grid>
+																</DataTemplate>
+															</ContentPresenter.ContentTemplate>
+														</ContentPresenter>
+
+														<ContentPresenter Content="{Binding $parent.((vm:StatRowViewModel)DataContext).IndexBoxPart}">
+															<ContentPresenter.ContentTemplate>
+																<DataTemplate x:DataType="vm:StatRowViewModel">
+																	<Grid
+																		  ColumnDefinitions="*,Auto,Auto" Margin="0,8,0,0">
+																		<TextBlock Grid.Column="0" Classes="fieldname"
+																				   Text="{Binding IndexLabel}"/>
+																		<!-- A class drawn at random by its source has a
+																		     die beside the box (Hellfire Torch). The die,
+																		     as the skill's above. -->
+																		<base:RollButton Kind="Dice" Grid.Column="2" Margin="4,0,0,0"
+																				IsVisible="{Binding ClassIsDrawn}"
+																				Command="{Binding RerollClassCommand}"
+																				ToolTip.Tip="{L 'Reroll class'}"/>
+																		<ComboBox Grid.Column="1" Classes="slots"
+																				  HorizontalAlignment="Right" Width="{Binding IndexBoxWidth}"
+																				  ItemsSource="{Binding IndexChoices}"
+																				  SelectedItem="{Binding ChosenIndex, Mode=TwoWay}">
+																			<ComboBox.ItemTemplate>
+																				<DataTemplate x:DataType="vm:IndexChoice">
+																					<TextBlock base:TrimmedTip.Tip="{Binding Name}" Text="{Binding Name}"
+																							   TextTrimming="CharacterEllipsis"/>
+																				</DataTemplate>
+																			</ComboBox.ItemTemplate>
+																		</ComboBox>
+																	</Grid>
+																</DataTemplate>
+															</ContentPresenter.ContentTemplate>
+														</ContentPresenter>
+
+														<!-- The level it casts at, which the parameter carries beside the skill. A
+														     chance-to-cast property is three numbers, and this was the missing one. -->
+														<ContentPresenter Content="{Binding $parent.((vm:StatRowViewModel)DataContext).SkillLevelPart}">
+															<ContentPresenter.ContentTemplate>
+																<DataTemplate x:DataType="vm:StatRowViewModel">
+																	<Grid
+																		  ColumnDefinitions="*,*" Margin="0,8,0,0">
+																		<TextBlock Grid.Column="0" Classes="fieldname" Text="{L 'Skill level'}"/>
+																		<StackPanel Grid.Column="1" Orientation="Horizontal"
+																					Spacing="4" HorizontalAlignment="Right">
+																			<Button Classes="spend" Command="{Binding LowerSkillLevelCommand}"
+																					Tag="skill:down"
+																					ToolTip.Tip="{L 'Shift + LMB: min value'}"
+																					IsEnabled="{Binding CanLowerSkillLevel}">
+																				<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+																			</Button>
+																			<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Value}"
+																									  Minimum="{Binding SkillLevelMinimum}"
+																									  Maximum="{Binding SkillLevelMaximum}"
+																									  Text="{Binding SkillLevelText, UpdateSourceTrigger=PropertyChanged}"/>
+																			<Button Classes="spend" Command="{Binding RaiseSkillLevelCommand}"
+																					Tag="skill:up"
+																					ToolTip.Tip="{L 'Shift + LMB: max value'}"
+																					IsEnabled="{Binding CanRaiseSkillLevel}">
+																				<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+																			</Button>
+																		</StackPanel>
+																	</Grid>
+																</DataTemplate>
+															</ContentPresenter.ContentTemplate>
+														</ContentPresenter>
+
+														<TextBlock FontSize="{StaticResource [Type] Small}" Margin="0,3,0,0"
+																   IsVisible="{Binding SkillIsUnknown}"
+																   Text="{Binding UnknownSkillNote}"
+																   Foreground="{DynamicResource [Text] Danger}"/>
+
+
+														<!-- One bit, so a switch: on the name's line (above). -->
+
+														<!-- A dye's number is a colour: picked by name. -->
+														<ContentPresenter Content="{Binding $parent.((vm:StatRowViewModel)DataContext).ColourPart}">
+															<ContentPresenter.ContentTemplate>
+																<DataTemplate x:DataType="vm:StatRowViewModel">
+																	<Grid
+																		  ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+																		<TextBlock Grid.Column="0" Classes="fieldname" Text="{L 'Color'}"/>
+																		<ComboBox Grid.Column="1" Classes="slots"
+																				  HorizontalAlignment="Right" Width="{Binding ColourBoxWidth}"
+																				  ItemsSource="{Binding ColourChoices}"
+																				  SelectedItem="{Binding ChosenColour, Mode=TwoWay}">
+																			<ComboBox.ItemTemplate>
+																				<DataTemplate x:DataType="vm:IndexChoice">
+																					<TextBlock base:TrimmedTip.Tip="{Binding Name}" Text="{Binding Name}"
+																							   TextTrimming="CharacterEllipsis"/>
+																				</DataTemplate>
+																			</ComboBox.ItemTemplate>
+																		</ComboBox>
+																	</Grid>
+																</DataTemplate>
+															</ContentPresenter.ContentTemplate>
+														</ContentPresenter>
+
+														<!-- The number, with its steppers. A stat the game fixes shows none of
+														     them: a disabled minus only invites trying it. -->
+														<ContentPresenter Content="{Binding $parent.((vm:StatRowViewModel)DataContext).NumberPart}">
+															<ContentPresenter.ContentTemplate>
+																<DataTemplate x:DataType="vm:StatRowViewModel">
+																	<Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
+																		<TextBlock Grid.Column="0" Classes="fieldname"
+																				   Text="{Binding ValueLabel}"/>
+
+																		<ContentControl Grid.Column="1" Content="{Binding}" Classes="fieldline"
+																						ContentTemplate="{StaticResource ValueControls}"/>
+																	</Grid>
+																</DataTemplate>
+															</ContentPresenter.ContentTemplate>
+														</ContentPresenter>
+
+														<!-- How many it holds, against how many are left in the value. A byte
+														     each, sharing the one number the file keeps. -->
+														<ContentPresenter Content="{Binding $parent.((vm:StatRowViewModel)DataContext).ChargesPart}">
+															<ContentPresenter.ContentTemplate>
+																<DataTemplate x:DataType="vm:StatRowViewModel">
+																	<Grid
+																		  ColumnDefinitions="*,*" Margin="0,8,0,0">
+																		<TextBlock Grid.Column="0" Classes="fieldname" Text="{L 'Max charges'}"/>
+																		<StackPanel Grid.Column="1" Orientation="Horizontal"
+																					Spacing="4" HorizontalAlignment="Right">
+																			<Button Classes="spend" Command="{Binding LowerMaxChargesCommand}"
+																					Tag="charges:down" IsVisible="{Binding !MaxChargesLocked}"
+																					ToolTip.Tip="{L 'Shift + LMB: min value'}"
+																					IsEnabled="{Binding CanLowerMaxCharges}">
+																				<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+																			</Button>
+																			<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Value}"
+																									  IsReadOnly="{Binding MaxChargesLocked}" Focusable="{Binding !MaxChargesLocked}" Minimum="{Binding MaxChargesMinimum}"
+																									  Maximum="{Binding MaxChargesMaximum}"
+																									  Text="{Binding MaxChargesText, UpdateSourceTrigger=PropertyChanged}"/>
+																			<Button Classes="spend" Command="{Binding RaiseMaxChargesCommand}"
+																					Tag="charges:up" IsVisible="{Binding !MaxChargesLocked}"
+																					ToolTip.Tip="{L 'Shift + LMB: max value'}"
+																					IsEnabled="{Binding CanRaiseMaxCharges}">
+																				<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+																			</Button>
+																		</StackPanel>
+																	</Grid>
+																</DataTemplate>
+															</ContentPresenter.ContentTemplate>
+														</ContentPresenter>
+
+													</StackPanel>
+
+													<!-- A value that will not parse says so here, which is why keeping
+													     the item refuses. -->
+													<TextBlock Text="{Binding Error}"
+															   IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}"
+															   Foreground="{DynamicResource [Text] Danger}"
+															   FontSize="{StaticResource [Type] Small}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+												</StackPanel>
+											</Grid>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</StackPanel>
+						</Border>
+
+					</StackPanel>
+				</StackPanel>
+			</ScrollViewer>
+		</DockPanel>
+
+		<!-- Affix: its picker and view model are their own (AffixEditor). -->
+		<views:AffixPicker DataContext="{Binding Affixes}"/>
+
+		<!-- Corruption: its picker and view model are their own (CorruptionEditor). -->
+		<views:CorruptionPicker DataContext="{Binding Corruption}"/>
+
+		<!-- Desecration: its picker and view model are their own (DesecrationEditor). -->
+		<views:DesecrationPicker DataContext="{Binding Desecration}"/>
+
+		<!-- Runeword: its picker and view model are their own (RunewordEditor). -->
+		<views:RunewordPicker DataContext="{Binding Runeword}"/>
+
+		<!-- Crafting: its picker and view model are their own (CraftingEditor). -->
+		<views:CraftingPicker DataContext="{Binding Crafting}"/>
+
+		<!-- Superior: its picker and view model are their own (SuperiorEditor). -->
+		<views:SuperiorPicker DataContext="{Binding Superior}"/>
+
+		<!-- The base's automagic and staff mods: their pickers and view models are their own. -->
+		<views:AutomagicPicker DataContext="{Binding Automagic}"/>
+		<views:StaffModsPicker DataContext="{Binding StaffSkills}"/>
+
+		<!-- A map's recipes: their picker and view model are their own (MapRecipeEditor). -->
+		<views:MapRecipePicker DataContext="{Binding MapRecipe}"/>
+
+		<!-- Property: the one property picker (PropertyPicker), the save's own properties. -->
+		<views:PropertyPicker DataContext="{Binding StatPicker}"/>
+
+		<!-- RareName: its picker and view model are their own (RareNameEditor). -->
+		<views:RareNamePicker DataContext="{Binding RareName}"/>
+
+		<!-- The skill list, over the page rather than anchored to the row that asked for it.
+		     Anchoring means a popup, and a popup places and sizes itself from numbers that are
+		     not settled when it opens - which is the whole of the trouble this had. Over the
+		     page there is nothing to anchor to: it is the panel, inset, and cannot be wrong. -->
+		<Border Classes="veil"
+				IsVisible="{Binding IsPickerPresent}"
+				Classes.shown="{Binding IsPickerOpen}"
+				IsHitTestVisible="{Binding IsPickerOpen}">
+
+			<Panel>
+				<!-- The whole veil, not just the part the panel leaves over - inside the
+				     margin the panel covers everything, so a backdrop there is a backdrop
+				     nothing can reach. -->
+				<Button Classes="backdrop"
+						Command="{Binding ClosePickerCommand}"/>
+
+				<Panel Classes="pickerframe">
+				<Border Classes="pickerpanel"
+						DataContext="{Binding PickerContent}">
+					<DockPanel>
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+							<TextBlock Grid.Column="0" Classes="pickertitle" Text="{Binding PickerTitle}"/>
+							<Button Grid.Column="1" Classes="spend"
+									Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_R)DataContext).ClosePickerCommand}"
+									ToolTip.Tip="{L 'Close'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</Grid>
+
+						<base:SearchBox DockPanel.Dock="Top" Classes="value"
+								 Margin="0,0,0,8"
+								 Padding="2,0"
+								 IsVisible="{Binding PickerSearches}"
+								 Text="{Binding SkillSearch, Mode=TwoWay}"/>
+
+						<TextBlock DockPanel.Dock="Top" Classes="dim"
+								   FontSize="{StaticResource [Type] Small}" Margin="6,4,0,6"
+								   IsVisible="{Binding NothingMatches}"
+								   Text="{L 'No match.'}"/>
+
+						<!-- Twenty-one trees, seven classes or five elements - or 1,240 monsters, searched. Virtualised as
+						     the property picker's list is (the monster panel was very slow: every row
+						     was built at each open): the scroll viewer is the list's own, and the presenter is handed
+						     the panel, or it falls back to a plain StackPanel and builds them all. -->
+						<ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding IndexChoices}"
+									  IsVisible="{Binding PicksIndex}">
+							<ItemsControl.Template>
+								<ControlTemplate>
+									<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+										<ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}"/>
+									</ScrollViewer>
+								</ControlTemplate>
+							</ItemsControl.Template>
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<VirtualizingStackPanel/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="vm:IndexChoice">
+									<Button Classes="pickone"
+											Command="{Binding $parent[ItemsControl].((vm:StatRowViewModel)DataContext).ChooseIndexCommand}"
+											CommandParameter="{Binding}">
+										<TextBlock base:TrimmedTip.Tip="{Binding Name}" Text="{Binding Name}"
+												   TextTrimming="CharacterEllipsis"/>
+									</Button>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+							</ItemsControl>
+
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled"
+									  AllowAutoHide="False"
+									  IsVisible="{Binding PicksSkill}">
+							<ItemsControl ItemsSource="{Binding SkillGroups}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:SkillChoiceGroup">
+										<StackPanel>
+											<Button Classes="fold" Command="{Binding ToggleCommand}">
+												<Grid ColumnDefinitions="Auto,*">
+													<Path Grid.Column="0" Classes="chevron"
+														  Classes.open="{Binding IsOpen}"
+														  Data="{StaticResource [Glyph] Chevron}"/>
+													<TextBlock Grid.Column="1" Classes="pickhead"
+															   Margin="8,0,0,0"
+															   Text="{Binding Header}"/>
+												</Grid>
+											</Button>
+											<ItemsControl ItemsSource="{Binding Skills}"
+														  IsVisible="{Binding IsOpen}">
+												<ItemsControl.ItemTemplate>
+													<DataTemplate x:DataType="vm:SkillChoiceViewModel">
+														<Button Classes="pickone"
+																Classes.held="{Binding IsHeld}"
+																Command="{Binding PickCommand}">
+															<TextBlock Text="{Binding Label}"/>
+														</Button>
+													</DataTemplate>
+												</ItemsControl.ItemTemplate>
+											</ItemsControl>
+										</StackPanel>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</DockPanel>
+				</Border>
+				</Panel>
+			</Panel>
+		</Border>
+	</Panel>
+
+	<!-- A jewel of the item's sockets, edited where it lies: this same panel again over
+	     the jewel - made by the code-behind when one is opened, a panel inside itself being no markup's to write -
+	     under the way back to the item that holds it. -->
+	<DockPanel IsVisible="{Binding Nested, Converter={x:Static ObjectConverters.IsNotNull}}">
+		<Button DockPanel.Dock="Top" Classes="fold" Tag="nestedback"
+				Margin="16,12,16,-6" HorizontalAlignment="Left"
+				Command="{Binding CloseNestedCommand}">
+			<StackPanel Orientation="Horizontal" Spacing="6">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Back}" VerticalAlignment="Center"/>
+				<TextBlock Text="{Binding NestedBack}" VerticalAlignment="Center"
+						   FontSize="{StaticResource [Type] Body}"
+						   Foreground="{DynamicResource [Text] Heading}"/>
+			</StackPanel>
+		</Button>
+		<ContentControl x:Name="NestedHost"/>
+	</DockPanel>
+	</Panel>
+</UserControl>

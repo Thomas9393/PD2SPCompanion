@@ -1,0 +1,1091 @@
+# Strings in Shell and Core that are not for the player: table columns, settings keys, file and folder
+# names, identifiers compared in code, developer diagnostics, reports. tests/words.py reads this; a line is
+# path<TAB>text. Anything the player reads goes through L(...) instead.
+PD2SPCompanion.Core/AppVersion.cs	Project Diablo II Single Player Companion
+PD2SPCompanion.Core/Changelog.cs	Unreleased
+PD2SPCompanion.Core/Characters/Belts.cs	Beltable
+PD2SPCompanion.Core/Characters/Belts.cs	Code
+PD2SPCompanion.Core/Characters/CharacterCreation.cs	Completion
+PD2SPCompanion.Core/Characters/CharmArea.cs	Charm
+PD2SPCompanion.Core/Characters/CharmArea.cs	Code
+PD2SPCompanion.Core/Characters/ClassStats.cs	Unknown
+PD2SPCompanion.Core/Characters/Equipping.cs	Code
+PD2SPCompanion.Core/Characters/ExperienceTable.cs	Level
+PD2SPCompanion.Core/Characters/Hirelings.cs	Act
+PD2SPCompanion.Core/Characters/Hirelings.cs	Class
+PD2SPCompanion.Core/Characters/Hirelings.cs	Code
+PD2SPCompanion.Core/Characters/Hirelings.cs	Defense
+PD2SPCompanion.Core/Characters/Hirelings.cs	Dex
+PD2SPCompanion.Core/Characters/Hirelings.cs	Difficulty
+PD2SPCompanion.Core/Characters/Hirelings.cs	Hireling
+PD2SPCompanion.Core/Characters/Hirelings.cs	Id
+PD2SPCompanion.Core/Characters/Hirelings.cs	Level
+PD2SPCompanion.Core/Characters/Hirelings.cs	Level{n}
+PD2SPCompanion.Core/Characters/Hirelings.cs	Mode{n}
+PD2SPCompanion.Core/Characters/Hirelings.cs	Resist
+PD2SPCompanion.Core/Characters/Hirelings.cs	Skill{n}
+PD2SPCompanion.Core/Characters/Hirelings.cs	Sk{n}mode
+PD2SPCompanion.Core/Characters/Hirelings.cs	Str
+PD2SPCompanion.Core/Characters/Hirelings.cs	Version
+PD2SPCompanion.Core/Characters/NewCharacter.cs	Hell
+PD2SPCompanion.Core/Characters/NewCharacter.cs	Nightmare
+PD2SPCompanion.Core/Characters/NewCharacter.cs	Normal
+PD2SPCompanion.Core/Characters/QuestProgress.cs	Completion
+PD2SPCompanion.Core/Characters/QuestProgress.cs	Hellforge
+PD2SPCompanion.Core/Characters/Requirements.cs	Code
+PD2SPCompanion.Core/Characters/Requirements.cs	Shoots
+PD2SPCompanion.Core/Characters/Requirements.cs	lvl req
+PD2SPCompanion.Core/Characters/Requirements.cs	op base
+PD2SPCompanion.Core/Characters/Requirements.cs	op param
+PD2SPCompanion.Core/Characters/Requirements.cs	op stat1
+PD2SPCompanion.Core/Characters/Requirements.cs	op stat2
+PD2SPCompanion.Core/Characters/Requirements.cs	op stat3
+PD2SPCompanion.Core/Characters/Sheet/Buffs.cs	Code
+PD2SPCompanion.Core/Characters/Sheet/Buffs.cs	group {state.Group}
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	Charge, by its own rule
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	HTH
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	Whirlwind, its own frames
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	a cast
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	a cast or an aura
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	a skill of several hits in a form: not counted
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	form {token} {mode}: {attack.Frames} frames at its own speed {attack.Speed}
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	form {token} {mode}: {attack.Frames} frames at speed {speed}
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	its strikes are not known
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	mode {mode} not measured
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	no animation {AnimData.TokenOf(classId)}{mode}{weaponClass}
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	no attack: a caster
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	no neutral or own attack for the form {token}
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	no {mode} for the form {token}
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	sequence {skill.Sequence} with {held}: its frames are in no table
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	sequence {skill.Sequence} with {held}: {length} frames, measured in game
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	{AnimData.TokenOf(classId)}{mode}{weaponClass}: {animation.Frames} frames acting on {animation.ActionFrame}, start {start}, {strikes} strikes put back {rollback}%
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	{AnimData.TokenOf(classId)}{mode}{weaponClass}: {animation.Frames} frames at {animation.Speed}, start {start}
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	{use.Skill}, a sequence of {use.SequenceFrames} frames
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	{use.Skill}, its monster's {mode}; bare-handed matched in game (A5), with a weapon not yet
+PD2SPCompanion.Core/Characters/Hirelings.cs	HTH
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	{use.Skill}: its sequence is in no table
+PD2SPCompanion.Core/Characters/Sheet/CharacterSheet.cs	{use.Skill}: no {mode} animation
+PD2SPCompanion.Core/Characters/Sheet/SkillFormulas.cs	Id
+PD2SPCompanion.Core/Characters/Sheet/SkillFormulas.cs	Param{n}
+PD2SPCompanion.Core/Characters/SkillTips.cs	Id
+PD2SPCompanion.Core/Characters/SkillTips.cs	Param{word[3]}
+PD2SPCompanion.Core/Characters/SkillTips.cs	str long
+PD2SPCompanion.Core/Characters/SkillTips.cs	str short
+PD2SPCompanion.Core/Characters/SkillTree.cs	Id
+PD2SPCompanion.Core/Characters/SkillTree.cs	str name
+PD2SPCompanion.Core/Characters/SkillTree.cs	str short
+PD2SPCompanion.Core/Characters/WaypointProgress.cs	Dark Wood
+PD2SPCompanion.Core/Characters/WaypointProgress.cs	Level
+PD2SPCompanion.Core/Characters/WaypointProgress.cs	Lvl
+PD2SPCompanion.Core/Characters/WaypointProgress.cs	Of
+PD2SPCompanion.Core/Characters/WaypointProgress.cs	Rogue Encampment
+PD2SPCompanion.Core/Characters/WaypointProgress.cs	The
+PD2SPCompanion.Core/Collection/ForgeSearch.cs	No base takes {Runewords.GameName(word)}.
+PD2SPCompanion.Core/Collection/ForgeSearch.cs	Not used
+PD2SPCompanion.Core/Collection/ForgeSearch.cs	^\d+% .*\blevel \d+ (?<what>.+)$
+PD2SPCompanion.Core/Collection/GrailCatalog.cs	Helm
+PD2SPCompanion.Core/Collection/GrailCatalog.cs	Light Plate
+PD2SPCompanion.Core/Collection/GrailCatalog.cs	Long Sword
+PD2SPCompanion.Core/Collection/GrailCatalog.cs	Monarch
+PD2SPCompanion.Core/Collection/Migration.cs	Save Add
+PD2SPCompanion.Core/Collection/Migration.cs	Save Bits
+PD2SPCompanion.Core/Collection/Migration.cs	Save Param Bits
+PD2SPCompanion.Core/Collection/Migration.cs	class {stat.CharacterClass}
+PD2SPCompanion.Core/Collection/Migration.cs	cut down from {stat.Value}.
+PD2SPCompanion.Core/Collection/Migration.cs	its parameter
+PD2SPCompanion.Core/Collection/Migration.cs	level {stat.SkillLevel}
+PD2SPCompanion.Core/Collection/Migration.cs	parameter {stat.Param}
+PD2SPCompanion.Core/Collection/Migration.cs	skill {SkillNames.NameOf(stat.SkillId ?? 0)}
+PD2SPCompanion.Core/Collection/Migration.cs	stamped v{item.Version} as v{stamp}; a save holds one era of items.
+PD2SPCompanion.Core/Collection/Migration.cs	tab {stat.SkillTab}
+PD2SPCompanion.Core/Collection/Migration.cs	{Held(stat)} cannot be carried across.
+PD2SPCompanion.Core/Collection/Migration.cs	{name} has no parameter field this season; 
+PD2SPCompanion.Core/Collection/Migration.cs	{name} is a single flag this season, not a number; set rather than 
+PD2SPCompanion.Core/Collection/Migration.cs	{name} is not a property this season has.
+PD2SPCompanion.Core/Collection/Migration.cs	{name} was {stat.Value}; this season holds {floor} to {ceiling}.
+PD2SPCompanion.Core/Collection/Migration.cs	{stat.MaxCharges} charges
+PD2SPCompanion.Core/Collection/SeasonFit.cs	Save Bits
+PD2SPCompanion.Core/Collection/SeasonFit.cs	kept; a flag
+PD2SPCompanion.Core/Collection/SeasonFit.cs	kept; it names a row
+PD2SPCompanion.Core/Collection/SeasonFit.cs	kept; nothing to rescale from
+PD2SPCompanion.Core/Collection/SeasonFit.cs	kept; this season names no range
+PD2SPCompanion.Core/Collection/SeasonFit.cs	reduced to a flag; this season stores one bit
+PD2SPCompanion.Core/Collection/SeasonFit.cs	rescaled from {where:P0} of its old range
+PD2SPCompanion.Core/Collection/SeasonFit.cs	rolled; it had no range before
+PD2SPCompanion.Core/Collection/SmartSort.cs	(MISC !JEWELRY !CHARM !QUIVER)
+PD2SPCompanion.Core/Collection/SmartSort.cs	(NMAG !SUP !INF)
+PD2SPCompanion.Core/Collection/SmartSort.cs	// Converted from smart-sort.txt (kept beside it as smart-sort.txt.old): the rules are written
+PD2SPCompanion.Core/Collection/SmartSort.cs	// as PD2's loot filter writes its conditions now. smart-sort.default.filter shows every word.
+PD2SPCompanion.Core/Collection/SmartSort.cs	// not converted, no -> in it: 
+PD2SPCompanion.Core/Collection/SmartSort.cs	// not converted, the filter has no word for {word}: {line}
+PD2SPCompanion.Core/Collection/SmartSort.cs	ALVL
+PD2SPCompanion.Core/Collection/SmartSort.cs	AMAZON
+PD2SPCompanion.Core/Collection/SmartSort.cs	AND
+PD2SPCompanion.Core/Collection/SmartSort.cs	ARMOR
+PD2SPCompanion.Core/Collection/SmartSort.cs	ARPER
+PD2SPCompanion.Core/Collection/SmartSort.cs	ASSASSIN
+PD2SPCompanion.Core/Collection/SmartSort.cs	AUTOMOD
+PD2SPCompanion.Core/Collection/SmartSort.cs	AXE
+PD2SPCompanion.Core/Collection/SmartSort.cs	BAR
+PD2SPCompanion.Core/Collection/SmartSort.cs	BARBARIAN
+PD2SPCompanion.Core/Collection/SmartSort.cs	BASENAME
+PD2SPCompanion.Core/Collection/SmartSort.cs	BELT
+PD2SPCompanion.Core/Collection/SmartSort.cs	BOOTS
+PD2SPCompanion.Core/Collection/SmartSort.cs	BOW
+PD2SPCompanion.Core/Collection/SmartSort.cs	Bases
+PD2SPCompanion.Core/Collection/SmartSort.cs	CHARM
+PD2SPCompanion.Core/Collection/SmartSort.cs	CHARSTAT
+PD2SPCompanion.Core/Collection/SmartSort.cs	CHEST
+PD2SPCompanion.Core/Collection/SmartSort.cs	CIRC
+PD2SPCompanion.Core/Collection/SmartSort.cs	CLASS
+PD2SPCompanion.Core/Collection/SmartSort.cs	CLSK
+PD2SPCompanion.Core/Collection/SmartSort.cs	CLUB
+PD2SPCompanion.Core/Collection/SmartSort.cs	CLVL
+PD2SPCompanion.Core/Collection/SmartSort.cs	CODE
+PD2SPCompanion.Core/Collection/SmartSort.cs	CRAFT
+PD2SPCompanion.Core/Collection/SmartSort.cs	CRAFTBASE
+PD2SPCompanion.Core/Collection/SmartSort.cs	CRES
+PD2SPCompanion.Core/Collection/SmartSort.cs	CUBE
+PD2SPCompanion.Core/Collection/SmartSort.cs	Class Weapons
+PD2SPCompanion.Core/Collection/SmartSort.cs	Crafting Bases
+PD2SPCompanion.Core/Collection/SmartSort.cs	DAGGER
+PD2SPCompanion.Core/Collection/SmartSort.cs	DEF
+PD2SPCompanion.Core/Collection/SmartSort.cs	DEX
+PD2SPCompanion.Core/Collection/SmartSort.cs	DIFF
+PD2SPCompanion.Core/Collection/SmartSort.cs	DIN
+PD2SPCompanion.Core/Collection/SmartSort.cs	DRU
+PD2SPCompanion.Core/Collection/SmartSort.cs	DRUID
+PD2SPCompanion.Core/Collection/SmartSort.cs	DTM
+PD2SPCompanion.Core/Collection/SmartSort.cs	EDAM
+PD2SPCompanion.Core/Collection/SmartSort.cs	EDEF
+PD2SPCompanion.Core/Collection/SmartSort.cs	ELT
+PD2SPCompanion.Core/Collection/SmartSort.cs	EQUIPPED
+PD2SPCompanion.Core/Collection/SmartSort.cs	ETH
+PD2SPCompanion.Core/Collection/SmartSort.cs	EXC
+PD2SPCompanion.Core/Collection/SmartSort.cs	Elite
+PD2SPCompanion.Core/Collection/SmartSort.cs	Exceptional
+PD2SPCompanion.Core/Collection/SmartSort.cs	FALSE
+PD2SPCompanion.Core/Collection/SmartSort.cs	FBR
+PD2SPCompanion.Core/Collection/SmartSort.cs	FCR
+PD2SPCompanion.Core/Collection/SmartSort.cs	FHR
+PD2SPCompanion.Core/Collection/SmartSort.cs	FILTLVL
+PD2SPCompanion.Core/Collection/SmartSort.cs	FRES
+PD2SPCompanion.Core/Collection/SmartSort.cs	FRW
+PD2SPCompanion.Core/Collection/SmartSort.cs	GEM
+PD2SPCompanion.Core/Collection/SmartSort.cs	GEMLEVEL
+PD2SPCompanion.Core/Collection/SmartSort.cs	GEMMED
+PD2SPCompanion.Core/Collection/SmartSort.cs	GFIND
+PD2SPCompanion.Core/Collection/SmartSort.cs	GLOVES
+PD2SPCompanion.Core/Collection/SmartSort.cs	GOLD
+PD2SPCompanion.Core/Collection/SmartSort.cs	GROUND
+PD2SPCompanion.Core/Collection/SmartSort.cs	Grand
+PD2SPCompanion.Core/Collection/SmartSort.cs	HAMMER
+PD2SPCompanion.Core/Collection/SmartSort.cs	HELM
+PD2SPCompanion.Core/Collection/SmartSort.cs	Hammers
+PD2SPCompanion.Core/Collection/SmartSort.cs	IAS
+PD2SPCompanion.Core/Collection/SmartSort.cs	ILVL
+PD2SPCompanion.Core/Collection/SmartSort.cs	INF
+PD2SPCompanion.Core/Collection/SmartSort.cs	INVENTORY
+PD2SPCompanion.Core/Collection/SmartSort.cs	ItemDisplay[{string.Join(" ", conditions)}]: {folder}
+PD2SPCompanion.Core/Collection/SmartSort.cs	JAV
+PD2SPCompanion.Core/Collection/SmartSort.cs	JEWELRY
+PD2SPCompanion.Core/Collection/SmartSort.cs	LIFE
+PD2SPCompanion.Core/Collection/SmartSort.cs	LRES
+PD2SPCompanion.Core/Collection/SmartSort.cs	Large
+PD2SPCompanion.Core/Collection/SmartSort.cs	MACE
+PD2SPCompanion.Core/Collection/SmartSort.cs	MAEK
+PD2SPCompanion.Core/Collection/SmartSort.cs	MAG
+PD2SPCompanion.Core/Collection/SmartSort.cs	MANA
+PD2SPCompanion.Core/Collection/SmartSort.cs	MAPID
+PD2SPCompanion.Core/Collection/SmartSort.cs	MAPTIER
+PD2SPCompanion.Core/Collection/SmartSort.cs	MAXDUR
+PD2SPCompanion.Core/Collection/SmartSort.cs	MERC
+PD2SPCompanion.Core/Collection/SmartSort.cs	MFIND
+PD2SPCompanion.Core/Collection/SmartSort.cs	MISC
+PD2SPCompanion.Core/Collection/SmartSort.cs	Maces
+PD2SPCompanion.Core/Collection/SmartSort.cs	NAME
+PD2SPCompanion.Core/Collection/SmartSort.cs	NEC
+PD2SPCompanion.Core/Collection/SmartSort.cs	NECROMANCER
+PD2SPCompanion.Core/Collection/SmartSort.cs	NMAG
+PD2SPCompanion.Core/Collection/SmartSort.cs	NORM
+PD2SPCompanion.Core/Collection/SmartSort.cs	Normal
+PD2SPCompanion.Core/Collection/SmartSort.cs	PALADIN
+PD2SPCompanion.Core/Collection/SmartSort.cs	POLEARM
+PD2SPCompanion.Core/Collection/SmartSort.cs	PREFIX
+PD2SPCompanion.Core/Collection/SmartSort.cs	PRES
+PD2SPCompanion.Core/Collection/SmartSort.cs	PRICE
+PD2SPCompanion.Core/Collection/SmartSort.cs	QLVL
+PD2SPCompanion.Core/Collection/SmartSort.cs	QTY
+PD2SPCompanion.Core/Collection/SmartSort.cs	QUALITY
+PD2SPCompanion.Core/Collection/SmartSort.cs	QUIVER
+PD2SPCompanion.Core/Collection/SmartSort.cs	RARE
+PD2SPCompanion.Core/Collection/SmartSort.cs	REPAIR
+PD2SPCompanion.Core/Collection/SmartSort.cs	REPLIFE
+PD2SPCompanion.Core/Collection/SmartSort.cs	RES
+PD2SPCompanion.Core/Collection/SmartSort.cs	RUNE
+PD2SPCompanion.Core/Collection/SmartSort.cs	SCEPTER
+PD2SPCompanion.Core/Collection/SmartSort.cs	SET
+PD2SPCompanion.Core/Collection/SmartSort.cs	SETGROUP
+PD2SPCompanion.Core/Collection/SmartSort.cs	SHIELD
+PD2SPCompanion.Core/Collection/SmartSort.cs	SHOP
+PD2SPCompanion.Core/Collection/SmartSort.cs	SIN
+PD2SPCompanion.Core/Collection/SmartSort.cs	SIZE
+PD2SPCompanion.Core/Collection/SmartSort.cs	SLOT
+PD2SPCompanion.Core/Collection/SmartSort.cs	SOCK
+PD2SPCompanion.Core/Collection/SmartSort.cs	SOCKETS
+PD2SPCompanion.Core/Collection/SmartSort.cs	SOR
+PD2SPCompanion.Core/Collection/SmartSort.cs	SORCERESS
+PD2SPCompanion.Core/Collection/SmartSort.cs	SPEAR
+PD2SPCompanion.Core/Collection/SmartSort.cs	STAFF
+PD2SPCompanion.Core/Collection/SmartSort.cs	STASH
+PD2SPCompanion.Core/Collection/SmartSort.cs	STAT
+PD2SPCompanion.Core/Collection/SmartSort.cs	STR
+PD2SPCompanion.Core/Collection/SmartSort.cs	SUFFIX
+PD2SPCompanion.Core/Collection/SmartSort.cs	SUP
+PD2SPCompanion.Core/Collection/SmartSort.cs	SWORD
+PD2SPCompanion.Core/Collection/SmartSort.cs	SetGroup[{line[..equals].Trim()}]: {line[(equals + 1)..].Trim()}
+PD2SPCompanion.Core/Collection/SmartSort.cs	Small
+PD2SPCompanion.Core/Collection/SmartSort.cs	THROWING
+PD2SPCompanion.Core/Collection/SmartSort.cs	TIER
+PD2SPCompanion.Core/Collection/SmartSort.cs	TOWN
+PD2SPCompanion.Core/Collection/SmartSort.cs	TRUE
+PD2SPCompanion.Core/Collection/SmartSort.cs	Throwing
+PD2SPCompanion.Core/Collection/SmartSort.cs	Tier {tier}
+PD2SPCompanion.Core/Collection/SmartSort.cs	UNI
+PD2SPCompanion.Core/Collection/SmartSort.cs	Uber
+PD2SPCompanion.Core/Collection/SmartSort.cs	Uncommon
+PD2SPCompanion.Core/Collection/SmartSort.cs	Unknown recipe
+PD2SPCompanion.Core/Collection/SmartSort.cs	Unsorted
+PD2SPCompanion.Core/Collection/SmartSort.cs	WAND
+PD2SPCompanion.Core/Collection/SmartSort.cs	WEAPON
+PD2SPCompanion.Core/Collection/SmartSort.cs	Weapons
+PD2SPCompanion.Core/Collection/SmartSort.cs	XBOW
+PD2SPCompanion.Core/Collection/SmartSort.cs	ZON
+PD2SPCompanion.Core/Collection/SmartSort.cs	\n        [set groups]\n        Common = Arctic Gear, Hsarus' Defense, Berserker's Arsenal, Cleglaw's Brace, Infernal Tools, Death's Disguise, Sigon's Complete Steel, Isenhart's Armory, Civerb's Vestments, Cathan's Traps, Angelic Raiment, Vidala's Rig, Arcanna's Tricks, Iratha's Finery, Milabrega's Regalia, Tancred's Battlegear\n        Uncommon = Cow King's Leathers, Sander's Folly, Hwanin's Majesty, Orphan's Call, The Disciple, Naj's Ancient Vestige, Sazabi's Grand Tribute, Heaven's Brethren, Bul-Kathos' Children\n        Class-Focused = Aldur's Watchtower, Griswold's Legacy, Immortal King, M'avina's Battle Hymn, Natalya's Odium, Tal Rasha's Wrappings, Trang-Oul's Avatar\n        [sorted]\n        set                    -> Sets/{set group}/{set}\n        runeword helm          -> Runewords/Helms\n        runeword chest         -> Runewords/Chests\n        runeword shield        -> Runewords/Shields\n        runeword quiver        -> Runewords/Quivers\n        runeword               -> Runewords/Weapons\n        map                    -> Maps/{map tier}\n        charm unique           -> Charms/Unique\n        charm skiller          -> Charms/Skillers/{class}\n        charm                  -> Charms/{size}\n        ring unique            -> Rings/Unique\n        ring crafted           -> Rings/Crafted/{family}\n        ring rare              -> Rings/Rare\n        ring magic             -> Rings/Magic\n        amulet unique          -> Amulets/Unique\n        amulet crafted         -> Amulets/Crafted/{family}\n        amulet rare            -> Amulets/Rare\n        amulet magic           -> Amulets/Magic\n        jewel unique           -> Jewels/Unique\n        jewel crafted          -> Jewels/Crafted/{family}\n        jewel rare             -> Jewels/Rare\n        jewel magic            -> Jewels/Magic\n        unique weapon          -> Unique Weapons/{weapon}\n        unique                 -> Other Uniques/{slot}\n        crafted                -> Crafted/{family}/{slot}\n        rare                   -> Rare/{slot}\n        magic                  -> Magic/{slot}\n        rune|gem               -> Runes & Gems\n        material               -> Materials\n        normal|superior|low-quality -> Bases/{slot}\n        *                      -> Unsorted\n        [crafting bases]\n        *                      -> Crafting Bases/{slot}\n        
+PD2SPCompanion.Core/Collection/SmartSort.cs	crafting bases
+PD2SPCompanion.Core/Collection/SmartSort.cs	map tier
+PD2SPCompanion.Core/Collection/SmartSort.cs	set group
+PD2SPCompanion.Core/Collection/SmartSort.cs	set groups
+PD2SPCompanion.Core/Collection/Vault.Folders.cs	AND CAST(substr(key, {LockKeys.Length + 1}) AS INTEGER) NOT IN (SELECT id FROM folder);
+PD2SPCompanion.Core/Collection/Vault.Items.cs	ASC
+PD2SPCompanion.Core/Collection/Vault.Items.cs	COALESCE(m.rarity, 99)
+PD2SPCompanion.Core/Collection/Vault.Items.cs	COALESCE(m.type_rank, 9999)
+PD2SPCompanion.Core/Collection/Vault.Items.cs	DESC
+PD2SPCompanion.Core/Collection/Vault.Items.cs	Name
+PD2SPCompanion.Core/Collection/Vault.Items.cs	Rarity
+PD2SPCompanion.Core/Collection/Vault.Items.cs	The vault did not say which key it gave an item.
+PD2SPCompanion.Core/Collection/Vault.Items.cs	Type
+PD2SPCompanion.Core/Collection/Vault.Items.cs	\nAND 0
+PD2SPCompanion.Core/Collection/Vault.Items.cs	\nAND i.origin_id IN ({string.Join(", ", ids.Select(id => (long)id))})
+PD2SPCompanion.Core/Collection/Vault.Items.cs	s.key = $key
+PD2SPCompanion.Core/Collection/Vault.Items.cs	substr(s.key, 1, length($key)) = $key
+PD2SPCompanion.Core/Collection/Vault.Items.cs	{string.Join($" {way}, ", keys)} {way}, i.key {way}
+PD2SPCompanion.Core/Collection/Vault.cs	Backups
+PD2SPCompanion.Core/Collection/Vault.cs	^Collections merged (?<at>\d{8}-\d{6})$
+PD2SPCompanion.Core/Collection/Vault.cs	{season}.pd2lib
+PD2SPCompanion.Core/Collection/Vault.cs	{stem}-{n}.pd2lib
+PD2SPCompanion.Core/Collection/Vault.cs	{stem}.pd2lib
+PD2SPCompanion.Core/Collection/VaultLibrary.cs	Collections
+PD2SPCompanion.Core/Collection/VaultLibrary.cs	Collections merged {DateTime.Now:yyyyMMdd-HHmmss}
+PD2SPCompanion.Core/Collection/VaultLibrary.cs	Default
+PD2SPCompanion.Core/Collection/VaultLibrary.cs	Exports
+PD2SPCompanion.Core/Collection/VaultLibrary.cs	Hardcore
+PD2SPCompanion.Core/Collection/VaultLibrary.cs	Profiles
+PD2SPCompanion.Core/Collection/VaultLibrary.cs	Softcore
+PD2SPCompanion.Core/Collection/VaultLibrary.cs	Vault
+PD2SPCompanion.Core/Collection/VaultLibrary.cs	{Vault.StagedPrefix}{Guid.NewGuid():N}.pd2lib
+PD2SPCompanion.Core/Collection/VaultLibrary.cs	{season} Main
+PD2SPCompanion.Core/Collection/VaultUndo.cs	'\"{column}\"=' || quote(old.\"{column}\")
+PD2SPCompanion.Core/Collection/VaultUndo.cs	main.\"{table}\"
+PD2SPCompanion.Core/Collection/VaultUndo.cs	quote(old.\"{column}\")
+PD2SPCompanion.Core/Diagnostics/Log.cs	ERROR
+PD2SPCompanion.Core/Diagnostics/Log.cs	FATAL
+PD2SPCompanion.Core/Diagnostics/Log.cs	INFO 
+PD2SPCompanion.Core/Diagnostics/Log.cs	WARN 
+PD2SPCompanion.Core/Diagnostics/ProblemReport.cs	Not included - {line}
+PD2SPCompanion.Core/Diagnostics/ProblemReport.cs	pd2spc-report-{now:yyyyMMdd-HHmmss}
+PD2SPCompanion.Core/Diagnostics/ProblemReport.cs	{stem}-{n}.zip
+PD2SPCompanion.Core/GameFiles/CharacterClasses.cs	Amazon
+PD2SPCompanion.Core/GameFiles/CharacterClasses.cs	Assassin
+PD2SPCompanion.Core/GameFiles/CharacterClasses.cs	Barbarian
+PD2SPCompanion.Core/GameFiles/CharacterClasses.cs	Druid
+PD2SPCompanion.Core/GameFiles/CharacterClasses.cs	Necromancer
+PD2SPCompanion.Core/GameFiles/CharacterClasses.cs	Paladin
+PD2SPCompanion.Core/GameFiles/CharacterClasses.cs	Sorceress
+PD2SPCompanion.Core/GameFiles/GameData.cs	'{table}.txt' is not present in any loaded archive.
+PD2SPCompanion.Core/GameFiles/GameData.cs	No Diablo II archives found under '{gameRoot}'.
+PD2SPCompanion.Core/GameFiles/GameData.cs	data\global\excel\{table}.txt
+PD2SPCompanion.Core/GameFiles/GameData.cs	data\global\items\{invFile}.dc6
+PD2SPCompanion.Core/GameFiles/GameLocation.cs	Diablo II
+PD2SPCompanion.Core/GameFiles/GameLocation.cs	Games
+PD2SPCompanion.Core/GameFiles/ParamTables.cs	Id
+PD2SPCompanion.Core/GameFiles/StringTable.cs	+%d to 
+PD2SPCompanion.Core/GameFiles/TxtTable.cs	'{name}.txt' is empty.
+PD2SPCompanion.Core/Graphics/CharacterFigure.cs	BOW
+PD2SPCompanion.Core/Graphics/CharacterFigure.cs	HTH
+PD2SPCompanion.Core/Graphics/CharacterFigure.cs	HVY
+PD2SPCompanion.Core/Graphics/CharacterFigure.cs	LIT
+PD2SPCompanion.Core/Graphics/CharacterFigure.cs	Legs
+PD2SPCompanion.Core/Graphics/CharacterFigure.cs	MED
+PD2SPCompanion.Core/Graphics/CharacterFigure.cs	Torso
+PD2SPCompanion.Core/Graphics/CharacterFigure.cs	data\global\chars\{look.Token}\{part}\{look.Token}{part}{art}{look.Mode}{layer.WeaponClass}.dcc
+PD2SPCompanion.Core/Graphics/Cof.cs	COF ends inside its drawing order.
+PD2SPCompanion.Core/Graphics/Cof.cs	COF ends inside its layer list.
+PD2SPCompanion.Core/Graphics/Cof.cs	COF is {data.Length} bytes, shorter than its header.
+PD2SPCompanion.Core/Graphics/Cof.cs	data\global\chars\{token}\COF\{token}{mode}{weaponClass}.cof
+PD2SPCompanion.Core/Graphics/ColourMaps.cs	data\global\items\Palette\{Files[n]}.dat
+PD2SPCompanion.Core/Graphics/Dc6.cs	DC6 claims {frameCount} frames, which is not plausible.
+PD2SPCompanion.Core/Graphics/Dc6.cs	DC6 frame is {width}x{height}, which is not plausible.
+PD2SPCompanion.Core/Graphics/Dcc.cs	DCC claims {framesPerDirection} frames a direction, which is not plausible.
+PD2SPCompanion.Core/Graphics/Dcc.cs	DCC direction {direction} runs {start}..{end} in a {data.Length}-byte file.
+PD2SPCompanion.Core/Graphics/Dcc.cs	DCC frame carries optional data; not handled.
+PD2SPCompanion.Core/Graphics/Dcc.cs	DCC frame is stored bottom-up; not handled.
+PD2SPCompanion.Core/Graphics/Dcc.cs	DCC sub-stream runs past the direction.
+PD2SPCompanion.Core/Graphics/Dcc.cs	DCC {name} stream read past its end ({end - _start} bits).
+PD2SPCompanion.Core/Graphics/Dcc.cs	encoding type
+PD2SPCompanion.Core/Graphics/Dcc.cs	equal cell
+PD2SPCompanion.Core/Graphics/Dcc.cs	not a DCC file (no 0x74 signature).
+PD2SPCompanion.Core/Graphics/Dcc.cs	pixel code
+PD2SPCompanion.Core/Graphics/Dcc.cs	pixel mask
+PD2SPCompanion.Core/Graphics/Dcc.cs	raw pixel
+PD2SPCompanion.Core/Graphics/Palette.cs	'{GameData.PalettePath}' is not in any loaded archive.
+PD2SPCompanion.Core/Graphics/Palette.cs	palette is {data.Length} bytes; expected at least 768.
+PD2SPCompanion.Core/Graphics/Png.cs	IDAT
+PD2SPCompanion.Core/Graphics/Png.cs	IEND
+PD2SPCompanion.Core/Graphics/Png.cs	IHDR
+PD2SPCompanion.Core/Graphics/SkillIcons.cs	skillicon-{classId}-{iconCel}
+PD2SPCompanion.Core/Graphics/TownScene.cs	Act
+PD2SPCompanion.Core/Graphics/TownScene.cs	File {n + 1}
+PD2SPCompanion.Core/Graphics/TownScene.cs	File{n}
+PD2SPCompanion.Core/Graphics/TownScene.cs	Id
+PD2SPCompanion.Core/Items/AffixNames.cs	Name
+PD2SPCompanion.Core/Items/AffixRanges.cs	Expansion
+PD2SPCompanion.Core/Items/AffixRanges.cs	^([bc] )?mod \d$
+PD2SPCompanion.Core/Items/AffixRanges.cs	auto prefix
+PD2SPCompanion.Core/Items/AffixRanges.cs	input 1
+PD2SPCompanion.Core/Items/AffixRanges.cs	input {n}
+PD2SPCompanion.Core/Items/AffixRanges.cs	mod {n}
+PD2SPCompanion.Core/Items/AffixRanges.cs	mod {n} max
+PD2SPCompanion.Core/Items/AffixRanges.cs	mod {n} min
+PD2SPCompanion.Core/Items/AffixRanges.cs	mod {n} param
+PD2SPCompanion.Core/Items/AffixRanges.cs	mod{n}code
+PD2SPCompanion.Core/Items/AffixRanges.cs	mod{n}max
+PD2SPCompanion.Core/Items/AffixRanges.cs	mod{n}min
+PD2SPCompanion.Core/Items/AffixRanges.cs	mod{n}param
+PD2SPCompanion.Core/Items/Crafting/BaseUpgrades.cs	auto prefix
+PD2SPCompanion.Core/Items/Crafting/BaseUpgrades.cs	defense {stored} -> {item.Armor}
+PD2SPCompanion.Core/Items/Crafting/BaseUpgrades.cs	durability {item.Durability}/{item.MaxDurability} -> none
+PD2SPCompanion.Core/Items/Crafting/BaseUpgrades.cs	durability {left}/{most} -> {item.Durability}/{item.MaxDurability}
+PD2SPCompanion.Core/Items/Crafting/BaseUpgrades.cs	input 1
+PD2SPCompanion.Core/Items/Crafting/BaseUpgrades.cs	mod {n}
+PD2SPCompanion.Core/Items/Crafting/BaseUpgrades.cs	mod {n} max
+PD2SPCompanion.Core/Items/Crafting/BaseUpgrades.cs	mod {n} min
+PD2SPCompanion.Core/Items/Crafting/BaseUpgrades.cs	mod {n} param
+PD2SPCompanion.Core/Items/Crafting/BaseUpgrades.cs	recipe adds {string.Join(", ", values.Select(each => $"{each.Stat} {each.Value}"))}
+PD2SPCompanion.Core/Items/Crafting/Corruptions.cs	input 1
+PD2SPCompanion.Core/Items/Crafting/Corruptions.cs	input 2
+PD2SPCompanion.Core/Items/Crafting/Corruptions.cs	mod {n}
+PD2SPCompanion.Core/Items/Crafting/Corruptions.cs	mod {n} max
+PD2SPCompanion.Core/Items/Crafting/Corruptions.cs	mod {n} min
+PD2SPCompanion.Core/Items/Crafting/Corruptions.cs	mod {n} param
+PD2SPCompanion.Core/Items/Crafting/Crafts.cs	Enhanced Damage
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	'{propCode}' asked for {wrote.Stat} {wrote.Value}, which its field 
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	'{propCode}' writes no property this season knows, so it was left off
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	A base is not made {quality}.
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	Expansion
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	No craft recipe takes {code}.
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	That row names no base in '{baseColumn}'.
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	added {name} at nought to finish the run led by {stat.Stat}
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	automod {only.Id}, its base's only one
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	cannot hold
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	cannot hold; written as {held}
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	crafted: {crafted.Family}
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	defense {item.Armor}, being the base maximum {maxac} plus one for the enhanced defense
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	defense {item.Armor}, ethereal
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	ethereal, as asked
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	rolled {picks.Count(pick => pick.Value.Id > 0)} affixes
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	set bonus for {tier + 1} pieces
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	setitems.txt is not loaded. Call SaveTables.Install first.
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	this season has no base '{code}', so defense and durability are unset
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	uniqueitems.txt is not loaded. Call SaveTables.Install first.
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	writes no property
+PD2SPCompanion.Core/Items/Crafting/ItemForge.cs	{sockets} sockets
+PD2SPCompanion.Core/Items/Crafting/MapRecipes.cs	input 1
+PD2SPCompanion.Core/Items/Crafting/MapRecipes.cs	input 2
+PD2SPCompanion.Core/Items/Crafting/MapRecipes.cs	input 3
+PD2SPCompanion.Core/Items/Crafting/MapRecipes.cs	mod {n}
+PD2SPCompanion.Core/Items/Crafting/MapRecipes.cs	mod {n} max
+PD2SPCompanion.Core/Items/Crafting/MapRecipes.cs	mod {n} min
+PD2SPCompanion.Core/Items/Crafting/MapRecipes.cs	mod {n} param
+PD2SPCompanion.Core/Items/Crafting/Puzzlebox.cs	input 1
+PD2SPCompanion.Core/Items/Crafting/Puzzlebox.cs	input 2
+PD2SPCompanion.Core/Items/Crafting/Puzzlebox.cs	mod 1
+PD2SPCompanion.Core/Items/Crafting/Puzzlebox.cs	mod 1 max
+PD2SPCompanion.Core/Items/Crafting/Puzzlebox.cs	mod 1 min
+PD2SPCompanion.Core/Items/Dyes.cs	Code
+PD2SPCompanion.Core/Items/Dyes.cs	Transform Color
+PD2SPCompanion.Core/Items/ItemBases.cs	Code
+PD2SPCompanion.Core/Items/ItemBases.cs	magic lvl
+PD2SPCompanion.Core/Items/ItemLines.cs	Socketed ({sockets})
+PD2SPCompanion.Core/Items/ItemOrder.cs	Maps
+PD2SPCompanion.Core/Items/ItemOrder.cs	Weapons
+PD2SPCompanion.Core/Items/ItemOrder.cs	Weapons: {(kind < Kinds.Length ? Kinds[kind].Kind : "Other")}
+PD2SPCompanion.Core/Items/ItemOrder.cs	Weapons: {Kinds[kind].Kind}
+PD2SPCompanion.Core/Items/ItemPresenter.cs	'{rowCode}' and not '{code}' — row indexing is off, name unreliable
+PD2SPCompanion.Core/Items/ItemPresenter.cs	Expansion
+PD2SPCompanion.Core/Items/ItemPresenter.cs	FileIndex {item.FileIndex} resolves to '{label}', whose code is 
+PD2SPCompanion.Core/Items/ItemTier.cs	Elite
+PD2SPCompanion.Core/Items/ItemTier.cs	Exceptional
+PD2SPCompanion.Core/Items/ItemTier.cs	Normal
+PD2SPCompanion.Core/Items/ItemTints.cs	Transform
+PD2SPCompanion.Core/Items/ItemTypes.cs	Class
+PD2SPCompanion.Core/Items/ItemTypes.cs	Code
+PD2SPCompanion.Core/Items/ItemTypes.cs	Magic
+PD2SPCompanion.Core/Items/ItemTypes.cs	Normal
+PD2SPCompanion.Core/Items/ItemTypes.cs	Rare
+PD2SPCompanion.Core/Items/ItemTypes.cs	Repair
+PD2SPCompanion.Core/Items/KadalasHeirloom.cs	Expansion
+PD2SPCompanion.Core/Items/KadalasHeirloom.cs	Nethercrow
+PD2SPCompanion.Core/Items/MagicAffixes.cs	Name
+PD2SPCompanion.Core/Items/MagicAffixes.cs	mod{n}code
+PD2SPCompanion.Core/Items/MagicAffixes.cs	mod{n}max
+PD2SPCompanion.Core/Items/MagicAffixes.cs	mod{n}min
+PD2SPCompanion.Core/Items/MagicAffixes.cs	mod{n}param
+PD2SPCompanion.Core/Items/MagicAffixes.cs	sockets {item.TotalNumberOfSockets} -> {sockets}
+PD2SPCompanion.Core/Items/MagicAffixes.cs	{moved.Stat} removed
+PD2SPCompanion.Core/Items/MagicAffixes.cs	{name} removed
+PD2SPCompanion.Core/Items/MagicAffixes.cs	{name} {value} added
+PD2SPCompanion.Core/Items/MagicAffixes.cs	{stat} removed
+PD2SPCompanion.Core/Items/MagicAffixes.cs	{stat} {total} added
+PD2SPCompanion.Core/Items/PageArrange.cs	Name
+PD2SPCompanion.Core/Items/PageArrange.cs	Rarity
+PD2SPCompanion.Core/Items/QualityItems.cs	mod{n}code
+PD2SPCompanion.Core/Items/QualityItems.cs	mod{n}max
+PD2SPCompanion.Core/Items/QualityItems.cs	mod{n}min
+PD2SPCompanion.Core/Items/QualityRows.cs	Expansion
+PD2SPCompanion.Core/Items/Runewords.cs	 Rune
+PD2SPCompanion.Core/Items/Runewords.cs	Chests
+PD2SPCompanion.Core/Items/Runewords.cs	Helms
+PD2SPCompanion.Core/Items/Runewords.cs	Name
+PD2SPCompanion.Core/Items/Runewords.cs	Quivers
+PD2SPCompanion.Core/Items/Runewords.cs	Rune Name
+PD2SPCompanion.Core/Items/Runewords.cs	Rune{n}
+PD2SPCompanion.Core/Items/Runewords.cs	Shields
+PD2SPCompanion.Core/Items/Runewords.cs	Weapons
+PD2SPCompanion.Core/Items/SkillNames.cs	Id
+PD2SPCompanion.Core/Items/SkillNames.cs	str name
+PD2SPCompanion.Core/Items/SkillTabs.cs	Expansion
+PD2SPCompanion.Core/Items/Skins.cs	Fenris
+PD2SPCompanion.Core/Items/Skins.cs	Harlequin Crest
+PD2SPCompanion.Core/Items/Skins.cs	Mang Song's Lesson
+PD2SPCompanion.Core/Items/Skins.cs	Shaftstop
+PD2SPCompanion.Core/Items/Skins.cs	Stormshield
+PD2SPCompanion.Core/Items/SocketEffects.cs	{which}Mod{n}Code
+PD2SPCompanion.Core/Items/SocketEffects.cs	{which}Mod{n}Max
+PD2SPCompanion.Core/Items/SocketEffects.cs	{which}Mod{n}Min
+PD2SPCompanion.Core/Items/SocketEffects.cs	{which}Mod{n}Param
+PD2SPCompanion.Core/Items/Stacks.cs	Code
+PD2SPCompanion.Core/Items/Stacks.cs	Quiver
+PD2SPCompanion.Core/Items/Stacks.cs	Throwable
+PD2SPCompanion.Core/Items/StaffMods.cs	Blade Fury
+PD2SPCompanion.Core/Items/StaffMods.cs	Blade Sentinel
+PD2SPCompanion.Core/Items/StaffMods.cs	Blade Shield
+PD2SPCompanion.Core/Items/StaffMods.cs	Blades of Ice
+PD2SPCompanion.Core/Items/StaffMods.cs	Claws of Thunder
+PD2SPCompanion.Core/Items/StaffMods.cs	Cobra Strike
+PD2SPCompanion.Core/Items/StaffMods.cs	Code
+PD2SPCompanion.Core/Items/StaffMods.cs	Dragon Flight
+PD2SPCompanion.Core/Items/StaffMods.cs	Dragon Tail
+PD2SPCompanion.Core/Items/StaffMods.cs	Dragon Talon
+PD2SPCompanion.Core/Items/StaffMods.cs	Fists of Fire
+PD2SPCompanion.Core/Items/StaffMods.cs	Poison Dagger
+PD2SPCompanion.Core/Items/StaffMods.cs	Royal Strike
+PD2SPCompanion.Core/Items/StaffMods.cs	Tiger Strike
+PD2SPCompanion.Core/Items/StatCatalogue.cs	Stat
+PD2SPCompanion.Core/Items/StatCatalogue.cs	stat {Id}
+PD2SPCompanion.Core/Items/StatFields.cs	'{statName}' is not a stat in this season's ItemStatCost.txt.
+PD2SPCompanion.Core/Items/StatFields.cs	Encode
+PD2SPCompanion.Core/Items/StatFields.cs	Save Add
+PD2SPCompanion.Core/Items/StatFields.cs	Save Bits
+PD2SPCompanion.Core/Items/StatFields.cs	Save Param Bits
+PD2SPCompanion.Core/Items/StatFields.cs	a byte of charges left and a byte of charges held, so 0 to 255 each
+PD2SPCompanion.Core/Items/StatFields.cs	{room}. {value} does not fit.
+PD2SPCompanion.Core/Items/StatFields.cs	{statName} is stored in {bits} bits with Save Add {add}, so it holds 
+PD2SPCompanion.Core/Items/StatText.cs	+X Absorbs Poison Damage (Based on Character Level)
+PD2SPCompanion.Core/Items/StatText.cs	+X Absorbs Poison Damage (Increases Over Time)
+PD2SPCompanion.Core/Items/StatText.cs	+X Energy Shield Efficiency
+PD2SPCompanion.Core/Items/StatText.cs	+X Maximum Durability
+PD2SPCompanion.Core/Items/StatText.cs	+X to Elemental Skills (No Line of Its Own)
+PD2SPCompanion.Core/Items/StatText.cs	+X to Maximum Throw Damage
+PD2SPCompanion.Core/Items/StatText.cs	+X to Minimum Throw Damage
+PD2SPCompanion.Core/Items/StatText.cs	+X% Velocity
+PD2SPCompanion.Core/Items/StatText.cs	+{Placeholder} to {SkillSlot} (Class Only)
+PD2SPCompanion.Core/Items/StatText.cs	Adds {low.Value}-{high.Value} damage
+PD2SPCompanion.Core/Items/StatText.cs	Cold
+PD2SPCompanion.Core/Items/StatText.cs	Double Herb Duration
+PD2SPCompanion.Core/Items/StatText.cs	Dye (colour)
+PD2SPCompanion.Core/Items/StatText.cs	Dye X
+PD2SPCompanion.Core/Items/StatText.cs	Encode
+PD2SPCompanion.Core/Items/StatText.cs	Extra Blood
+PD2SPCompanion.Core/Items/StatText.cs	Fade (Monsters Only)
+PD2SPCompanion.Core/Items/StatText.cs	Fire
+PD2SPCompanion.Core/Items/StatText.cs	Lasts X (Timed Item)
+PD2SPCompanion.Core/Items/StatText.cs	Level {Placeholder} {SkillSlot} {text}
+PD2SPCompanion.Core/Items/StatText.cs	Level {at} {(subject is { Length: > 0 } who ? who : "(none)")} {text}
+PD2SPCompanion.Core/Items/StatText.cs	Light Color X
+PD2SPCompanion.Core/Items/StatText.cs	Lightning
+PD2SPCompanion.Core/Items/StatText.cs	Magic
+PD2SPCompanion.Core/Items/StatText.cs	Map Monsters: Cold Length X
+PD2SPCompanion.Core/Items/StatText.cs	Map Monsters: Poison Length X
+PD2SPCompanion.Core/Items/StatText.cs	Poison
+PD2SPCompanion.Core/Items/StatText.cs	Reanimate as:
+PD2SPCompanion.Core/Items/StatText.cs	Required Level X
+PD2SPCompanion.Core/Items/StatText.cs	Sockets (X)
+PD2SPCompanion.Core/Items/StatText.cs	Stat
+PD2SPCompanion.Core/Items/StatText.cs	State X
+PD2SPCompanion.Core/Items/StatText.cs	State: {wearing} ({(value != 0 ? "On" : "Off")})
+PD2SPCompanion.Core/Items/StatText.cs	op base
+PD2SPCompanion.Core/Items/StatText.cs	op param
+PD2SPCompanion.Core/Items/StatText.cs	{plus} to {Elements[param]} Skills
+PD2SPCompanion.Core/Items/StatText.cs	{plus} to {granted.Name} ({granted.ClassName} Only)
+PD2SPCompanion.Core/Items/StatText.cs	{plus} to {named} Skill Levels
+PD2SPCompanion.Core/Items/StatText.cs	{plus} to {tree} ({who} Only)
+PD2SPCompanion.Core/Localization/Language.cs	, {pack.Dropped.Count} dropped (holes not in the English)
+PD2SPCompanion.Core/Localization/Language.cs	English (US)
+PD2SPCompanion.Core/Localization/Language.cs	Languages
+PD2SPCompanion.Core/Mpq/MpqArchive.cs	(block table)
+PD2SPCompanion.Core/Mpq/MpqArchive.cs	(hash table)
+PD2SPCompanion.Core/Mpq/MpqArchive.cs	Unsupported MPQ compression mask 0x{mask:X2}.
+PD2SPCompanion.Core/Mpq/MpqArchive.cs	{BitConverter.ToUInt32(_blockTable, at + 4)} stored, {BitConverter.ToUInt32(_blockTable, at + 8)} bytes) could not be read: {problem.Message}
+PD2SPCompanion.Core/Mpq/MpqArchive.cs	{System.IO.Path.GetFileName(Path)}: {fileName} (block {blockIndex}, flags 0x{BitConverter.ToUInt32(_blockTable, at + 12):X8}, 
+PD2SPCompanion.Core/Mpq/MpqArchive.cs	{path}: MPQ format version {formatVersion + 1} is not supported (expected v1).
+PD2SPCompanion.Core/Mpq/MpqArchive.cs	{stream.Name}: no MPQ header found.
+PD2SPCompanion.Core/SaveTables.cs	'{table}.txt' is not present in any loaded archive.
+PD2SPCompanion.Core/Saves/GameProcess.cs	Game
+PD2SPCompanion.Core/Saves/InventoryLayout.cs	Bank Page
+PD2SPCompanion.Core/Saves/InventoryLayout.cs	Bank Page 1
+PD2SPCompanion.Core/Saves/InventoryLayout.cs	Big Bank Page
+PD2SPCompanion.Core/Saves/InventoryLayout.cs	Big Bank Page 1
+PD2SPCompanion.Core/Saves/InventoryLayout.cs	Transmogrify Box
+PD2SPCompanion.Core/Saves/InventoryLayout.cs	Transmogrify Box Page 1
+PD2SPCompanion.Core/Saves/SaveDump.cs	  (raw {raw})
+PD2SPCompanion.Core/Saves/SaveDump.cs	  <- unexplained
+PD2SPCompanion.Core/Saves/SaveDump.cs	  [{named}, level {stat.SkillLevel}]
+PD2SPCompanion.Core/Saves/SaveDump.cs	  affixes {source}
+PD2SPCompanion.Core/Saves/SaveDump.cs	  param={param}
+PD2SPCompanion.Core/Saves/SaveDump.cs	  {name}: act {location.Act}
+PD2SPCompanion.Core/Saves/SaveDump.cs	, row {item.FileIndex}
+PD2SPCompanion.Core/Saves/SaveDump.cs	DEAD
+PD2SPCompanion.Core/Saves/SaveDump.cs	UNIDENTIFIED
+PD2SPCompanion.Core/Saves/SaveDump.cs	\n  == mercenary ({worn.Count})
+PD2SPCompanion.Core/Saves/SaveDump.cs	act bosses {stats.Andariel}/{stats.Duriel}/{stats.Mephisto}/{stats.Diablo}/{stats.Baal}; 
+PD2SPCompanion.Core/Saves/SaveDump.cs	ancients {stats.UberAncients}, dclone {stats.DiabloClone}+{stats.DiabloCloneTier2}, 
+PD2SPCompanion.Core/Saves/SaveDump.cs	auto affix {item.AutoAffixId}
+PD2SPCompanion.Core/Saves/SaveDump.cs	class {save.ClassId}
+PD2SPCompanion.Core/Saves/SaveDump.cs	equipped: {item.Location}
+PD2SPCompanion.Core/Saves/SaveDump.cs	format {format}, d2s version {save.Header.Version}, {save.Header.Filesize} bytes
+PD2SPCompanion.Core/Saves/SaveDump.cs	items ({items.Count})
+PD2SPCompanion.Core/Saves/SaveDump.cs	maps {stats.MapBosses}, dungeons {stats.DungeonBosses}, ubers {stats.UberTristram}, 
+PD2SPCompanion.Core/Saves/SaveDump.cs	no invfile
+PD2SPCompanion.Core/Saves/SaveDump.cs	personalized: {item.PlayerName}
+PD2SPCompanion.Core/Saves/SaveDump.cs	qty {item.Quantity}
+PD2SPCompanion.Core/Saves/SaveDump.cs	rare name {item.RarePrefixId}/{item.RareSuffixId}
+PD2SPCompanion.Core/Saves/SaveDump.cs	rathma {stats.Rathma}+{stats.RathmaTier2}, pvp {stats.PlayerKills}
+PD2SPCompanion.Core/Saves/SaveDump.cs	runeword {item.RunewordId}
+PD2SPCompanion.Core/Saves/SaveDump.cs	stats: played {stats.Played}, {stats.MonsterKills} kills, {stats.Deaths} deaths; 
+PD2SPCompanion.Core/Saves/SaveDump.cs	storage page {item.Page}
+PD2SPCompanion.Core/Saves/SaveDump.cs	{indent}          -- list {which}: {list.Stats.Count} properties
+PD2SPCompanion.Core/Saves/SaveDump.cs	{indent}          defense {item.Armor}
+PD2SPCompanion.Core/Saves/SaveDump.cs	{indent}          durability {item.Durability}/{item.MaxDurability}
+PD2SPCompanion.Core/Saves/SaveDump.cs	{item.NumberOfSocketedItems}/{item.TotalNumberOfSockets} sockets
+PD2SPCompanion.Core/Saves/SaveDump.cs	{item.Quality}, ilvl {item.ItemLevel}, id {item.Id}
+PD2SPCompanion.Core/Saves/SaveDump.cs	{save.Name}  -  level {save.Level} {className}
+PD2SPCompanion.Core/Saves/SaveDump.cs	{view.SpriteName} MISSING
+PD2SPCompanion.Core/Saves/SaveDump.cs	classic stash
+PD2SPCompanion.Core/Saves/SaveVerifier.cs	PARSE FAIL
+PD2SPCompanion.Core/Saves/SaveVerifier.cs	ROUND-TRIP FAIL
+PD2SPCompanion.Core/Saves/SaveWriter.cs	{name} {floor} (skill {its})
+PD2SPCompanion.Core/Saves/SaveWriter.cs	 - every number came back the same
+PD2SPCompanion.Core/Saves/SaveWriter.cs	PD2SPCompanion Backups
+PD2SPCompanion.Core/Saves/SaveWriter.cs	after writing, {statName} reads back as 
+PD2SPCompanion.Core/Saves/SaveWriter.cs	corruption {wanted} is not one this item can take. It can take: 
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} ({item.Code?.Trim()}) has no stat '{statName}'. It has: 
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} ({item.Code?.Trim()}) has nothing to roll.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} ({item.Code?.Trim()}) is a simple item and holds no properties.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} ({item.Code?.Trim()}) is already corrupted.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} ({item.Code?.Trim()}) is not corrupted.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} ({item.Code?.Trim()}) is not something the game puts properties on.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} ({item.Code?.Trim()}): added {string.Join(", ", added)}
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} ({item.Code?.Trim()}): cleaned
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} ({item.Code?.Trim()}): corrupted {chosen.Id} - {chosen.Summary}
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} ({item.Code?.Trim()}): rerolled
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} ({item.Code?.Trim()}): {statName} {before} -> {value}
+PD2SPCompanion.Core/Saves/SaveWriter.cs	item #{itemIndex} does not exist; this character has {items.Count} items (0-{items.Count - 1}).
+PD2SPCompanion.Core/Saves/SaveWriter.cs	no property has id {id}.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	nothing corrupts a {item.Code?.Trim()}.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	removed {removed} stored item(s); {list.Items.Count} left (worn and belt)
+PD2SPCompanion.Core/Saves/SaveWriter.cs	the written save does not read back with '{name}' on item #{itemIndex}.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	the written save reads back corruption {Corruptions.IdOn(back)} 
+PD2SPCompanion.Core/Saves/SaveWriter.cs	the written save still holds a stored item.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	the written save still reads as corrupted.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	this character has no item list.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	where {chosen.Id} was written.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	{(stat is null ? "missing" : stat.Value.ToString())} instead of {expected}; refusing to write.
+PD2SPCompanion.Core/Saves/SaveWriter.cs	{Path.GetFileName(path)}.*.bak
+PD2SPCompanion.Core/Saves/SaveWriter.cs	{each.Stat} removed
+PD2SPCompanion.Core/Saves/SaveWriter.cs	{name}.*.bak
+PD2SPCompanion.Core/Saves/SaveWriter.cs	{stem}-{n}.bak
+PD2SPCompanion.Core/Saves/SaveWriter.cs	{stem}.bak
+PD2SPCompanion.Core/Saves/TestCopies.cs	Saves: {saves}
+PD2SPCompanion.Core/Saves/TestCopies.cs	Vaults: {vaults}
+PD2SPCompanion.Core/Season.cs	, loose tables from {looseFirst}
+PD2SPCompanion.Core/SeasonFacts.cs	A code gone or a new stackable material: the tab's slots follow the game's stash file, so check it in game
+PD2SPCompanion.Core/SeasonFacts.cs	A moved row: an old ring keeps its FileIndex, so settle which row reads \"Kadala's Heirloom\" in game
+PD2SPCompanion.Core/SeasonFacts.cs	A wider field or other values: check desecrated amulets from the market (checklist A3)
+PD2SPCompanion.Core/SeasonFacts.cs	Add the season's charstats.txt columns at the rollover: a new install moves a character's base by this list alone
+PD2SPCompanion.Core/SeasonFacts.cs	Measure the season's rates in game; raise Version
+PD2SPCompanion.Core/SeasonFacts.cs	Check a few in game; raise Version when seeds change
+PD2SPCompanion.Core/SeasonFacts.cs	Desecration values
+PD2SPCompanion.Core/SeasonFacts.cs	Item version stamp
+PD2SPCompanion.Core/SeasonFacts.cs	Items/Materials.cs (Codes), MaterialsViewModel blocks
+PD2SPCompanion.Core/SeasonFacts.cs	Kadala's Heirloom
+PD2SPCompanion.Core/SeasonFacts.cs	Map seed starters
+PD2SPCompanion.Core/SeasonFacts.cs	Materials tab
+PD2SPCompanion.Core/SeasonFacts.cs	Names the season before: the vault and its migration follow it. None means the vault stays closed until the editor is updated
+PD2SPCompanion.Core/SeasonFacts.cs	New _se pictures in the archives (season.py B10) mean new skins: add them from the wiki's Cosmetics page
+PD2SPCompanion.Core/SeasonFacts.cs	Previous-season columns
+PD2SPCompanion.Core/SeasonFacts.cs	SeasonSnapshot.cs (KnownClassValues)
+PD2SPCompanion.Core/SeasonFacts.cs	Shell Services/Settings/MapSeedStarters.cs
+PD2SPCompanion.Core/SeasonFacts.cs	Shell Services/Settings/TradePriceStarters.cs
+PD2SPCompanion.Core/SeasonFacts.cs	Shipped class values
+PD2SPCompanion.Core/SeasonFacts.cs	Skinned uniques
+PD2SPCompanion.Core/SeasonFacts.cs	Taken from the first character of the season opened; a migration writes it
+PD2SPCompanion.Core/SeasonFacts.cs	Trade price starters
+PD2SPCompanion.Core/SeasonFacts.cs	failed: {problem.Message}
+PD2SPCompanion.Core/SeasonFacts.cs	no row \"{KadalasHeirloom.RowKey}\"
+PD2SPCompanion.Core/SeasonFacts.cs	not checked: community seeds
+PD2SPCompanion.Core/SeasonFacts.cs	not checked: market prices, set by hand
+PD2SPCompanion.Core/SeasonFacts.cs	not in the tables
+PD2SPCompanion.Core/SeasonFacts.cs	not known yet
+PD2SPCompanion.Core/SeasonFacts.cs	row {row}
+PD2SPCompanion.Core/SeasonFacts.cs	the season's snapshot (season.json ItemVersion)
+PD2SPCompanion.Core/SeasonFacts.cs	the tables' Save Bits <season> column (StatEncoding.PreviousSeason)
+PD2SPCompanion.Core/SeasonFacts.cs	{Desecrations.ForDamage} for enhanced damage, {Desecrations.ForOthers} the rest; 
+PD2SPCompanion.Core/SeasonFacts.cs	{Materials.Codes.Count} codes
+PD2SPCompanion.Core/SeasonFacts.cs	{Skins.Uniques.Count} uniques
+PD2SPCompanion.Core/SeasonFacts.cs	{StatEncoding.SaveBits(row)} bits
+PD2SPCompanion.Core/SeasonFacts.cs	{what}, all in the tables
+PD2SPCompanion.Core/SeasonFacts.cs	{what}, not in the tables: {string.Join(", ", missing)}
+PD2SPCompanion.Core/SeasonFacts.cs	Materials tab, Season 14's
+PD2SPCompanion.Core/SeasonFacts.cs	{Materials.Season14Codes.Count} codes
+PD2SPCompanion.Core/SeasonFacts.cs	A map or gem code renamed or gone: the slots are cells of the game's stash file, so read each in game from a numbered file
+PD2SPCompanion.Core/SeasonFacts.cs	Shared stash layouts
+PD2SPCompanion.Core/SeasonFacts.cs	A new VERSION in the file, or a slot this one cannot place: map the file's cells in game from a numbered file
+PD2SPCompanion.Core/SeasonFacts.cs	Corruption rolls
+PD2SPCompanion.Core/SeasonFacts.cs	{Corruptions.Thousand} on gear, {Corruptions.MapRoll} on maps; the recipes set {string.Join(", ", Corruptions.RollHeights())}
+PD2SPCompanion.Core/SeasonFacts.cs	The cube's corruptnum moved: every band reads against these tops, so check the odds on the corruption ladder
+PD2SPCompanion.Core/SeasonFacts.cs	Unidentified tail
+PD2SPCompanion.Core/SeasonFacts.cs	D2S Model/Save/Items.cs (Item.UnidentifiedTailSince)
+PD2SPCompanion.Core/SeasonFacts.cs	stamp {D2SLib.Model.Save.Item.UnidentifiedTailSince} on
+PD2SPCompanion.Core/SeasonFacts.cs	A unique or set item unidentified carries a byte more from this stamp: check an unidentified one of the new season reads back
+PD2SPCompanion.Core/SeasonFacts.cs	Shipped item stamps
+PD2SPCompanion.Core/SeasonFacts.cs	SeasonSnapshot.cs (KnownStamps)
+PD2SPCompanion.Core/SeasonFacts.cs	; none for {before}, the season before
+PD2SPCompanion.Core/SeasonFacts.cs	Add the season's stamp once it is seen: a new install reads last season's items by this list alone
+PD2SPCompanion.Core/SeasonMigration.cs	1 value kept its place in a changed range
+PD2SPCompanion.Core/SeasonMigration.cs	Disk full (test).
+PD2SPCompanion.Core/SeasonMigration.cs	Items: {Items.Count} - clean {Count(Outcome.Clean)}, adjusted {Count(Outcome.Adjusted)}, 
+PD2SPCompanion.Core/SeasonMigration.cs	Migrate {from} to {to} {(request.Hardcore ? "hardcore" : "softcore")} {name}{(request.DryRun ? " (dry run)" : "")} {DateTime.Now:yyyyMMdd-HHmmss}.txt
+PD2SPCompanion.Core/SeasonMigration.cs	Migrated - check these
+PD2SPCompanion.Core/SeasonMigration.cs	No snapshot of {from}'s tables was kept, and {to}'s tables can only read 
+PD2SPCompanion.Core/SeasonMigration.cs	Not migrated (still in the old season's vault):
+PD2SPCompanion.Core/SeasonMigration.cs	The {to} vault \"{request.Name}\" was there already: added to, backed up first ({Path.GetFileName(there.BackUp("before-migration"))}).
+PD2SPCompanion.Core/SeasonMigration.cs	To check (in \"{ReviewFolder}\"):
+PD2SPCompanion.Core/SeasonMigration.cs	Values keep their place in their range (the old season's tables were read).
+PD2SPCompanion.Core/SeasonMigration.cs	Values kept as numbers: no snapshot of the old season's tables to read its ranges from.
+PD2SPCompanion.Core/SeasonMigration.cs	Vault gold: {Gold:N0}.
+PD2SPCompanion.Core/SeasonMigration.cs	cannot be carried
+PD2SPCompanion.Core/SeasonMigration.cs	collection-{items.Count}-{Guid.NewGuid():N}.pd2lib
+PD2SPCompanion.Core/SeasonMigration.cs	migrating-{from}-{DateTime.Now:yyyyMMdd-HHmmss}
+PD2SPCompanion.Core/SeasonMigration.cs	not a property this season has
+PD2SPCompanion.Core/SeasonMigration.cs	not written: {refused}
+PD2SPCompanion.Core/SeasonMigration.cs	this season holds
+PD2SPCompanion.Core/SeasonMigration.cs	to check {Count(Outcome.Review)} (in \"{ReviewFolder}\"), not migrated {Count(Outcome.Failed)}
+PD2SPCompanion.Core/SeasonMigration.cs	to check {report.Count(Outcome.Review)}, not migrated {report.Count(Outcome.Failed)}; report {path}
+PD2SPCompanion.Core/SeasonMigration.cs	would not read
+PD2SPCompanion.Core/SeasonMigration.cs	would not read: {problem.Message}
+PD2SPCompanion.Core/SeasonMigration.cs	would not write: {refused}
+PD2SPCompanion.Core/SeasonMigration.cs	would not write: {unwritten}
+PD2SPCompanion.Core/SeasonMigration.cs	{(D2SLib.Model.TXT.StatEncoding.PreviousSeason is { Length: > 0 } previous ? previous : "no older season")}'s items.
+PD2SPCompanion.Core/SeasonMigration.cs	{(DryRun ? "Dry run - nothing written. " : "")}Migrate {From} to {To}, {(Hardcore ? "hardcore" : "softcore")} vault \"{Vault}\", {DateTimeOffset.Now:yyyy-MM-dd HH:mm}
+PD2SPCompanion.Core/SeasonMigration.cs	{from} has no {(request.Hardcore ? "hardcore" : "softcore")} vault \"{name}\" to migrate.
+PD2SPCompanion.Core/SeasonMigration.cs	{from} was migrated to {to} already.
+PD2SPCompanion.Core/SeasonMigration.cs	{moved} values kept their place in changed ranges
+PD2SPCompanion.Core/SeasonMigration.cs	{report.Items.Count} items, clean {report.Count(Outcome.Clean)}, adjusted {report.Count(Outcome.Adjusted)}, 
+PD2SPCompanion.Core/SeasonSnapshot.cs	unknown-{season.Build}
+PD2SPCompanion.Core/Storage/EditorData.cs	.write-{Guid.NewGuid():N}
+PD2SPCompanion.Core/Storage/EditorData.cs	Data
+PD2SPCompanion.Core/Storage/EditorData.cs	Logs
+PD2SPCompanion.Core/Storage/EditorData.cs	Project Diablo II Single Player Companion cannot write its data folder:\n{root}\n\n
+PD2SPCompanion.Core/Storage/EditorData.cs	Reports
+PD2SPCompanion.Core/Storage/EditorData.cs	Require a writable folder for the editor (not Program Files).
+PD2SPCompanion.Core/Storage/EditorData.cs	Seasons
+PD2SPCompanion.Core/Storage/EditorData.cs	Vaults
+PD2SPCompanion.Core/Testbed/CowPortalOverride.cs	Tome of Identify + Tome of Town Portal
+PD2SPCompanion.Core/Testbed/CowPortalOverride.cs	cubemain.txt already has this recipe.
+PD2SPCompanion.Core/Testbed/CowPortalOverride.cs	cubemain.txt has no '{column}' column.
+PD2SPCompanion.Core/Testbed/CowPortalOverride.cs	cubemain.txt has no cow portal recipe to copy.
+PD2SPCompanion.Core/Testbed/CowPortalOverride.cs	input 1
+PD2SPCompanion.Core/Testbed/CowPortalOverride.cs	input 2
+PD2SPCompanion.Core/Testbed/CowPortalOverride.cs	tome + tome -> portal to cow lvl (PD2SPCompanion)
+PD2SPCompanion.Core/Testbed/DaggerTest.cs	Scroll of Identify -> magic Dagger, item level 99
+PD2SPCompanion.Core/Testbed/DaggerTest.cs	cubemain.txt has no '{column}' column.
+PD2SPCompanion.Core/Testbed/DaggerTest.cs	input 1
+PD2SPCompanion.Core/Testbed/DaggerTest.cs	scroll of identify -> magic dagger ilvl 99 (PD2SPCompanion test)
+PD2SPCompanion.Core/Testbed/DensityInstaller.cs	{file.Table}.txt
+PD2SPCompanion.Core/Testbed/DensityInstaller.cs	{table}.txt
+PD2SPCompanion.Core/Testbed/DensityOverride.cs	'{table}.txt' is not in any archive.
+PD2SPCompanion.Core/Testbed/DensityOverride.cs	Id
+PD2SPCompanion.Core/Testbed/DensityOverride.cs	levels.txt has no Id or MonLvl3Ex column.
+PD2SPCompanion.Core/Testbed/DensityOverride.cs	levels.txt has no MonDen columns.
+PD2SPCompanion.Core/Testbed/DensityOverride.cs	monstats.txt has no MinGrp/MaxGrp columns.
+PD2SPCompanion.Core/Testbed/DensityOverride.cs	values left alone)
+PD2SPCompanion.Core/Testbed/DensityOverride.cs	{Scaled} density values scaled ({Clamped} hit the cap, {Skipped} preset or town 
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	Key
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	Scroll of Identify
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	Scroll of Town Portal
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	amulet + ingredient -> desecrated {value} (PD2SPCompanion test)
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	cubemain.txt has no '{column}' column.
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	input 1
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	input 2
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	mod 1
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	mod 1 chance
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	mod 1 max
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	mod 1 min
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	mod 2
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	mod 2 chance
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	mod 2 max
+PD2SPCompanion.Core/Testbed/DesecrationTest.cs	mod 2 min
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Act 5 (H) Good
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Act 5 (N) Good
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Act 5 Good
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	All
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Andariel
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Baal
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Chipped Gem
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Corrupted Zone
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Corrupted Zone T1 Maps
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Countess Item (H)
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Demonic Cube
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Diablo
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Flawed Gem
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Flawless Gem
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Horadric ID Book
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Horadric TP Book
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Item{n}
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Larzuk Puzzlebox
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Larzuk Puzzlepiece
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Lillith Mirror
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Mephisto
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Nihlathak (H)
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Perfect Gem
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Picks
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Prob{n}
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Rathma Jawbone
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Set
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Summoner (H)
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Treasure Class
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Treasure Fallen H
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Treasure Fallen N
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Treasure Fallen NM
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Unique
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Unique Map MapBoss
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Unique Map Monsters
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	Vial of Lightsong
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	^(Act [1-5]( \((N|H)\))? Good|Map Good t[1-3])$
+PD2SPCompanion.Core/Testbed/DropBoosts.cs	^Runes [0-9]+( equiv)?$
+PD2SPCompanion.Core/Testbed/DropOverride.cs	Item{n}
+PD2SPCompanion.Core/Testbed/DropOverride.cs	Picks
+PD2SPCompanion.Core/Testbed/DropOverride.cs	Prob{n}
+PD2SPCompanion.Core/Testbed/DropOverride.cs	Set
+PD2SPCompanion.Core/Testbed/DropOverride.cs	Treasure Class
+PD2SPCompanion.Core/Testbed/DropOverride.cs	Unique
+PD2SPCompanion.Core/Testbed/DropOverride.cs	treasureclassex.txt has no Treasure Class, Picks or NoDrop column.
+PD2SPCompanion.Core/Testbed/DropOverride.cs	{EveryKill} kill classes always drop, {Materials} material weights and {HighRunes} high rune weights raised, 
+PD2SPCompanion.Core/Testbed/DropOverride.cs	{Specials} special item chances raised
+PD2SPCompanion.Core/Trade/ArmoryImport.cs	Equipped
+PD2SPCompanion.Core/Trade/ArmoryImport.cs	Failed to parse character
+PD2SPCompanion.Core/Trade/ArmoryImport.cs	PD2 site
+PD2SPCompanion.Core/Trade/ArmoryImport.cs	https://api.projectdiablo2.com/game/character/{Uri.EscapeDataString(name)}
+PD2SPCompanion.Core/Trade/ArmoryImport.cs	trade site
+PD2SPCompanion.Core/Trade/GameClipboard.Write.cs	Crafted
+PD2SPCompanion.Core/Trade/GameClipboard.Write.cs	Low Quality
+PD2SPCompanion.Core/Trade/GameClipboard.Write.cs	Magic
+PD2SPCompanion.Core/Trade/GameClipboard.Write.cs	Normal
+PD2SPCompanion.Core/Trade/GameClipboard.Write.cs	Rare
+PD2SPCompanion.Core/Trade/GameClipboard.Write.cs	Set
+PD2SPCompanion.Core/Trade/GameClipboard.Write.cs	Stash
+PD2SPCompanion.Core/Trade/GameClipboard.Write.cs	Superior
+PD2SPCompanion.Core/Trade/GameClipboard.Write.cs	Unique
+PD2SPCompanion.Core/Trade/GameClipboard.cs	% Enhanced Damage
+PD2SPCompanion.Core/Trade/GameClipboard.cs	Encode
+PD2SPCompanion.Core/Trade/GameClipboard.cs	Skill Levels
+PD2SPCompanion.Core/Trade/GameClipboard.cs	left off: {(name.Length > 0 ? name : skill)}
+PD2SPCompanion.Core/Trade/GameClipboard.cs	left off: {name} (stat {id})
+PD2SPCompanion.Core/Trade/GameClipboard.cs	low quality
+PD2SPCompanion.Core/Trade/GameClipboard.cs	no base called {type}
+PD2SPCompanion.Core/Trade/GameClipboard.cs	no runeword called {wordName} this season
+PD2SPCompanion.Core/Trade/GameClipboard.cs	no {quality.ToString().ToLowerInvariant()} called {name} this season
+PD2SPCompanion.Core/Trade/GameClipboard.cs	on a {ItemPresenter.BaseName(code)}, not its own base
+PD2SPCompanion.Core/Trade/GameClipboard.cs	on attack
+PD2SPCompanion.Core/Trade/GameClipboard.cs	on striking
+PD2SPCompanion.Core/Trade/GameClipboard.cs	socketed {kind} not known
+PD2SPCompanion.Core/Trade/GameClipboard.cs	the game's text keeps one \"Monsters have\" line of a map and drops the rest
+PD2SPCompanion.Core/Trade/GameClipboard.cs	to Strength
+PD2SPCompanion.Core/Trade/GameClipboard.cs	when struck
+PD2SPCompanion.Core/Trade/GameClipboard.cs	when you Die
+PD2SPCompanion.Core/Trade/GameClipboard.cs	when you Kill an Enemy
+PD2SPCompanion.Core/Trade/GameClipboard.cs	when you Level-Up
+PD2SPCompanion.Core/Trade/GameClipboard.cs	{StatText.Describe(each.Stat, each.Value) ?? each.Stat}: not in the game's text, put back at its best
+PD2SPCompanion.Core/Trade/GameClipboard.cs	{StatText.Describe(each.Stat, each.Value) ?? each.Stat}: not in the game's text, put back at {own.Name}'s best
+PD2SPCompanion.Core/Trade/GameClipboard.cs	{StatText.Describe(left, stat.Value) ?? left}: not in the game's text, left at its best
+PD2SPCompanion.Core/Trade/TradeGate.cs	 (it asked for {wait.TotalSeconds:0} s)
+PD2SPCompanion.Core/Trade/TradeGate.cs	PD2SPCompanion/{AppVersion.Number}
+PD2SPCompanion.Core/Trade/TradeItems.cs	Encode
+PD2SPCompanion.Core/Trade/TradeItems.cs	item level {best}, the listing's {listed} being the site's own
+PD2SPCompanion.Core/Trade/TradeItems.cs	its affixes could not be told from the listing
+PD2SPCompanion.Core/Trade/TradeItems.cs	left off: {label}
+PD2SPCompanion.Core/Trade/TradeItems.cs	named {AffixNames.NameFrom(item.RarePrefixId, item.RareSuffixId)}, the listing giving no name
+PD2SPCompanion.Core/Trade/TradeItems.cs	no magic affixes named {name}
+PD2SPCompanion.Core/Trade/TradeItems.cs	no rare name {name}
+PD2SPCompanion.Core/Trade/TradeItems.cs	no table row: 
+PD2SPCompanion.Core/Trade/TradeItems.cs	taken by its base: 
+PD2SPCompanion.Core/Trade/TradeItems.cs	{NotThisSeason}no {item.Quality.ToString().ToLowerInvariant()} called {name} on this base
+PD2SPCompanion.Core/Trade/TradeItems.cs	{NotThisSeason}no runeword this season matches its runes
+PD2SPCompanion.Core/Trade/TradeItems.cs	{NotThisSeason}nothing says which properties are the runeword's
+PD2SPCompanion.Core/Trade/TradeItems.cs	{fit.Name} in prefix slot {slot + 1}, for its {sockets} sockets - the listing names no socket prefix
+PD2SPCompanion.Core/Trade/TradeItems.cs	{same.Stat} came out at {same.Value} once the sockets were taken off
+PD2SPCompanion.Core/Trade/TradeItems.cs	{sockets} sockets, and no room for the socket prefix that would explain them
+PD2SPCompanion.Core/Trade/TradeItems.cs	{sockets} sockets, and no socket prefix this item could roll gives them
+PD2SPCompanion.Core/Trade/TradeListings.cs	https://api.projectdiablo2.com/market/listing?_id={id}
+PD2SPCompanion.Core/Trade/TradeListings.cs	{id}.json
+PD2SPCompanion.Core/Trade/TradeSearch.cs	Crafted
+PD2SPCompanion.Core/Trade/TradeSearch.cs	Low quality
+PD2SPCompanion.Core/Trade/TradeSearch.cs	Magic
+PD2SPCompanion.Core/Trade/TradeSearch.cs	Normal
+PD2SPCompanion.Core/Trade/TradeSearch.cs	Rare
+PD2SPCompanion.Core/Trade/TradeSearch.cs	Runeword
+PD2SPCompanion.Core/Trade/TradeSearch.cs	Set
+PD2SPCompanion.Core/Trade/TradeSearch.cs	Superior
+PD2SPCompanion.Core/Trade/TradeSearch.cs	Trade site answer unreadable.
+PD2SPCompanion.Core/Trade/TradeSearch.cs	Unique
+PD2SPCompanion.Core/Trade/TradeSearch.cs	item.base.type_code[$in][{at++}]
+PD2SPCompanion.Core/Trade/TradeSearch.cs	item.modifiers[$all][{row++}][$elemMatch]
+PD2SPCompanion.Core/Trade/TradeSearch.cs	{each}[name]
+PD2SPCompanion.Core/Trade/TradeSearch.cs	{each}[name][$regex]
+PD2SPCompanion.Core/Trade/TradeSearch.cs	{each}[values.{at}]
+PD2SPCompanion.Core/Trade/TradeSearch.cs	{each}[values.{valueAt}][$gte]
+PD2SPCompanion.Core/Trade/TradeSearch.cs	{each}[values.{valueAt}][$lte]
+PD2SPCompanion.Shell.Desktop/Program.cs	; TEST COPY
+PD2SPCompanion.Shell.Desktop/Program.cs	{AppName} {version}; {RuntimeInformation.OSDescription}; .NET {Environment.Version}
+PD2SPCompanion.Shell/App.axaml.cs	The main window could not be built; the editor log says why.
+PD2SPCompanion.Shell/CustomControls/Base/CrumbPanel.cs	[Text] Muted
+PD2SPCompanion.Shell/CustomControls/Base/CrumbPanel.cs	[Type] Body
+PD2SPCompanion.Shell/CustomControls/Base/Input/DragPick.cs	[Brush] Selection - Current
+PD2SPCompanion.Shell/CustomControls/Base/Input/DragPick.cs	[UI] GradBrush - Frame - Golden#02
+PD2SPCompanion.Shell/CustomControls/Base/Input/ListKeys.cs	Into
+PD2SPCompanion.Shell/CustomControls/Base/Input/NavigationKeys.cs	Logo
+PD2SPCompanion.Shell/CustomControls/Base/KeepInView.cs	When
+PD2SPCompanion.Shell/CustomControls/Base/OverflowRow.cs	Leaves
+PD2SPCompanion.Shell/CustomControls/Base/PageRowsHost.cs	[Brush] Frame - Golden Dim
+PD2SPCompanion.Shell/CustomControls/Base/PagesMinimap.cs	[Brush] Button - Primary Hover Edge
+PD2SPCompanion.Shell/CustomControls/Base/PagesMinimap.cs	[Brush] Frame - Golden Dim
+PD2SPCompanion.Shell/CustomControls/Base/RollButton.cs	[Glyph] Dice
+PD2SPCompanion.Shell/CustomControls/Base/SearchBox.cs	[Glyph] Close
+PD2SPCompanion.Shell/CustomControls/Base/SearchBox.cs	[Glyph] Magnifier
+PD2SPCompanion.Shell/CustomControls/Base/TileLayerPeer.cs	Button
+PD2SPCompanion.Shell/CustomControls/Base/TileLayerPeer.cs	Tile
+PD2SPCompanion.Shell/CustomControls/Base/TrimmedTip.cs	Always
+PD2SPCompanion.Shell/CustomControls/Base/TrimmedTip.cs	Tip
+PD2SPCompanion.Shell/CustomControls/Third-Party/MainWindow_HeaderBars/Windows_HeaderBars.axaml.cs	Close
+PD2SPCompanion.Shell/CustomControls/Third-Party/MainWindow_HeaderBars/Windows_HeaderBars.axaml.cs	Maximize
+PD2SPCompanion.Shell/CustomControls/Third-Party/MainWindow_HeaderBars/Windows_HeaderBars.axaml.cs	Minimize
+PD2SPCompanion.Shell/CustomControls/Third-Party/MainWindow_HeaderBars/Windows_HeaderBars.axaml.cs	Restore
+PD2SPCompanion.Shell/Helper/ClickThroughTips.cs	Enabled
+PD2SPCompanion.Shell/Helper/KeyedTips.cs	Enabled
+PD2SPCompanion.Shell/Helper/ViewLocator/MainViewPage_ViewLocator.cs	View
+PD2SPCompanion.Shell/Helper/Win11Frame.cs	Window reveal
+PD2SPCompanion.Shell/Imaging/FrontEndArt.cs	[Art] D2 Logo
+PD2SPCompanion.Shell/Imaging/FrontEndArt.cs	[Art] D2 Logo Burning
+PD2SPCompanion.Shell/Imaging/FrontEndArt.cs	[Art] Frame Corner
+PD2SPCompanion.Shell/Imaging/FrontEndArt.cs	[Art] Frame Ornament
+PD2SPCompanion.Shell/Imaging/FrontEndArt.cs	[UI] ImageBrush - Background#1
+PD2SPCompanion.Shell/Imaging/FrontEndArt.cs	[UI] ImageBrush - Background#2
+PD2SPCompanion.Shell/Imaging/FrontEndArt.cs	[UI] ImageBrush - SubFrame_Bar#1
+PD2SPCompanion.Shell/Imaging/FrontEndArt.cs	[UI] ImageBrush - SubFrame_Border#1 - {side}
+PD2SPCompanion.Shell/Services/Character/CharacterSession.Corpse.cs	Corpse
+PD2SPCompanion.Shell/Services/Character/CharacterSession.Items.cs	Cube
+PD2SPCompanion.Shell/Services/Character/CharacterSession.Items.cs	Inventory
+PD2SPCompanion.Shell/Services/Character/CharacterSession.Items.cs	Stash
+PD2SPCompanion.Shell/Services/Character/CharacterSession.Tiles.cs	Belt
+PD2SPCompanion.Shell/Services/Character/CharacterSession.cs	Save
+PD2SPCompanion.Shell/Services/Character/CharacterSession.cs	item:{System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(tile.Item)}
+PD2SPCompanion.Shell/Services/Character/CharacterSession.cs	right strip
+PD2SPCompanion.Shell/Services/Character/ItemLanding.cs	Cube
+PD2SPCompanion.Shell/Services/Character/ItemLanding.cs	Inventory
+PD2SPCompanion.Shell/Services/Character/ItemLanding.cs	Stash
+PD2SPCompanion.Shell/Services/Character/SharedStashSession.cs	{FileName}.{moment}.bak
+PD2SPCompanion.Shell/Services/Generic/Messages/MessageLog.cs	Cannot
+PD2SPCompanion.Shell/Services/Generic/Messages/MessageLog.cs	No free space
+PD2SPCompanion.Shell/Services/Generic/Messages/MessageLog.cs	Not 
+PD2SPCompanion.Shell/Services/Generic/Messages/MessageLog.cs	Refused
+PD2SPCompanion.Shell/Services/Generic/Messages/MessageLog.cs	Require
+PD2SPCompanion.Shell/Services/Generic/Messages/MessageLog.cs	not found.
+PD2SPCompanion.Shell/Services/Settings/EditorSettings.cs	character:{newName}:
+PD2SPCompanion.Shell/Services/Settings/EditorSettings.cs	character:{oldName}:
+PD2SPCompanion.Shell/Services/Settings/PlayPolicy.cs	Casual
+PD2SPCompanion.Shell/Services/Settings/PlayPolicy.cs	Custom
+PD2SPCompanion.Shell/Services/Settings/PlayPolicy.cs	Free
+PD2SPCompanion.Shell/Services/Settings/PlayPolicy.cs	Legit
+PD2SPCompanion.Shell/Services/Settings/TitleFont.cs	Cinzel
+PD2SPCompanion.Shell/Services/Settings/TitleFont.cs	Fonts
+PD2SPCompanion.Shell/Services/Vault/InventorySearch.cs	Stored
+PD2SPCompanion.Shell/Services/Vault/VaultEditHost.cs	vault:{_key}
+PD2SPCompanion.Shell/Services/Vault/VaultFilter.cs	Not used
+PD2SPCompanion.Shell/Services/Vault/VaultPlayMode.cs	{name} (OLD {n})
+PD2SPCompanion.Shell/Services/Vault/VaultPlayMode.cs	{name} (OLD)
+PD2SPCompanion.Shell/Services/Vault/VaultService.cs	{merged.Items} items, {merged.Failed} not read; before: {merged.Backup}; the files: {merged.Retired}
+PD2SPCompanion.Shell/ViewModels/Characters/CharacterCard.cs	[Brush] Rarity - Broken items
+PD2SPCompanion.Shell/ViewModels/Characters/CharacterCard.cs	[Brush] Rarity - Set items
+PD2SPCompanion.Shell/ViewModels/Items/FindingRow.cs	[Text] Danger
+PD2SPCompanion.Shell/ViewModels/Items/FindingRow.cs	[Text] Warning
+PD2SPCompanion.Shell/ViewModels/Items/ItemTileViewModel.cs	Not a vault item.
+PD2SPCompanion.Shell/ViewModels/Items/RarityPalette.cs	Rarity - 
+PD2SPCompanion.Shell/ViewModels/Items/RarityPalette.cs	Rarity Wash - 
+PD2SPCompanion.Shell/ViewModels/Items/RarityPalette.cs	[Brush] Rarity - Crafted items
+PD2SPCompanion.Shell/ViewModels/Items/RarityPalette.cs	[Brush] Rarity - Magic items
+PD2SPCompanion.Shell/ViewModels/Items/RarityPalette.cs	[Brush] Rarity - Normal items
+PD2SPCompanion.Shell/ViewModels/Items/RarityPalette.cs	[Brush] Rarity - Rare items
+PD2SPCompanion.Shell/ViewModels/Items/RarityPalette.cs	[Brush] Rarity - Set items
+PD2SPCompanion.Shell/ViewModels/Items/RarityPalette.cs	[Brush] Rarity - Unique items
+PD2SPCompanion.Shell/ViewModels/MainPages/Char/MapSeedViewModel.cs	Added
+PD2SPCompanion.Shell/ViewModels/MainPages/Char/MapSeedViewModel.cs	Seed
+PD2SPCompanion.Shell/ViewModels/MainPages/Experimental/DropPanelViewModel.cs	Added
+PD2SPCompanion.Shell/ViewModels/MainPages/Experimental/DropPanelViewModel.cs	All
+PD2SPCompanion.Shell/ViewModels/MainPages/Experimental/DropPanelViewModel.cs	^Act (?<act>[1-5])( \((?<difficulty>N|H)\))? Good$
+PD2SPCompanion.Shell/ViewModels/MainPages/Experimental/VP_ViewModel_Experimental_L.cs	-3dfx -direct -txt
+PD2SPCompanion.Shell/ViewModels/MainPages/Experimental/VP_ViewModel_Experimental_L.cs	PD2 - Modded SP.lnk
+PD2SPCompanion.Shell/ViewModels/MainPages/Extra/VP_ViewModel_Extra_R.cs	Hardcore
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/CharacterSheetViewModel.cs	Lesser 
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/CharacterSheetViewModel.cs	[Text] Body
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/CharacterSheetViewModel.cs	[Text] Muted
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/CharacterSheetViewModel.cs	{value} ({(row.Hits is { } hits ? string.Join("|", hits[at]) : taken)})
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/MaterialsViewModel.cs	Materials
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.Search.cs	Containers
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.Store.cs	Containers
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.Store.cs	Inventory
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.cs	Containers
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.cs	Cube
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.cs	Inventory
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.cs	Materials
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.cs	Personal Stash
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.cs	Shared Stash
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.cs	Stash
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.cs	character:{name}:{page}
+PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.cs	shared:{Stash.FileName}:{page.Name}
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/PlayModeViewModel.cs	Added
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	  not read: {problem.Message}
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	  {part.Name}: {held.Length} files, {held.Sum(file => file.Length) / 1024} KB
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	.NET: {Environment.Version}
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	/select,\"{SmartSort.FilePath}\"
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	/select,\"{path}\"
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	Automatic
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	Character open: {(Session.IsLoaded ? "yes" : "no")}
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	Data folder: {DataFolder}
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	Game: {(GameFolderVersion.Length > 0 ? GameFolderVersion : "not read")}
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	Language: {Settings.Language}
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	Play mode: {Settings.PlayMode}
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	Report made: {DateTime.Now:yyyy-MM-dd HH:mm:ss}
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	UI scale: {scale}, in force {inForce:0.###}
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	Windows: {Environment.OSVersion.VersionString}
+PD2SPCompanion.Shell/ViewModels/MainPages/Settings/VP_ViewModel_Settings_L.cs	pd2spc-report-{Guid.NewGuid():N}.pd2lib
+PD2SPCompanion.Shell/ViewModels/MainPages/Trade/VP_ViewModel_Trade.cs	; back {back}
+PD2SPCompanion.Shell/ViewModels/MainPages/Trade/VP_ViewModel_Trade.cs	left off
+PD2SPCompanion.Shell/ViewModels/MainPages/Trade/VP_ViewModel_Trade.cs	left off: 
+PD2SPCompanion.Shell/ViewModels/MainPages/Trade/VP_ViewModel_Trade.cs	received {received}
+PD2SPCompanion.Shell/ViewModels/MainPages/Trade/VP_ViewModel_Trade.cs	yyyy-MM-dd HH:mm
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/ForgeViewModel.cs	not in the game's text
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/GrailViewModel.cs	Count
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/GrailViewModel.cs	Found
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/GrailViewModel.cs	Grail
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/GrailViewModel.cs	Name
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/GrailViewModel.cs	Rune
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/GrailViewModel.cs	Runewords
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/GrailViewModel.cs	Sets
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/GrailViewModel.cs	Socketed (
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/GrailViewModel.cs	Uniques
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_L.Pages.cs	Name
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_L.Pages.cs	Vault
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_L.Twin.cs	Left
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_L.Twin.cs	Right
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_L.cs	Move
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_L.cs	Name
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_L.cs	Vault
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_R.cs	Edit
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_R.cs	Forge
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_R.cs	Grail
+PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_R.cs	Search
+PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	Char
+PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	Edit
+PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	Experimental
+PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	Extra
+PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	Forge
+PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	Grail
+PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	Inventory
+PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	Search
+PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	Settings
+PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	Trade
+PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	Vault
+PD2SPCompanion.Shell/ViewModels/Shared/PickMenu.cs	Invert selection
+PD2SPCompanion.Shell/ViewModels/Shared/PickMenu.cs	Select all
+PD2SPCompanion.Shell/ViewModels/Shared/PickMenu.cs	Select none
+PD2SPCompanion.Shell/Views/Views/MainPages/Char/VP_View_Char_L.axaml.cs	level down
+PD2SPCompanion.Shell/Views/Views/MainPages/Char/VP_View_Char_L.axaml.cs	level up
+PD2SPCompanion.Shell/Views/Views/MainPages/Char/VP_View_Char_R.axaml.cs	add points
+PD2SPCompanion.Shell/Views/Views/MainPages/Char/VP_View_Char_R.axaml.cs	remove points
+PD2SPCompanion.Shell/Views/Views/MainPages/Char/VP_View_Char_R.axaml.cs	skill in
+PD2SPCompanion.Shell/Views/Views/MainPages/Char/VP_View_Char_R.axaml.cs	skill out
+PD2SPCompanion.Shell/Views/Views/MainPages/Experimental/DropPanel.axaml.cs	rate down
+PD2SPCompanion.Shell/Views/Views/MainPages/Experimental/DropPanel.axaml.cs	rate up
+PD2SPCompanion.Shell/Views/Views/MainPages/Experimental/VP_View_Experimental_R.axaml.cs	level down
+PD2SPCompanion.Shell/Views/Views/MainPages/Experimental/VP_View_Experimental_R.axaml.cs	level up
+PD2SPCompanion.Shell/Views/Views/MainView.axaml.cs	Char
+PD2SPCompanion.Shell/Views/Views/MainView.axaml.cs	Experimental
+PD2SPCompanion.Shell/Views/Views/MainView.axaml.cs	Extra
+PD2SPCompanion.Shell/Views/Views/MainView.axaml.cs	Inventory
+PD2SPCompanion.Shell/Views/Views/MainView.axaml.cs	Settings
+PD2SPCompanion.Shell/Views/Windows/MainWindow.axaml.cs	Box
+PD2SPCompanion.Shell/Views/Windows/SplashWindow.axaml.cs	Offset
+PD2SPCompanion.Core/Collection/SmartSort.cs	ItemDisplay[CHARM STAT188>0]: Charms/Skillers/%CLASS%
+PD2SPCompanion.Core/Collection/SmartSort.cs	ItemDisplay[CHARM STAT188>0]: Charms/Skillers/%CLASS%/%SKILLTAB%
+PD2SPCompanion.Core/Collection/SmartSort.cs	SKILLTAB
+PD2SPCompanion.Core/Collection/SmartSort.cs	\n        // Project Diablo II Single Player Companion smart sort\n        //\n        // Written as PD2's loot filter writes its conditions: a rule is\n        //     ItemDisplay[conditions]: Folder/Subfolder\n        // and the first rule whose conditions fit the item picks its folder - where the filter would show\n        // the item's name, the folder goes. An item no rule takes goes to Unsorted.\n        //\n        // Ctrl + Store stores sorted. Shift + Store stores a magic or rare item a craft recipe takes as a\n        // crafting base: the rules are asked with CRAFTBASE true. Plain Store puts it in the folder you have open.\n        //\n        // Edit this file in any text editor; the companion reads it again the next time you store.\n        // smart-sort.default.filter beside it is the original, rewritten every time the companion starts.\n        // Delete this file to go back to it.\n        //\n        // Conditions, as in the filter (several side by side must all fit; OR, ! and brackets as there):\n        //   quality    UNI SET RW CRAFT RARE MAG SUP INF NMAG (normal, superior or inferior)  ETH ID GEMMED\n        //   tier       NORM EXC ELT\n        //   type       HELM CHEST SHIELD GLOVES BOOTS BELT CIRC ARMOR  JEWELRY CHARM QUIVER MISC\n        //              WEAPON AXE MACE CLUB HAMMER SWORD DAGGER THROWING JAV SPEAR POLEARM BOW XBOW\n        //              STAFF WAND SCEPTER 1H 2H\n        //              a type takes the types under it in the game's own tree: HELM takes circlets,\n        //              barbarian helms and druid pelts; SHIELD paladin shields and necromancer heads\n        //   class      DRU BAR DIN NEC SIN SOR ZON, CLASS for any of them\n        //   base code  the game's own: amu rin jew cm1 cm2 cm3 6bs r33 ...\n        //   numbers    SOCK ILVL ALVL QLVL DEF ED EDEF EDAM MAXDUR AR ARPER RES FRES CRES LRES PRES\n        //              FRW IAS FCR FHR FBR STR DEX LIFE MANA MFIND GFIND MAEK DTM REPLIFE REPAIR QTY\n        //              RUNE (El 1 to Zod 33)  GEM (chipped 1 to perfect 5)  MAPTIER  PREFIX SUFFIX AUTOMOD\n        //              STATn (a stat by its number)  SKn OSn CLSKn TABSKn (skills)\n        //              compared with < > = or a range ~ (ILVL~80-82), added with + (FRES+CRES>40)\n        //   CRAFTBASE  the item is being stored as a crafting base (Shift + Store)\n        // What the filter asks of where an item lies or who holds it (GROUND, SHOP, CLVL ...) means\n        // nothing in the vault, and the line is said to be wrong.\n        //\n        // A folder can name a fact of the item:\n        //   %SLOT%      Helms, Chests, Shields, Gloves, Boots, Belts, Amulets, Rings, Weapons,\n        //               Quivers, Charms, Jewels, Runes, Gems, Maps, Other\n        //   %WEAPON%    Axes, Maces, Swords, Daggers, Throwing, Spears, Polearms, Bows, Crossbows,\n        //               Staves, Wands, Scepters, Class Weapons ...\n        //   %CLASS%     the class a base is made for, or whose skill tree it raises\n        //   %SKILLTAB%  the skill tree it raises: Javelin and Spear Skills, Warcries ...\n        //   %SET%       the set's name        %SETGROUP%  its group below\n        //   %CRAFT%     a crafted item's recipe family, or "Unknown recipe"\n        //   %MAPTIER%   Tier 1 to Tier 5, Uber\n        //   %TIER%      Normal, Exceptional, Elite        %SIZE%  Small, Large, Grand\n        //   %QUALITY%   Unique, Set, Runeword, Crafted, Rare, Magic, Superior, Normal ...\n        //   %NAME% %BASENAME% %CODE% %ILVL% %SOCKETS%\n        // A rule whose folder names a fact the item does not have is skipped for it.\n        //\n        // A folder the sorter makes remembers what it is for. Rename it or move it and items\n        // still go to it; delete it and the next one makes it again. Items already stored are\n        // never moved.\n\n        // The sets' groups, as the PD2 wiki has them, by the names the game shows. A set not named here goes to\n        // Class-Focused when one of its pieces is a class item, and to Uncommon otherwise.\n        SetGroup[Common]: Arctic Gear, Hsarus' Defense, Berserker's Arsenal, Cleglaw's Brace, Infernal Tools, Death's Disguise, Sigon's Complete Steel, Isenhart's Armory, Civerb's Vestments, Cathan's Traps, Angelic Raiment, Vidala's Rig, Arcanna's Tricks, Iratha's Finery, Milabrega's Regalia, Tancred's Battlegear\n        SetGroup[Uncommon]: Cow King's Leathers, Sander's Folly, Hwanin's Majesty, Orphan's Call, The Disciple, Naj's Ancient Vestige, Sazabi's Grand Tribute, Heaven's Brethren, Bul-Kathos' Children\n        SetGroup[Class-Focused]: Aldur's Watchtower, Griswold's Legacy, Immortal King, M'avina's Battle Hymn, Natalya's Odium, Tal Rasha's Wrappings, Trang-Oul's Avatar\n\n        // Shift + Store: crafting bases.\n        ItemDisplay[CRAFTBASE]: Crafting Bases/%SLOT%\n\n        ItemDisplay[SET]: Sets/%SETGROUP%/%SET%\n\n        ItemDisplay[RW HELM]: Runewords/Helms\n        ItemDisplay[RW CHEST]: Runewords/Chests\n        ItemDisplay[RW SHIELD]: Runewords/Shields\n        ItemDisplay[RW QUIVER]: Runewords/Quivers\n        ItemDisplay[RW]: Runewords/Weapons\n\n        ItemDisplay[MAPTIER>0]: Maps/%MAPTIER%\n\n        ItemDisplay[CHARM UNI]: Charms/Unique\n        ItemDisplay[CHARM STAT188>0]: Charms/Skillers/%CLASS%/%SKILLTAB%\n        ItemDisplay[CHARM]: Charms/%SIZE%\n\n        // Amulets are jewelry that is no ring: amu, and the few uniques on bases of their own.\n        ItemDisplay[rin UNI]: Rings/Unique\n        ItemDisplay[rin CRAFT]: Rings/Crafted/%CRAFT%\n        ItemDisplay[rin RARE]: Rings/Rare\n        ItemDisplay[rin MAG]: Rings/Magic\n        ItemDisplay[JEWELRY !rin UNI]: Amulets/Unique\n        ItemDisplay[JEWELRY !rin CRAFT]: Amulets/Crafted/%CRAFT%\n        ItemDisplay[JEWELRY !rin RARE]: Amulets/Rare\n        ItemDisplay[JEWELRY !rin MAG]: Amulets/Magic\n        ItemDisplay[jew UNI]: Jewels/Unique\n        ItemDisplay[jew CRAFT]: Jewels/Crafted/%CRAFT%\n        ItemDisplay[jew RARE]: Jewels/Rare\n        ItemDisplay[jew MAG]: Jewels/Magic\n\n        ItemDisplay[UNI WEAPON]: Unique Weapons/%WEAPON%\n        ItemDisplay[UNI]: Other Uniques/%SLOT%\n\n        ItemDisplay[CRAFT]: Crafted/%CRAFT%/%SLOT%\n        ItemDisplay[RARE]: Rare/%SLOT%\n        ItemDisplay[MAG]: Magic/%SLOT%\n\n        ItemDisplay[RUNE>0 OR GEM>0]: Runes & Gems\n        ItemDisplay[MISC !JEWELRY !CHARM !QUIVER]: Materials\n        ItemDisplay[NMAG]: Bases/%SLOT%\n\n        ItemDisplay[]: Unsorted\n\n        
+PD2SPCompanion.Core/Characters/Hirelings.cs	Sk{n}lvl
+PD2SPCompanion.Core/Items/Skins.cs	Buriza-Do Kyanon
+PD2SPCompanion.Core/Items/Skins.cs	Chance Guards
+PD2SPCompanion.Core/Items/Skins.cs	Earthshifter
+PD2SPCompanion.Core/Items/Skins.cs	Fleshripper
+PD2SPCompanion.Core/Items/Skins.cs	Giantskull
+PD2SPCompanion.Core/Items/Skins.cs	Guardian Angel
+PD2SPCompanion.Core/Items/Skins.cs	Headhunter's Glory
+PD2SPCompanion.Core/Items/Skins.cs	Hellslayer
+PD2SPCompanion.Core/Items/Skins.cs	Herald of Zakarum
+PD2SPCompanion.Core/Items/Skins.cs	Medusa's Gaze
+PD2SPCompanion.Core/Items/Skins.cs	Ormus' Robes
+PD2SPCompanion.Core/Items/Skins.cs	Ribcracker
+PD2SPCompanion.Core/Items/Skins.cs	Stormspire
+PD2SPCompanion.Core/Items/Skins.cs	String of Ears
+PD2SPCompanion.Core/Items/Skins.cs	The Grandfather
+PD2SPCompanion.Core/Items/Skins.cs	The Spirit Shroud
+PD2SPCompanion.Core/Items/Skins.cs	Venom Grip
+PD2SPCompanion.Core/Items/Skins.cs	Wartraveler

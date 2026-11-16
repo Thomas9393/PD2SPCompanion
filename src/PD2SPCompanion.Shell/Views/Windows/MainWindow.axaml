@@ -1,0 +1,73 @@
+﻿<!-- Background: the window's own backdrop shows wherever content does not cover it -
+     behind the 7px padding the header bar applies while maximized, and briefly during a
+     resize. Left unset it is FluentTheme's default, white under a light system theme,
+     which is the pale ring that appeared around the maximized window. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:chrome="using:Avalonia.Controls.Chrome"
+        xmlns:helper="using:PD2SPCompanion.Shell.Helper"
+        xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		
+        xmlns:views="clr-namespace:PD2SPCompanion.Shell.Views"
+		xmlns:custom_controls="clr-namespace:Layer_UserInterface.CustomControls"
+
+        x:Class="PD2SPCompanion.Shell.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+		
+		mc:Ignorable="d" d:DesignWidth="{DynamicResource [UI] Windows MinWidth}" d:DesignHeight="{DynamicResource [UI] Windows MinHeight}"
+		Width ="{DynamicResource [UI] Windows MinWidth}" Height="{DynamicResource [UI] Windows MinHeight}"
+		MinWidth="{DynamicResource [UI] Windows MinWidth}" MinHeight="{DynamicResource [UI] Windows MinHeight}"
+		
+		FontFamily="{StaticResource BodyFont}"
+		
+        Icon="/Assets/pd2spc.ico"
+        Title="{DynamicResource [UI Text] App Title}"
+		
+		WindowStartupLocation="CenterScreen"
+
+		Background="{DynamicResource [Brush] Template - Background}"
+
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="-1">
+
+	<Window.WindowDecorationsTheme>
+		<ControlTheme TargetType="chrome:WindowDrawnDecorations">
+			<Setter Property="Template">
+				<helper:EmptyWindowDecorations/>
+			</Setter>
+		</ControlTheme>
+	</Window.WindowDecorationsTheme>
+
+	<!-- Everything the window shows under one scale (Services.Settings.UiScale): laid out
+	     as if the screen had the room the layout was drawn for, and drawn smaller - or larger. No transform at
+	     all at 1, which is what the reference monitor gets. Set by MainWindow.ApplyScale. -->
+	<LayoutTransformControl Name="Scaler">
+		<Grid RowDefinitions="Auto, *">
+			<!-- Custom Header Bars -->
+			<custom_controls:Windows_HeaderBars Grid.Row="0"
+												TitleContent="{StaticResource [UI Text] App Title Short}"/>
+
+			<!-- Main Content -->
+			<views:MainView Grid.Row="1"/>
+
+			<!-- The window's search, over the title row's middle (one search box at the
+			     top, as Word has it). Beside the header rather than in it: the header's styles are its window
+			     buttons'. -->
+			<!-- Midway between the window's top edge and the gold line under the title row, which is what the eye
+			     takes for the top bar - not midway in the header's own 30, which ends some 4 above that line: it
+			     sat 2 too high (measured in a screenshot: 2 pixels over it, 8 under). -->
+			<views:QuickSearchBar Grid.Row="0" Name="QuickBar" HorizontalAlignment="Center" VerticalAlignment="Center"
+								  Margin="0,4,0,0"
+								  DataContext="{Binding QuickSearch}"/>
+
+			<!-- Its list, under the box and over the pages: in the window's own layer, so it is scaled with
+			     the rest and is the window's to read. Placed as it opens (MainWindow.PlaceQuickList). -->
+			<Canvas Grid.Row="0" Grid.RowSpan="2" Name="QuickLayer">
+				<views:QuickSearchList Name="QuickList" DataContext="{Binding QuickSearch}"
+									   IsVisible="{Binding $parent[Window].((vm:MainViewModel)DataContext).QuickSearch.IsListOpen, FallbackValue=False}"/>
+			</Canvas>
+		</Grid>
+	</LayoutTransformControl>
+</Window>

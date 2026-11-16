@@ -1,0 +1,41 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The fold's chevron: points right while folded, turns down when open. Class "chevron" on a
+	  Path, and "open" while the section is:
+
+	      <Path Classes="chevron" Classes.open="{Binding IsOpen}" Data="{StaticResource [Glyph] Chevron}"/>
+
+	  Written out identically on the landing page and both inventory panels; the vault's cards
+	  wanted a fourth, and it is one file now.
+	-->
+	<Style Selector="Path.chevron">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		<!-- Every icon's grid and stroke (Glyph.axaml), turned as well as scaled. -->
+		<Setter Property="StrokeThickness" Value="{DynamicResource [Glyph] Stroke}"/>
+		<Setter Property="StrokeLineCap" Value="Round"/>
+		<Setter Property="StrokeJoin" Value="Round"/>
+		<Setter Property="Stretch" Value="None"/>
+		<Setter Property="Width" Value="12"/>
+		<Setter Property="Height" Value="12"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="RenderTransformOrigin" Value="50%,50%"/>
+		<Setter Property="RenderTransform" Value="rotate(-90deg) scale(1.1667)"/>
+		<Setter Property="Transitions">
+			<Transitions>
+				<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15"/>
+			</Transitions>
+		</Setter>
+	</Style>
+	<Style Selector="Path.chevron.open">
+		<Setter Property="RenderTransform" Value="rotate(0deg) scale(1.1667)"/>
+	</Style>
+	<!-- A card's fold: the small glyphs' size (Glyph.axaml). -->
+	<Style Selector="Path.chevron.small">
+		<Setter Property="StrokeThickness" Value="{DynamicResource [Glyph] Stroke Small}"/>
+		<Setter Property="RenderTransform" Value="rotate(-90deg) scale(0.8333)"/>
+	</Style>
+	<Style Selector="Path.chevron.small.open">
+		<Setter Property="RenderTransform" Value="rotate(0deg) scale(0.8333)"/>
+	</Style>
+</Styles>

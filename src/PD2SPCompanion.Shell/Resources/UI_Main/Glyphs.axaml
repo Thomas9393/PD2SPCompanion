@@ -1,0 +1,233 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System">
+	<!--
+		Every icon inside a page or a popup, one shape for each meaning: all in-page icons are in the glyph set. The
+		chrome - the sidebar, the bookmarks, the title bar - draws its own.
+
+		One grid for all of them: a 12-unit box, the shape inside 1 to 11, drawn as round-ended strokes. A
+		Path takes one with Classes="pin" and Data="{StaticResource [Glyph] Name}"; Glyph.axaml sets the one
+		size (14px, a 1.6px stroke - see [Glyph] Stroke) for every pin, so a glyph never carries a width, a height or a stroke of its
+		own. Drawn rather than fitted: a shape stretched to its box takes its stroke with it, and every glyph
+		came out a different weight (measured).
+
+		Room inside: at 14px a 2px stroke fills most of a small outline, so a mark drawn inside a shape keeps
+		a clear unit from its walls or it merges into them - the folder's + and arrow, the triangle's !, the
+		globe's lines and the coins' rims all did. A badge goes outside the outline, at its
+		top right, the outline broken where it sits. Check a new glyph at real size before using it:
+		python tests/ui/glyphsheet.py out.png draws every glyph as the app does, and enlarged.
+	-->
+
+	<!-- ==== the stroke ==================================================================================== -->
+	<!-- In grid units, which Glyph.axaml scales: a glyph's 12 units are 14px, a small one's 10px. 1.6px at rest,
+	     2 screen pixels exactly at 125% - lighter than the 2px the set began with (14% of the icon, about twice
+	     the usual line-icon weight) and crisp where 2.5 screen pixels smeared. The
+	     chrome's filled icons have no stroke and are untouched. -->
+	<sys:Double x:Key="[Glyph] Stroke">1.3714</sys:Double>
+	<!-- A small glyph (10px): 1.2px, the same share of its size. -->
+	<sys:Double x:Key="[Glyph] Stroke Small">1.44</sys:Double>
+	<!-- Heavier than at rest, for a button holding a question (the armed bin): 2px. -->
+	<sys:Double x:Key="[Glyph] Stroke Armed">1.7143</sys:Double>
+
+	<!-- ==== marks ======================================================================================= -->
+	<!-- A cross: close, clear, cancel, remove from a list. -->
+	<StreamGeometry x:Key="[Glyph] Close">M 2,2 L 10,10  M 10,2 L 2,10</StreamGeometry>
+	<!-- A tick: on, done, confirm, accept. -->
+	<StreamGeometry x:Key="[Glyph] Tick">M 1.5,6.5 L 4.5,9.5 L 10.5,2.5</StreamGeometry>
+	<!-- A stepper's minus and plus. -->
+	<StreamGeometry x:Key="[Glyph] Minus">M 1.5,6 L 10.5,6</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Plus">M 1.5,6 L 10.5,6  M 6,1.5 L 6,10.5</StreamGeometry>
+	<!-- A warning: a ring and its mark (Alert.axaml) - a ring, as a triangle left the mark no room. -->
+	<StreamGeometry x:Key="[Glyph] Alert">M 11,6 A 5,5 0 1 1 1,6 A 5,5 0 1 1 11,6 Z  M 6,3.3 L 6,6.4  M 6,8.7 L 6.01,8.7</StreamGeometry>
+	<!-- A note: the same ring with an "i" - something to know, not a warning (the "!" stood for
+	     both). The Alert turned over. -->
+	<StreamGeometry x:Key="[Glyph] Info">M 11,6 A 5,5 0 1 1 1,6 A 5,5 0 1 1 11,6 Z  M 6,5.6 L 6,8.7  M 6,3.3 L 6.01,3.3</StreamGeometry>
+
+	<!-- ==== direction =================================================================================== -->
+	<!-- A fold's chevron, pointing down; Chevron.axaml turns it while the fold is shut. -->
+	<StreamGeometry x:Key="[Glyph] Chevron">M 2,4 L 6,8 L 10,4</StreamGeometry>
+	<!-- A page back and on. -->
+	<StreamGeometry x:Key="[Glyph] Chevron left">M 8,2 L 4,6 L 8,10</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Chevron right">M 4,2 L 8,6 L 4,10</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Chevron up">M 2,8 L 6,4 L 10,8</StreamGeometry>
+	<!-- Two chevrons: all of them, between the inventory's two panes (one chevron moves the picked). -->
+	<StreamGeometry x:Key="[Glyph] Chevrons right">M 2,2 L 6,6 L 2,10  M 6,2 L 10,6 L 6,10</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Chevrons left">M 10,2 L 6,6 L 10,10  M 6,2 L 2,6 L 6,10</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Chevrons down">M 2,2 L 6,6 L 10,2  M 2,6 L 6,10 L 10,6</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Chevrons up">M 2,10 L 6,6 L 10,10  M 2,6 L 6,2 L 10,6</StreamGeometry>
+	<!-- Up: a gem out of its socket, a folder up. -->
+	<StreamGeometry x:Key="[Glyph] Arrow up">M 6,10.5 L 6,1.5  M 2.5,5 L 6,1.5 L 9.5,5</StreamGeometry>
+	<!-- Down, and up with it: gold between the gold panel's rows - carried down to the shared stash, and back up. -->
+	<StreamGeometry x:Key="[Glyph] Arrow down">M 6,1.5 L 6,10.5  M 2.5,7 L 6,10.5 L 9.5,7</StreamGeometry>
+	<!-- Into the materials tab (the game's "Deposit materials" is an arrow icon whose tail curls): an arrow come in from
+	     the left, its tail curling down into the tab - Deposit materials, and nothing else. -->
+	<StreamGeometry x:Key="[Glyph] Deposit">M 1.5,3 L 4.5,3 A 3.5,3.5 0 0 1 8,6.5 L 8,10.5  M 5.5,8 L 8,10.5 L 10.5,8</StreamGeometry>
+	<!-- Three dots: what a line of tools had no room for (OverflowRow). Each a stroke too short to be a line. -->
+	<StreamGeometry x:Key="[Glyph] More">M 2.2,6 L 2.3,6  M 5.95,6 L 6.05,6  M 9.7,6 L 9.8,6</StreamGeometry>
+	<!-- Back and forward over where a page has been, as Explorer's two arrows (the vault page's path line). -->
+	<StreamGeometry x:Key="[Glyph] Arrow left">M 10.5,6 L 1.5,6  M 5,2.5 L 1.5,6 L 5,9.5</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Arrow right">M 1.5,6 L 10.5,6  M 7,2.5 L 10.5,6 L 7,9.5</StreamGeometry>
+	<!-- Two of the up arrow side by side: every gem out of its sockets at once - the single one's arrow, twice (it was
+	     Chevrons up, which says "to the first"
+	     elsewhere). Narrow heads, a unit between them, so the two do not join at 14px (tests/ui/glyphsheet.py). -->
+	<StreamGeometry x:Key="[Glyph] Arrows up">M 3.5,10.5 L 3.5,1.5  M 1.5,3.5 L 3.5,1.5 L 5.5,3.5  M 8.5,10.5 L 8.5,1.5  M 6.5,3.5 L 8.5,1.5 L 10.5,3.5</StreamGeometry>
+	<!-- The two panes' contents, swapped side to side or top to bottom. -->
+	<StreamGeometry x:Key="[Glyph] Swap across">M 1.5,4 L 10.5,4  M 8,1.5 L 10.5,4 L 8,6.5  M 10.5,8 L 1.5,8  M 4,5.5 L 1.5,8 L 4,10.5</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Swap down">M 4,10.5 L 4,1.5  M 1.5,4 L 4,1.5 L 6.5,4  M 8,1.5 L 8,10.5  M 5.5,8 L 8,10.5 L 10.5,8</StreamGeometry>
+	<!-- Into a tray and out of it: a file in, a file out - Import and Export, and nothing else (one glyph, one act: it was also Store, a purse's gold to the vault and Load). -->
+	<StreamGeometry x:Key="[Glyph] Download">M 6,1.5 L 6,7.5  M 3.5,5 L 6,7.5 L 8.5,5  M 1.5,8.5 L 1.5,10.5 L 10.5,10.5 L 10.5,8.5</StreamGeometry>
+	<!-- Store all (the same vault icon, distinct from Store's
+	     tray): the vault bookmark's chest (Material Design's treasure-chest) with Download's arrow going into its lid
+	     - one: two crowded the chest at 14px ("Use single arrow") - and a clear gap cut around it where it meets the
+	     chest - "otherwise they overlapped with each other become a block of colour". One filled shape
+	     (Path.pin.filled), built with shapely: the chest minus the arrow grown by 1.2 units, plus the arrow stroked as
+	     Path.pin strokes (1.3714 units, round). Checked at real size
+	     with tests/ui/glyphsheet.py beside Download. It replaced Download all, two arrows into Download's tray, which
+	     looked too much like Store beside it. -->
+	<StreamGeometry x:Key="[Glyph] Store all">F0 M 6.00,6.09 L 6.18,6.06 L 6.34,5.99 L 6.48,5.88 L 8.68,3.68 L 8.79,3.54 L 8.86,3.38 L 8.89,3.20 L 8.86,3.02 L 8.79,2.86 L 8.68,2.72 L 8.54,2.61 L 8.38,2.54 L 8.20,2.51 L 8.02,2.54 L 7.86,2.61 L 7.72,2.72 L 6.69,3.74 L 6.69,0.60 L 6.66,0.42 L 6.59,0.26 L 6.48,0.12 L 6.34,0.01 L 6.18,-0.06 L 6.00,-0.09 L 5.82,-0.06 L 5.66,0.01 L 5.52,0.12 L 5.41,0.26 L 5.34,0.42 L 5.31,0.60 L 5.31,3.74 L 4.28,2.72 L 4.14,2.61 L 3.98,2.54 L 3.80,2.51 L 3.62,2.54 L 3.46,2.61 L 3.32,2.72 L 3.21,2.86 L 3.14,3.02 L 3.11,3.20 L 3.14,3.38 L 3.21,3.54 L 3.32,3.68 L 5.52,5.88 L 5.66,5.99 L 5.82,6.06 Z M 1.90,4.80 L 1.73,5.00 L 1.60,5.23 L 1.53,5.49 L 1.50,5.75 L 1.50,7.55 L 4.65,7.55 L 4.65,7.10 L 5.19,7.10 L 4.93,6.95 L 4.78,6.84 L 4.67,6.73 L 2.42,4.48 L 2.33,4.50 L 2.10,4.63 Z M 10.50,7.55 L 10.50,5.75 L 10.47,5.49 L 10.40,5.23 L 10.27,5.00 L 10.10,4.80 L 9.90,4.63 L 9.67,4.50 L 9.58,4.48 L 7.33,6.73 L 7.22,6.84 L 7.07,6.95 L 6.81,7.10 L 7.35,7.10 L 7.35,7.55 Z M 6.45,8.45 L 6.45,7.55 L 5.55,7.55 L 5.55,8.45 Z M 6.45,9.35 L 5.55,9.35 L 4.65,8.45 L 4.65,8.00 L 1.50,8.00 L 1.50,11.60 L 10.50,11.60 L 10.50,8.00 L 7.35,8.00 L 7.35,8.45 Z</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Upload">M 6,7.5 L 6,1.5  M 3.5,4 L 6,1.5 L 8.5,4  M 1.5,8.5 L 1.5,10.5 L 10.5,10.5 L 10.5,8.5</StreamGeometry>
+	<!-- Out to somewhere else: a picker, a list, a page of its own. -->
+	<StreamGeometry x:Key="[Glyph] Open">M 5,1.5 L 1.5,1.5 L 1.5,10.5 L 10.5,10.5 L 10.5,7  M 7,1.5 L 10.5,1.5 L 10.5,5  M 10.5,1.5 L 5.5,6.5</StreamGeometry>
+	<!-- Into a closed box and out of it - the archive's box, with its handle: into the vault and out of it.
+	     Store and Withdraw, and a purse's gold to the vault and back (they wore the
+	     files' tray). Checked at real size beside Download and Upload (tests/ui/glyphsheet.py). -->
+	<StreamGeometry x:Key="[Glyph] To vault">M 6,0.8 L 6,5  M 3.9,3 L 6,5.1 L 8.1,3  M 1.5,7 L 10.5,7 L 10.5,10.5 L 1.5,10.5 Z  M 4.8,8.75 L 7.2,8.75</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] From vault">M 6,5.1 L 6,0.9  M 3.9,3 L 6,0.9 L 8.1,3  M 1.5,7 L 10.5,7 L 10.5,10.5 L 1.5,10.5 Z  M 4.8,8.75 L 7.2,8.75</StreamGeometry>
+	<!-- Going in: open a character - Exit's other way round (Load wore the files' tray). -->
+	<StreamGeometry x:Key="[Glyph] Enter">M 7,1.5 L 10.5,1.5 L 10.5,10.5 L 7,10.5  M 1.5,6 L 7.5,6  M 5,3.5 L 7.5,6 L 5,8.5</StreamGeometry>
+	<!-- Leaving: close the character. -->
+	<StreamGeometry x:Key="[Glyph] Exit">M 5,1.5 L 1.5,1.5 L 1.5,10.5 L 5,10.5  M 4.5,6 L 10.5,6  M 8,3.5 L 10.5,6 L 8,8.5</StreamGeometry>
+
+	<!-- ==== time ======================================================================================== -->
+	<!-- Back and forward a step: every going back (one undo everywhere). -->
+	<StreamGeometry x:Key="[Glyph] Undo">M 4,1.5 L 1.5,4 L 4,6.5  M 1.5,4 L 7.5,4 A 3.25,3.25 0 0 1 7.5,10.5 L 3.5,10.5</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Redo">M 8,1.5 L 10.5,4 L 8,6.5  M 10.5,4 L 4.5,4 A 3.25,3.25 0 0 0 4.5,10.5 L 8.5,10.5</StreamGeometry>
+	<!-- A clock turned back: history, every respec, a quest reverted. -->
+	<StreamGeometry x:Key="[Glyph] History">M 2.4,3.4 A 4.5,4.5 0 1 1 1.5,6  M 1.2,1.4 L 2.4,3.4 L 4.6,3  M 6,3.5 L 6,6 L 7.8,7.3</StreamGeometry>
+	<!-- An archive box, lid, body and handle: the backups - stored copies, not the history's clock beside
+	     them on the strip (the same clock on both misled). -->
+	<StreamGeometry x:Key="[Glyph] Archive">M 1,2 L 11,2 L 11,4.5 L 1,4.5 Z  M 2,4.5 L 2,10.5 L 10,10.5 L 10,4.5  M 4.5,6.75 L 7.5,6.75</StreamGeometry>
+	<!-- A ring with a tick: a quest completed. -->
+	<StreamGeometry x:Key="[Glyph] Task done">M 10.5,6 A 4.5,4.5 0 1 1 7.6,1.8  M 3.8,5.8 L 5.8,7.8 L 10.8,2.8</StreamGeometry>
+
+	<!-- ==== things ====================================================================================== -->
+	<!-- The bin: a lid with its handle, a body, and two lines. -->
+	<StreamGeometry x:Key="[Glyph] Bin">M 1.5,3 L 10.5,3  M 4.5,3 L 4.5,1.5 L 7.5,1.5 L 7.5,3  M 2.5,3 L 3.2,10.5 L 8.8,10.5 L 9.5,3  M 5,5 L 5,8.5  M 7,5 L 7,8.5</StreamGeometry>
+	<!-- A page's lines beside a narrow strip of them in small: the vault's map of a folder, in place of the scroll bar. -->
+	<StreamGeometry x:Key="[Glyph] Minimap">M 1.5,2.5 L 5.5,2.5  M 1.5,5 L 5.5,5  M 1.5,7.5 L 4.5,7.5  M 1.5,10 L 5.5,10  M 7.5,1.5 L 10.5,1.5 L 10.5,10.5 L 7.5,10.5 Z  M 7.5,4 L 10.5,4  M 7.5,6.5 L 10.5,6.5</StreamGeometry>
+	<!-- A pencil: rename. -->
+	<StreamGeometry x:Key="[Glyph] Pencil">M 1.5,10.5 L 2,8 L 8.5,1.5 L 10.5,3.5 L 4,10 Z  M 7,3 L 9,5</StreamGeometry>
+	<!-- The magnifier: search. -->
+	<StreamGeometry x:Key="[Glyph] Magnifier">M 8.5,5 A 3.5,3.5 0 1 1 1.5,5 A 3.5,3.5 0 1 1 8.5,5  M 7.5,7.5 L 10.5,10.5</StreamGeometry>
+	<!-- Two links of a chain: a property row's number put on the rows written with it: a button that
+	     propagates the current box's value to the other synced boxes. -->
+	<StreamGeometry x:Key="[Glyph] Link">M 6.5,3.5 L 7.5,2.5 A 2.12,2.12 0 0 1 10.5,5.5 L 9.5,6.5  M 5.5,8.5 L 4.5,9.5 A 2.12,2.12 0 0 1 1.5,6.5 L 2.5,5.5  M 4.5,7.5 L 7.5,4.5</StreamGeometry>
+	<!-- Two squares, one over the other: duplicate, clone. -->
+	<StreamGeometry x:Key="[Glyph] Duplicate">M 1.5,4.5 L 7.5,4.5 L 7.5,10.5 L 1.5,10.5 Z  M 4.5,4.5 L 4.5,1.5 L 10.5,1.5 L 10.5,7.5 L 7.5,7.5</StreamGeometry>
+	<!-- Paste: a clipboard, its clip at the top - the Forge's Paste from game (Material Design's
+	     content-paste, drawn in this set's strokes). The clip is a box two and a half units deep, so its opening
+	     still shows at 14px; shallower, it filled in (tests/ui/glyphsheet.py). -->
+	<StreamGeometry x:Key="[Glyph] Paste">M 4,2.5 L 2,2.5 L 2,10.5 L 10,10.5 L 10,2.5 L 8,2.5  M 4,1.5 L 8,1.5 L 8,4 L 4,4 Z</StreamGeometry>
+	<!-- Sort: an arrow up and an arrow down - the Sort button's own drawing (SortMenu's default glyph, which is
+	     written out there as a control's default cannot be looked up), here for the menu's "Sort by" row. -->
+	<StreamGeometry x:Key="[Glyph] Sort">M 3.5,11 L 3.5,1.5  M 1,4 L 3.5,1.5 L 6,4  M 8.5,1 L 8.5,10.5  M 6,8 L 8.5,10.5 L 11,8</StreamGeometry>
+	<!-- Cut: a pair of scissors, its two rings at the foot and its blades crossing to the top (the clipboard's three, as
+	     Windows' menu has them). Copy is Duplicate's two squares. -->
+	<StreamGeometry x:Key="[Glyph] Cut">M 4.9,9 A 1.7,1.7 0 1 1 1.5,9 A 1.7,1.7 0 1 1 4.9,9 Z  M 10.5,9 A 1.7,1.7 0 1 1 7.1,9 A 1.7,1.7 0 1 1 10.5,9 Z  M 4.3,7.7 L 9.5,1.5  M 7.7,7.7 L 2.5,1.5</StreamGeometry>
+	<!-- Select all: corner marks round a square - the picks menu (all, none, the other way round). Corners,
+	     not a dashed frame: at 14px the dashes ran together. -->
+	<StreamGeometry x:Key="[Glyph] Select all">M 1,3.5 L 1,1 L 3.5,1  M 8.5,1 L 11,1 L 11,3.5  M 11,8.5 L 11,11 L 8.5,11  M 3.5,11 L 1,11 L 1,8.5  M 4,4 L 8,4 L 8,8 L 4,8 Z</StreamGeometry>
+	<!-- A socket: a ring round a gem - the sockets drawn over the tiles. -->
+	<StreamGeometry x:Key="[Glyph] Socket">M 10.5,6 A 4.5,4.5 0 1 1 1.5,6 A 4.5,4.5 0 1 1 10.5,6 Z  M 7.5,6 A 1.5,1.5 0 1 1 4.5,6 A 1.5,1.5 0 1 1 7.5,6 Z</StreamGeometry>
+	<!-- A buckle and the strap either side: the belt. Drawn open - a strap closed round the buckle filled in
+	     at this size. -->
+	<StreamGeometry x:Key="[Glyph] Belt">M 1,4.5 L 4,4.5  M 8,4.5 L 11,4.5  M 1,7.5 L 4,7.5  M 8,7.5 L 11,7.5  M 4,2.5 L 8,2.5 L 8,9.5 L 4,9.5 Z</StreamGeometry>
+	<!-- A floppy: save, apply. -->
+	<StreamGeometry x:Key="[Glyph] Save">M 1.5,1.5 L 8.5,1.5 L 10.5,3.5 L 10.5,10.5 L 1.5,10.5 Z  M 3.5,1.5 L 3.5,4 L 7.5,4 L 7.5,1.5  M 3.5,10.5 L 3.5,7 L 8.5,7 L 8.5,10.5</StreamGeometry>
+	<!-- A star: quick access - a folder pinned to the list over the vault's tree. -->
+	<StreamGeometry x:Key="[Glyph] Star">M 6,1.2 L 7.5,4.3 L 10.9,4.8 L 8.4,7.1 L 9,10.5 L 6,8.9 L 3,10.5 L 3.6,7.1 L 1.1,4.8 L 4.5,4.3 Z</StreamGeometry>
+	<!-- A ribbon: keep (a seed, a preset). -->
+	<StreamGeometry x:Key="[Glyph] Bookmark">M 2.5,1.5 L 9.5,1.5 L 9.5,10.5 L 6,8 L 2.5,10.5 Z</StreamGeometry>
+	<!-- Three bars: statistics. -->
+	<StreamGeometry x:Key="[Glyph] Statistics">M 1,10.5 L 11,10.5  M 3,10 L 3,6.5  M 6,10 L 6,2  M 9,10 L 9,4.5</StreamGeometry>
+	<!-- Three bars and a rise: meet the gear's requirements. -->
+	<StreamGeometry x:Key="[Glyph] Refit">M 2,10.5 L 2,6.5  M 6,10.5 L 6,3  M 10,10.5 L 10,5  M 4.3,3.7 L 6,2 L 7.7,3.7</StreamGeometry>
+	<!-- A cup with handles: the grail. -->
+	<StreamGeometry x:Key="[Glyph] Grail">M 3,1.5 L 9,1.5 L 9,4.5 A 3,3 0 0 1 3,4.5 Z  M 3,2.5 L 1.5,2.5 L 1.5,3.5 A 1.5,1.5 0 0 0 3,5  M 9,2.5 L 10.5,2.5 L 10.5,3.5 A 1.5,1.5 0 0 1 9,5  M 6,7.5 L 6,9.5  M 3.5,10.5 L 8.5,10.5</StreamGeometry>
+	<!-- A dollar sign: prices, buying, selling (preferred to coins). Its stroke stops
+	     above and below the S - run through it, the S filled in at 14px. -->
+	<StreamGeometry x:Key="[Glyph] Dollar">M 8.6,3.7 C 8.2,2.8 7.2,2.3 6,2.3 C 4.5,2.3 3.4,3.1 3.4,4.2 C 3.4,5.4 4.6,5.8 6,6.1 C 7.5,6.4 8.6,6.9 8.6,8 C 8.6,9.2 7.5,9.8 6,9.8 C 4.7,9.8 3.7,9.3 3.3,8.4  M 6,0.8 L 6,2.3  M 6,9.8 L 6,11.2</StreamGeometry>
+	<!-- Three lines, each after its dot: a list of records - the trades. Not the
+	     history's clock, which is the session's undo, nor the archive's box, which is the backups. -->
+	<StreamGeometry x:Key="[Glyph] List">M 1.6,2.6 L 2.4,2.6  M 4.4,2.6 L 10.6,2.6  M 1.6,6 L 2.4,6  M 4.4,6 L 10.6,6  M 1.6,9.4 L 2.4,9.4  M 4.4,9.4 L 10.6,9.4</StreamGeometry>
+	<!-- A globe: a site on the web. -->
+	<StreamGeometry x:Key="[Glyph] Globe">M 10.75,6 A 4.75,4.75 0 1 1 1.25,6 A 4.75,4.75 0 1 1 10.75,6 Z  M 6,1.25 A 2.1,4.75 0 0 1 6,10.75 A 2.1,4.75 0 0 1 6,1.25 Z  M 1.25,6 L 10.75,6</StreamGeometry>
+	<!-- A screen: a desktop shortcut. -->
+	<StreamGeometry x:Key="[Glyph] Monitor">M 1.5,1.5 L 10.5,1.5 L 10.5,8 L 1.5,8 Z  M 6,8 L 6,10.5  M 3.5,10.5 L 8.5,10.5</StreamGeometry>
+	<!-- A figure and a plus: make a character. -->
+	<StreamGeometry x:Key="[Glyph] Person plus">M 6,3.5 A 2,2 0 1 1 2,3.5 A 2,2 0 1 1 6,3.5 Z  M 0.5,10.5 C 0.5,7.2 7.5,7.2 7.5,10.5  M 9.5,3 L 9.5,7  M 7.5,5 L 11.5,5</StreamGeometry>
+	<!-- A cross of mercy: revive a dead hardcore character. -->
+	<StreamGeometry x:Key="[Glyph] Revive">M 4.5,1.5 L 7.5,1.5 L 7.5,4.5 L 10.5,4.5 L 10.5,7.5 L 7.5,7.5 L 7.5,10.5 L 4.5,10.5 L 4.5,7.5 L 1.5,7.5 L 1.5,4.5 L 4.5,4.5 Z</StreamGeometry>
+	<!-- A brush: clean an item back to a white base. No bristle lines - at 14px they filled the head. -->
+	<StreamGeometry x:Key="[Glyph] Clean">M 9.5,1.5 L 6,6.5  M 2.5,6.5 L 8.5,6.5 L 7.5,10.5 L 1.5,10.5 Z</StreamGeometry>
+	<!-- A ghost: ethereal. -->
+	<StreamGeometry x:Key="[Glyph] Ghost">M 2.5,10.5 L 2.5,5.5 A 3.5,3.5 0 0 1 9.5,5.5 L 9.5,10.5 L 8.3,9.5 L 7.2,10.5 L 6,9.5 L 4.8,10.5 L 3.7,9.5 Z  M 4.75,5.5 L 4.8,5.5  M 7.25,5.5 L 7.3,5.5</StreamGeometry>
+	<!-- A golem: the Iron Golem's item, beside the mercenary. "Rock golem" by Delapouite, game-icons.net, CC BY 3.0
+	     (THIRD-PARTY-NOTICES.md), the path as published on its 512-unit grid - worn with Classes="pin art" (the game's
+	     own skill icon carries the bevel of the button it is cut from, and the
+	     one drawn here in its place was a stand-in). -->
+	<StreamGeometry x:Key="[Glyph] Golem">m227.7 25-57.9 57.96L183.4 151h145.2l13.6-68.04-32.8-32.84L282.5 64l16.3-24.53L284.3 25h-56.6zM195 88.44 240 111l-4 17h-41V88.44zm122 0V128h-41l-4-17 32-16.05 13-6.51zM154 109.1l-22 11 10.6 17.1-24.1-10.4L73 149.6v16l91.8-13.1-10.8-43.4zm204 0-10.8 43.4 91.8 13.1v-16l-81-40.5zm-152.4 60.1-63.3 4.7-6.6 1-9.2 62.3 50.2 25.1 44.5-14.8 5.6 17-51.5 17.2-44.4-22.2 20.4 84.5 95.7 13.6V196.8l-41.4-27.6zm100.8 0L265 196.8v160.8l95.7-13.6 20.4-84.5-23.8 11.9-19.6 38.6-18.8-34.2-33.7-11.3 5.6-17 44.5 14.8 50.2-25.1-9.2-62.3-6.6-1-63.3-4.7zm-189.6 8.4-61.32 8.7-30.04 40.1 3.64 25.5 25.38 10.4L33.09 280l6.47 45.3L103 312.7v-57.4l13.8-77.7zm278.4 0 13.8 77.6v57.4l52 10.4 13.7-13.7 11.9-82.9-30.1-40.1-28-4-4.2 17.9-9.9-19.9-19.2-2.7zM104.1 330.8 42.78 343l28 126 47.42-11.8-14.1-126.4zm303.8 0-14.1 126.4 22.6 5.6 7.9-25.8 17.8 28.1L469.2 343l-61.3-12.2zm-256 31.4L138.1 487h80.3l37.6-75.1 37.6 75.1h30.8l11.6-23 11.5 23h26.4l-13.8-124.8L256 377.1l-41.9-6-6.1 34.4-15.3-37.5-40.8-5.8z</StreamGeometry>
+	<!-- Reset: an arrow coming round on itself, with sliders at its foot - the Forge's RESET, the item made
+	     afresh from the boxes. Material Symbols "reset_settings" by Google,
+	     Apache 2.0 (THIRD-PARTY-NOTICES.md), the path as published on its 960-unit grid - worn with
+	     Classes="pin art". -->
+	<StreamGeometry x:Key="[Glyph] Reset settings">M520-330v-60h160v60H520Zm60 210v-50h-60v-60h60v-50h60v160h-60Zm100-50v-60h160v60H680Zm40-110v-160h60v50h60v60h-60v50h-60Zm111-280h-83q-26-88-99-144t-169-56q-117 0-198.5 81.5T200-480q0 72 32.5 132t87.5 98v-110h80v240H160v-80h94q-62-50-98-122.5T120-480q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-840q129 0 226.5 79.5T831-560Z</StreamGeometry>
+	<!-- Battle gear - a sword, a helm and a shield: the rune wizard's toggle that counts a runeword's bases. "Battle
+	     gear" by Lorc, game-icons.net, CC BY 3.0 (THIRD-PARTY-NOTICES.md), the path
+	     as published on its 512-unit grid - worn with Classes="pin art". -->
+	<StreamGeometry x:Key="[Glyph] Battle gear">M262.406 17.188c-27.22 8.822-54.017 28.012-72.375 55.53 17.544 47.898 17.544 57.26 0 105.157 19.92 15.463 40.304 24.76 60.782 27.47-2.063-25.563-3.63-51.13 1.125-76.69-13.625-1.483-23.374-5.995-37-13.874V82.563c35.866 19.096 61.84 18.777 98.813 0v32.22c-13.364 6.497-21.886 11.16-35.25 13.218 3.614 25.568 3.48 51.15 1.375 76.72 18.644-3.265 37.236-12.113 55.5-26.845-14.353-47.897-14.355-57.26 0-105.156-16.982-28.008-47.453-46.633-72.97-55.532zm-129.594 8.218c-25.906 110.414-27.35 215.33-27.4 330.922-18.84-1.537-37.582-5.12-56.027-11.12v28.554h69.066c8.715 35.025 6.472 70.052-1.036 105.078h28.13c-7.195-35.026-8.237-70.053-.872-105.078h68.904v-28.555c-18.49 4.942-37.256 8.552-56.097 10.46.082-114.94 2.496-223.068-24.667-330.26zm89.47 202.375c0 117.27 25.517 233.342 120.155 257.97C446.62 464.716 462.72 345.374 462.72 227.78H222.28z</StreamGeometry>
+	<!-- An anvil: forge. -->
+	<StreamGeometry x:Key="[Glyph] Anvil">M 1,3 L 11,3 L 11,4.5 C 9,4.5 8,5.2 8,6.5 L 8,8 L 9.7,10 L 2.3,10 L 4,8 L 4,6.5 C 4,5.2 3,4.5 1,4.5 Z</StreamGeometry>
+
+	<!-- Close gaps: two items lying together, and a third pushed up against them - what closing a folder's or a
+	     stash page's gaps does, its order kept. Drawn here. -->
+	<StreamGeometry x:Key="[Glyph] Close gaps">M 1.5,1.5 L 4.5,1.5 L 4.5,4.5 L 1.5,4.5 Z  M 6,1.5 L 9,1.5 L 9,4.5 L 6,4.5 Z  M 1.5,7 L 4.5,7 L 4.5,10 L 1.5,10 Z  M 10.5,8.5 L 6.5,8.5  M 8,7 L 6.5,8.5 L 8,10</StreamGeometry>
+
+	<!-- A padlock, shut and open: the inventory lock. Open swings the shackle off its left post, so the two
+	     differ at a glance rather than by a gap a stroke wide. -->
+	<StreamGeometry x:Key="[Glyph] Lock">M 3,5 L 9,5 A 1,1 0 0 1 10,6 L 10,9.5 A 1,1 0 0 1 9,10.5 L 3,10.5 A 1,1 0 0 1 2,9.5 L 2,6 A 1,1 0 0 1 3,5 Z  M 4,5 L 4,3.5 A 2,2 0 0 1 8,3.5 L 8,5  M 6,7.2 L 6,8.3</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Unlock">M 3,5 L 9,5 A 1,1 0 0 1 10,6 L 10,9.5 A 1,1 0 0 1 9,10.5 L 3,10.5 A 1,1 0 0 1 2,9.5 L 2,6 A 1,1 0 0 1 3,5 Z  M 6,7.2 L 6,8.3  M 8,5 L 8,2.6 A 2,2 0 0 1 12,2.6</StreamGeometry>
+	<!-- The socket's ring with a padlock in it - shut, and open: socketing by a drop held off, or not (after Material's
+	     "Lock Open Circle"). Checked at real size (tests/ui/glyphsheet.py): the two
+	     differ by the shackle's free end, and the button's lit state says the rest. -->
+	<StreamGeometry x:Key="[Glyph] Socket lock">M 11,6 A 5,5 0 1 1 1,6 A 5,5 0 1 1 11,6 Z  M 4.2,6.3 L 7.8,6.3 L 7.8,8 L 4.2,8 Z  M 4.9,6.3 L 4.9,4.9 A 1.1,1.1 0 0 1 7.1,4.9 L 7.1,6.3</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Socket unlock">M 11,6 A 5,5 0 1 1 1,6 A 5,5 0 1 1 11,6 Z  M 4.2,6.9 L 7.8,6.9 L 7.8,8.4 L 4.2,8.4 Z  M 4.9,6.9 L 4.9,4.3 A 1.1,1.1 0 0 1 7.1,4.3</StreamGeometry>
+	<!-- The way back out of a layer: the jewel's panel to the item that holds it. -->
+	<StreamGeometry x:Key="[Glyph] Back">M 7.5,2 L 3.5,6 L 7.5,10</StreamGeometry>
+
+	<!-- ==== folders ===================================================================================== -->
+	<StreamGeometry x:Key="[Glyph] Folder">M 1,2.5 L 4.5,2.5 L 5.5,4 L 11,4 L 11,10 L 1,10 Z</StreamGeometry>
+	<!-- An open folder: open a backup, a collection, a game folder. -->
+	<StreamGeometry x:Key="[Glyph] Open folder">M 1,10 L 2.8,5.5 L 11.2,5.5 L 9.5,10 Z  M 1,10 L 1,2 L 4,2 L 5,3.5 L 8.5,3.5 L 8.5,5.5</StreamGeometry>
+	<!-- A new folder and moving into one: the folder with a + or a falling arrow at its top right. -->
+	<StreamGeometry x:Key="[Glyph] New folder">M 5,4 L 4.6,4 L 3.6,2.5 L 1,2.5 L 1,10.5 L 10.5,10.5 L 10.5,7.3  M 9.25,0.9 L 9.25,4.6  M 7.4,2.75 L 11.1,2.75</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Move to folder">M 5,4 L 4.6,4 L 3.6,2.5 L 1,2.5 L 1,10.5 L 10.5,10.5 L 10.5,7.3  M 9.25,0.8 L 9.25,4.9  M 7.6,3.3 L 9.25,4.9 L 10.9,3.3</StreamGeometry>
+	<!-- Up a level: the folder above. -->
+	<!-- What is done to the folder shown, beside what is done to items on the same line: the folder with a
+	     small bin, and with an arrow out of it, at its top right - a bin and Move to folder would be there twice.
+	     A bin, not a cross: the cross closes, the bin deletes (one meaning each). -->
+	<StreamGeometry x:Key="[Glyph] Delete folder">M 5,4 L 4.6,4 L 3.6,2.5 L 1,2.5 L 1,10.5 L 10.5,10.5 L 10.5,7.3  M 7.3,1.9 L 11.3,1.9  M 8.6,1.9 L 8.6,1 L 10,1 L 10,1.9  M 7.8,1.9 L 8.2,5.4 L 10.4,5.4 L 10.8,1.9</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Move folder">M 5,4 L 4.6,4 L 3.6,2.5 L 1,2.5 L 1,10.5 L 10.5,10.5 L 10.5,7.3  M 7.2,2.75 L 11.2,2.75  M 9.6,1.15 L 11.2,2.75 L 9.6,4.35</StreamGeometry>
+	<!-- A page's panes, each a frame with the pane marked off: the folder tree at the left, the strip of
+	     folders at the top (the map at the right is [Glyph] Minimap). -->
+	<StreamGeometry x:Key="[Glyph] Side pane">M 1.5,2 L 10.5,2 L 10.5,10 L 1.5,10 Z  M 4.8,2 L 4.8,10  M 2.9,4.4 L 3.4,4.4  M 2.9,6 L 3.4,6  M 2.9,7.6 L 3.4,7.6</StreamGeometry>
+	<StreamGeometry x:Key="[Glyph] Top pane">M 1.5,2 L 10.5,2 L 10.5,10 L 1.5,10 Z  M 1.5,5.4 L 10.5,5.4  M 3.4,3.7 L 4.2,3.7  M 5.6,3.7 L 6.4,3.7  M 7.8,3.7 L 8.6,3.7</StreamGeometry>
+	<!-- Two pages side by side, an arrow each way between them: the vault on both pages of the book, and the
+	     inventory's second pane. -->
+	<StreamGeometry x:Key="[Glyph] Compare">M 1.5,1.5 L 4.5,1.5 L 4.5,10.5 L 1.5,10.5 Z  M 7.5,1.5 L 10.5,1.5 L 10.5,10.5 L 7.5,10.5 Z  M 5.2,4.5 L 6.8,4.5  M 5.2,7.5 L 6.8,7.5</StreamGeometry>
+
+	<!-- ==== filled: Classes="pin filled", gold unless given a Fill ====================================================== -->
+	<!-- A die - a frame and five pips, even-odd, so it reads at this size; drawn as strokes its pips were dots
+	     a pixel across and the die an empty square. Every reroll, the random seed. -->
+	<StreamGeometry x:Key="[Glyph] Dice">F0 M 1,1 L 11,1 L 11,11 L 1,11 Z  M 2.4,2.4 L 2.4,9.6 L 9.6,9.6 L 9.6,2.4 Z  M 3.2,4.1 A 0.95,0.95 0 1 0 5.1,4.1 A 0.95,0.95 0 1 0 3.2,4.1 Z  M 6.9,4.1 A 0.95,0.95 0 1 0 8.8,4.1 A 0.95,0.95 0 1 0 6.9,4.1 Z  M 5.05,6 A 0.95,0.95 0 1 0 6.95,6 A 0.95,0.95 0 1 0 5.05,6 Z  M 3.2,7.9 A 0.95,0.95 0 1 0 5.1,7.9 A 0.95,0.95 0 1 0 3.2,7.9 Z  M 6.9,7.9 A 0.95,0.95 0 1 0 8.8,7.9 A 0.95,0.95 0 1 0 6.9,7.9 Z</StreamGeometry>
+</ResourceDictionary>

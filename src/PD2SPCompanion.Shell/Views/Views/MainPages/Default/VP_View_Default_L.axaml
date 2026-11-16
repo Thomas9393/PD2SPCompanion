@@ -1,0 +1,572 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Default_L"
+			 x:DataType="vm:VP_ViewModel_Default_L"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_L CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Default_L/>
+	</Design.DataContext>
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/Badge.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/RowIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/BareIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+
+		<!-- The two states of this page share the frame and cross-fade. They overlap in a
+		     Panel, so neither reserves space from the other, and the one that is off is
+		     both invisible and untouchable rather than merely transparent. -->
+		<Style Selector=":is(Control).state">
+			<Setter Property="Transitions">
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.22"/>
+				</Transitions>
+			</Setter>
+		</Style>
+		<Style Selector=":is(Control).state.on">
+			<Setter Property="Opacity" Value="1"/>
+			<Setter Property="IsHitTestVisible" Value="True"/>
+		</Style>
+		<Style Selector=":is(Control).state:not(.on)">
+			<Setter Property="Opacity" Value="0"/>
+			<Setter Property="IsHitTestVisible" Value="False"/>
+		</Style>
+
+		<!-- The fold header: a plain row, not a button-looking thing. -->
+
+
+		<!-- Entries, in the game's own manner: a plain row that takes a gold frame when
+		     selected, rather than Fluent's blue accent bar. -->
+		<Style Selector="ListBox.characters">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="Padding" Value="6"/>
+		</Style>
+		<!-- A fixed height, so one character is a card and not a page. The figure is 116
+		     tall and governs it; letting the row size itself meant the only character on
+		     the list stretched to fill the whole box. -->
+		<Style Selector="ListBox.characters ListBoxItem">
+			<Setter Property="Height" Value="136"/>
+			<Setter Property="Padding" Value="8"/>
+			<Setter Property="Margin" Value="3"/>
+			<Setter Property="Cursor" Value="Hand"/>
+		</Style>
+		<!-- The card's frame 1 thick, as the Character page's card (it was 1.5). -->
+		<Style Selector="ListBox.characters ListBoxItem /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="Transparent"/>
+			<Setter Property="CornerRadius" Value="2"/>
+		</Style>
+		<Style Selector="ListBox.characters ListBoxItem:pointerover /template/ ContentPresenter, ListBox.characters ListBoxItem:focus-visible /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		</Style>
+		<Style Selector="ListBox.characters ListBoxItem:selected /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Selection - Highlight}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+		</Style>
+
+		<!-- Icons for the action buttons. These live here rather than in the control theme
+		     because a ControlTheme cannot select into its own content. -->
+		<!-- These sit at the bottom of the page, so their tooltips go below rather than to
+		     the side. The look comes from the app-wide ToolTip style. -->
+
+		<!-- A card the standing search finds nothing on (find across characters): its figure and its lines
+		     dimmed - not its buttons, which still act. Less than a missed tile's 0.25: its name is still read. -->
+		<Style Selector="ListBox.characters :is(Panel).miss">
+			<Setter Property="Opacity" Value="0.4"/>
+		</Style>
+
+		<!-- Last, so a running game's red wins over the icons' gold. -->
+		<StyleInclude Source="/Styles/CommonControls/GameLock.axaml"/>
+
+	</UserControl.Styles>
+
+	<Panel>
+	<DockPanel Margin="16">
+		<!-- The title, and how many characters there are while the list shows, in the removed line's small plain text. No line of the page's own
+		     under the list: what happens is the message strip's. -->
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,*,Auto" Margin="0,0,0,10">
+			<TextBlock Grid.Column="0" Classes="title" Text="{L 'Characters'}" VerticalAlignment="Bottom"/>
+
+			<!-- (No "Find item" box here: the window's search box, in its top
+			     row, asks every character on disk. The cards say what a standing search holds on each.) -->
+
+			<!-- No Refresh: the save folder is watched, and a save made, changed, deleted or renamed
+			     rescans the list by itself (CharacterSession.WatchSaveFolder). -->
+			<TextBlock Grid.Column="3" Classes="dim" Text="{Binding CountLine}" VerticalAlignment="Bottom"
+					   AutomationProperties.AutomationId="Home_Count"
+					   IsVisible="{Binding IsBrowsable}"/>
+		</Grid>
+
+		<!-- The characters, laid out like the game's own select screen: two columns of
+		     entries, each a figure beside its details, scrolling when there are more than
+		     fit. A list says how many there are and what they are at a glance, which is
+		     what a carousel could not. -->
+		<!-- 1 thick, as every gold frame (it was 2). -->
+		<Border x:Name="CardShell"
+				BorderBrush="{DynamicResource [UI] GradBrush - Frame - Golden#02}"
+				BorderThickness="1" CornerRadius="3"
+				Background="Black">
+			<!-- It clips: the opened card's town reaches the gold frame itself, with no black gap inside it - the card's
+			     own margin is for what lies over the town. -->
+			<Panel ClipToBounds="True">
+				<TextBlock Classes="dim" Text="{L 'No characters found.'}"
+						   HorizontalAlignment="Center" VerticalAlignment="Center"
+						   IsVisible="{Binding !HasCharacters}"
+						   ZIndex="-1"/>
+
+				<!-- With a character open the list steps aside for it. Nothing to pick
+				     means nothing to misread: save and close plainly act on what is shown,
+				     and the page says which character you are in without a second marker
+				     competing with the selection. -->
+				<Grid x:Name="OpenedCard" Classes="state" Classes.on="{Binding !IsBrowsable}"
+					  RowDefinitions="*,Auto,Auto,*" Margin="18"
+					  SizeChanged="OpenedCard_SizeChanged">
+					<!-- The figure and the name as one group, centred top to bottom between two equal spacers;
+					     the figure's row is as tall as the figure asks - as large as the
+					     card's height lets it be, up to FigureImage.OpenedScale (the code-behind says). -->
+					<!-- Close, or Back on a backup: a bare cross in the card's top right corner, as the notices close. -->
+					<Button Grid.Row="0" Grid.RowSpan="4" Classes="bareicon" ZIndex="1"
+							HorizontalAlignment="Right" VerticalAlignment="Top"
+							IsVisible="{Binding !IsBrowsable}"
+							Command="{Binding CloseCommand}"
+							IsEnabled="{Binding CanLeave}" ToolTip.ShowOnDisabled="True"
+							ToolTip.Tip="{Binding CloseHint}">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+					</Button>
+
+					<!-- The character in its gear once it is drawn; the class bare, from the game, where none will be. -->
+					<Panel x:Name="Stage" Grid.Row="1" Margin="0,0,0,12">
+						<!-- The town it is in, around its stash, under its feet: the
+						     game's own map tiles, read from the install. It reaches past this box to the
+						     card's edges and fades out before them. A shadow under the figure's feet too:
+						     without one it floated. -->
+						<base:TownBackdrop Picture="{Binding Selected.Backdrop}" Figure="{Binding Selected.Standing}"/>
+						<base:FigureImage Figure="{Binding Selected.BareFigure}"
+								IsVisible="{Binding Selected.ShowsClassPicture}"/>
+						<base:FigureImage AutomationProperties.Name="Character figure" Figure="{Binding Selected.Figure}"
+								IsVisible="{Binding Selected.HasFigure}"/>
+					</Panel>
+
+					<!-- Behind the words, over the town: they are read on dark whatever ground the act has - Lut
+					     Gholein's sand is light. Wider and taller than the words, clear at its rim. -->
+					<Border Grid.Row="2" Margin="-90,-26,-90,-34" MaxWidth="560" IsHitTestVisible="False"
+							Background="{DynamicResource [ABrush] Veil - Soft}"
+							IsVisible="{Binding Selected.Backdrop, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+
+					<StackPanel x:Name="Words" Grid.Row="2" HorizontalAlignment="Center" SizeChanged="OpenedCard_SizeChanged">
+						<!-- The name on its own line; under it, what PD2's .kills / .deaths / .played
+						     would say about this character - read from the save, not asked of the
+						     game - its grail, and the rename pencil. A row of their own since the
+						     pencil joined: beside the name, three buttons crowded it. -->
+						<TextBlock Text="{Binding Selected.Name}"
+								   FontFamily="{StaticResource DiabloFont}"
+								   FontSize="{StaticResource [Type] Display}" FontWeight="Bold"
+								   Foreground="{DynamicResource [Text] Heading}"
+								   HorizontalAlignment="Center"
+								   Effect="drop-shadow(0 0 10 Black)"/>
+						<StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" Margin="0,4,0,0">
+
+							<Button Classes="spend" VerticalAlignment="Center"
+									IsVisible="{Binding HasStats}"
+									ToolTip.Tip="{L 'Statistics'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Statistics}"/>
+
+								<Button.Flyout>
+									<!-- The gap as a margin, not VerticalOffset - see SortMenu:
+									     an offset pushes down even when the panel opens above. -->
+									<Flyout Placement="Bottom">
+										<Border Classes="menupanel"
+												Padding="14,10" MinWidth="260" Margin="0,4">
+											<Border.Styles>
+												<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+												<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+											</Border.Styles>
+
+											<ItemsControl ItemsSource="{Binding StatLines}">
+												<ItemsControl.ItemTemplate>
+													<DataTemplate x:DataType="vm:StatLine">
+														<Grid ColumnDefinitions="*,Auto">
+															<!-- A group heading: the same gold as the values,
+															     with room above it. -->
+															<TextBlock Grid.ColumnSpan="2"
+																	   Text="{Binding Label}"
+																	   FontWeight="Bold" Margin="0,10,0,3"
+																	   Foreground="{DynamicResource [Text] Body}"
+																	   IsVisible="{Binding IsHeading}"/>
+															<TextBlock Grid.Column="0" Classes="fieldname"
+																	   Text="{Binding Label}" Margin="0,1,16,1"
+																	   IsVisible="{Binding !IsHeading}"/>
+															<TextBlock Grid.Column="1" FontSize="{StaticResource [Type] Body}"
+																	   Text="{Binding Value}"
+																	   Foreground="{DynamicResource [Text] Body}"
+																	   HorizontalAlignment="Right" VerticalAlignment="Center"
+																	   IsVisible="{Binding !IsHeading}"/>
+														</Grid>
+													</DataTemplate>
+												</ItemsControl.ItemTemplate>
+											</ItemsControl>
+										</Border>
+									</Flyout>
+								</Button.Flyout>
+							</Button>
+
+							<!-- The grail of this character's mode: what the game has discovered of each list, out of how
+							     many. The same panel as the statistics, read afresh when opened. -->
+							<Button Classes="spend" VerticalAlignment="Center"
+									Command="{Binding ShowGrailCommand}"
+									ToolTip.Tip="{L 'Compendium'}">
+								<!-- A cup. -->
+								<Path Classes="pin" Data="{StaticResource [Glyph] Grail}"/>
+
+								<Button.Flyout>
+									<!-- The gap as a margin, not VerticalOffset - see SortMenu:
+									     an offset pushes down even when the panel opens above. -->
+									<Flyout Placement="Bottom">
+										<Border Classes="menupanel"
+												Padding="14,10" MinWidth="260" Margin="0,4">
+											<Border.Styles>
+												<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+												<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+											</Border.Styles>
+
+											<ItemsControl ItemsSource="{Binding GrailLines}">
+												<ItemsControl.ItemTemplate>
+													<DataTemplate x:DataType="vm:StatLine">
+														<Grid ColumnDefinitions="*,Auto">
+															<!-- A group heading: the same gold as the values,
+															     with room above it. -->
+															<TextBlock Grid.ColumnSpan="2"
+																	   Text="{Binding Label}"
+																	   FontWeight="Bold" Margin="0,10,0,3"
+																	   Foreground="{DynamicResource [Text] Body}"
+																	   IsVisible="{Binding IsHeading}"/>
+															<TextBlock Grid.Column="0" Classes="fieldname"
+																	   Text="{Binding Label}" Margin="0,1,16,1"
+																	   IsVisible="{Binding !IsHeading}"/>
+															<TextBlock Grid.Column="1" FontSize="{StaticResource [Type] Body}"
+																	   Text="{Binding Value}"
+																	   Foreground="{DynamicResource [Text] Body}"
+																	   HorizontalAlignment="Right" VerticalAlignment="Center"
+																	   IsVisible="{Binding !IsHeading}"/>
+														</Grid>
+													</DataTemplate>
+												</ItemsControl.ItemTemplate>
+											</ItemsControl>
+										</Border>
+									</Flyout>
+								</Button.Flyout>
+							</Button>
+
+						</StackPanel>
+
+						<TextBlock Text="{Binding Selected.Description}"
+								   Foreground="{DynamicResource [Text] Body}" FontSize="{StaticResource [Type] Body}"
+								   HorizontalAlignment="Center" Margin="0,3,0,0"/>
+
+						<StackPanel Orientation="Horizontal" Spacing="5"
+									HorizontalAlignment="Center" Margin="0,8,0,0">
+							<!-- Centred in the row, which the revive button (26 high) sets: stretched, their words
+							     sat at the top and the button looked low beside them. -->
+							<Border Classes="badge" VerticalAlignment="Center" BorderBrush="{Binding Selected.ModeBrush}">
+								<TextBlock Text="{Binding Selected.Mode}"
+										   Foreground="{Binding Selected.ModeBrush}"/>
+							</Border>
+							<Border Classes="badge" VerticalAlignment="Center"
+									BorderBrush="{DynamicResource [Text] Body}">
+								<TextBlock Text="{Binding Selected.Ruleset}"
+										   Foreground="{DynamicResource [Text] Body}"/>
+							</Border>
+							<Border Classes="badge" VerticalAlignment="Center" IsVisible="{Binding Selected.IsDead}"
+									BorderBrush="{DynamicResource [Brush] Rarity - Broken items}">
+								<TextBlock Text="{L 'DEAD'}"
+										   Foreground="{DynamicResource [Text] Danger}"/>
+							</Border>
+
+							<!-- Revive a dead hardcore character: Casual and Free. -->
+							<Button Classes="spend" VerticalAlignment="Center"
+									IsVisible="{Binding CanRevive}"
+									Classes.blocked="{Binding GameBlocked}"
+									IsEnabled="{Binding !GameBlocked}"
+									Command="{Binding ReviveCommand}"
+									ToolTip.Tip="{Binding ReviveHint}"
+									ToolTip.ShowOnDisabled="True">
+								<!-- A health cross, Google's Material Symbols "health_cross" (Apache 2.0, credited in
+								     THIRD-PARTY-NOTICES.md). A filled outline, so filled rather
+								     than stroked like the other small glyphs. -->
+								<Path Classes="pin" Data="{StaticResource [Glyph] Revive}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+							</Button>
+
+							<!-- The health mark: only when something is wrong with the open character,
+							     what is wrong on hover. The item tiles' impossible mark, larger. A Label, not a
+							     Border: a Border has no automation peer, so a test cannot find it. -->
+							<Label Background="Transparent" Padding="0" VerticalAlignment="Center"
+									AutomationProperties.AutomationId="HealthMark"
+									IsVisible="{Binding HasHealthIssue}"
+									ToolTip.Tip="{Binding HealthIssue}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Alert}" Stroke="{DynamicResource [Text] Danger}" Fill="#66CC2200"/>
+							</Label>
+						</StackPanel>
+
+						<TextBlock Text="{Binding Selected.LastSaved}" Classes="dim"
+								   HorizontalAlignment="Center" Margin="0,10,0,0"/>
+						<TextBlock Text="{Binding Selected.CreatedOn}" Classes="dim" Opacity="0.7"
+								   IsVisible="{Binding Selected.HasCreated}"
+								   HorizontalAlignment="Center"/>
+
+						<!-- The backup on screen, as its row in the Backups list reads. -->
+						<StackPanel IsVisible="{Binding HasOpenedBackup}" HorizontalAlignment="Center" Margin="0,8,0,0">
+							<TextBlock Classes="dim" Foreground="{DynamicResource [Text] Body}" HorizontalAlignment="Center">
+								<Run Text="{L 'Backup'}"/>
+								<Run Text="{Binding OpenedBackup.When}"/>
+							</TextBlock>
+							<TextBlock Text="{Binding OpenedBackup.Caption}" Classes="dim"
+									   IsVisible="{Binding OpenedBackup.HasCaption}"
+									   HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
+						</StackPanel>
+
+						<!-- A backup on screen, and only then: Close backup (the backups are out of the
+						     main flow - everything saves by itself, and undo and the history are the way back). The list
+						     they are opened from is in Settings, under Storage; it opens here by itself only when a
+						     character will not load. Restore is the top bar's alone: it stood here
+						     too, the same button twice on screen. -->
+						<StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" Margin="0,10,0,4"
+									IsVisible="{Binding ShowsRestore}">
+							<Button Classes="spend" VerticalAlignment="Center"
+									AutomationProperties.AutomationId="Backup_Close"
+									Command="{Binding CloseBackupCommand}"
+									ToolTip.Tip="{L 'Close backup'}" ToolTip.ShowOnDisabled="True">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</StackPanel>
+
+						<!-- Said plainly, because the backups below are the way out of it - and why, under it: it was only
+						     on the strip, and the card read as though the character would open. -->
+						<TextBlock FontWeight="Bold" IsVisible="{Binding LoadFailed}"
+								   Text="{L 'Character not opened.'}"
+								   Foreground="{DynamicResource [Text] Danger}"
+								   FontFamily="{StaticResource DiabloFont}"
+								   FontSize="{StaticResource [Type] Heading}"
+								   HorizontalAlignment="Center"
+								   Margin="0,10,0,0"/>
+						<TextBlock IsVisible="{Binding LoadFailed}"
+								   AutomationProperties.AutomationId="Home_LoadProblem"
+								   Text="{Binding LoadProblem}" Classes="dim"
+								   TextWrapping="Wrap" TextAlignment="Center" MaxWidth="460"
+								   HorizontalAlignment="Center" Margin="0,4,0,0"/>
+					</StackPanel>
+
+					<!-- Open again, after a failed load: under the words, in the row below them - in theirs, it stretched
+					     over the name - and the card's own button's size. -->
+					<Button Grid.Row="3" Margin="0,14,0,0" IsVisible="{Binding LoadFailed}"
+							VerticalAlignment="Top" HorizontalAlignment="Center"
+							Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+							HorizontalContentAlignment="Stretch"
+							Theme="{DynamicResource [CtrlThm] Button_Primary}"
+							AutomationProperties.AutomationId="Home_TryAgain"
+							Command="{Binding LoadCommand}"
+							ToolTip.Tip="{Binding LoadHint}">
+						<Grid ColumnDefinitions="Auto,*">
+							<Path Classes="pin label" Data="{StaticResource [Glyph] Enter}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+							<TextBlock Grid.Column="1" Text="{Binding LoadLabel}" Margin="6,0,0,0"
+									   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+						</Grid>
+					</Button>
+				</Grid>
+
+				<ListBox x:Name="Characters" Classes="characters state"
+						 Classes.on="{Binding IsBrowsable}"
+						 ItemsSource="{Binding Characters}"
+						 SelectedIndex="{Binding SelectedIndex}"
+						 DoubleTapped="Characters_DoubleTapped"
+						 ContextRequested="Characters_Context"
+						 KeyDown="Characters_KeyDown"
+						 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+						 ScrollViewer.AllowAutoHide="False"
+						 SizeChanged="Characters_SizeChanged">
+					<ListBox.ItemsPanel>
+						<ItemsPanelTemplate>
+							<!-- Top, not stretched. A UniformGrid divides whatever height it
+							     is given between its rows, and the list hands it the whole
+							     viewport - so a single row became the whole panel. -->
+							<UniformGrid Columns="{Binding Columns}" VerticalAlignment="Top"/>
+						</ItemsPanelTemplate>
+					</ListBox.ItemsPanel>
+					<ListBox.ItemTemplate>
+						<DataTemplate x:DataType="vm:CharacterCard">
+							<Grid ColumnDefinitions="Auto,*,Auto" Margin="2">
+								<!-- The figure animates only for the selected character, so
+								     a full page of them is not all moving at once. -->
+								<Panel Grid.Column="0" Width="76" Height="116" Classes.miss="{Binding IsFindMiss}"
+									   VerticalAlignment="Center" Margin="0,0,10,0">
+									<!-- The class bare, from the game's own sprites, where no figure in gear will be; still unless selected. -->
+									<base:FigureImage Figure="{Binding BareFigure}"
+										IsVisible="{Binding ShowsClassPicture}"
+										Animate="{Binding $parent[ListBoxItem].IsSelected}"/>
+									<base:FigureImage AutomationProperties.Name="Character figure" Figure="{Binding Figure}"
+											IsVisible="{Binding HasFigure}"
+											Animate="{Binding $parent[ListBoxItem].IsSelected}"/>
+								</Panel>
+
+								<StackPanel Grid.Column="1" VerticalAlignment="Center" Classes.miss="{Binding IsFindMiss}">
+									<TextBlock base:TrimmedTip.Tip="{Binding Name}" Text="{Binding Name}"
+											   FontFamily="{StaticResource DiabloFont}"
+											   FontSize="{StaticResource [Type] Heading}" FontWeight="Bold"
+											   Foreground="{DynamicResource [Text] Heading}"
+											   TextTrimming="CharacterEllipsis"/>
+									<TextBlock base:TrimmedTip.Tip="{Binding Description}" Text="{Binding Description}"
+											   Foreground="{DynamicResource [Text] Body}" FontSize="{StaticResource [Type] Small}"
+											   Margin="0,2,0,0"
+											   TextTrimming="CharacterEllipsis"/>
+
+									<StackPanel Orientation="Horizontal" Spacing="4" Margin="0,5,0,0">
+										<Border Classes="badge" BorderBrush="{Binding ModeBrush}">
+											<TextBlock Text="{Binding Mode}" Foreground="{Binding ModeBrush}"/>
+										</Border>
+										<Border Classes="badge"
+												BorderBrush="{DynamicResource [Text] Body}">
+											<TextBlock Text="{Binding Ruleset}"
+													   Foreground="{DynamicResource [Text] Body}"/>
+										</Border>
+										<Border Classes="badge" IsVisible="{Binding IsDead}"
+												BorderBrush="{DynamicResource [Brush] Rarity - Broken items}">
+											<TextBlock Text="{L 'DEAD'}"
+													   Foreground="{DynamicResource [Text] Danger}"/>
+										</Border>
+										<!-- What the standing search found on this character: how many, and under the
+										     pointer which, each with where it lies. -->
+										<!-- Filled, in the gold of a unique: the one thing on the card that is news. -->
+										<Border Classes="badge found" IsVisible="{Binding HasFinds}"
+												ToolTip.Tip="{Binding FoundLines}">
+											<TextBlock Text="{Binding FoundText}"
+													   AutomationProperties.AutomationId="Card_Found"
+													   AutomationProperties.HelpText="{Binding FoundLines}"/>
+										</Border>
+									</StackPanel>
+
+									<TextBlock base:TrimmedTip.Tip="{Binding LastSaved}" Text="{Binding LastSaved}" Classes="dim" Margin="0,6,0,0"
+											   TextTrimming="CharacterEllipsis"/>
+									<TextBlock base:TrimmedTip.Tip="{Binding CreatedOn}" Text="{Binding CreatedOn}" Classes="dim"
+											   Opacity="0.7" IsVisible="{Binding HasCreated}"
+											   TextTrimming="CharacterEllipsis"/>
+								</StackPanel>
+
+								<!-- Load, on the selected card (it was under the list). A
+								     double click or Enter opens it too. -->
+								<!-- On the selected card: rename, clone and delete in its top right corner -
+								     file operations, as Explorer's on a selected file - and open in its bottom right. F2 and
+								     Delete do the first and third, a double click or Enter opens. -->
+								<Grid Grid.Column="2" RowDefinitions="Auto,*,Auto" Margin="8,0,0,0"
+									  IsVisible="{Binding $parent[ListBoxItem].IsSelected}">
+									<StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
+										<!-- Rename: Casual and Free. The name picker asks for the new name. -->
+										<Panel IsVisible="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).CanRename}">
+											<Button Classes="spend" VerticalAlignment="Center"
+													Classes.blocked="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).GameBlocked}"
+													IsEnabled="{Binding !$parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).GameBlocked}"
+													Command="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).ToggleRenameCommand}"
+													ToolTip.Tip="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).RenameHint}"
+													ToolTip.ShowOnDisabled="True">
+												<!-- A pencil. -->
+												<Path Classes="pin" Data="{StaticResource [Glyph] Pencil}"/>
+											</Button>
+										</Panel>
+
+										<!-- Clone: the same name picker, naming a copy. Casual and Free, as rename. -->
+										<Panel IsVisible="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).CanRename}">
+											<Button Classes="spend" VerticalAlignment="Center"
+													Classes.blocked="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).GameBlocked}"
+													IsEnabled="{Binding !$parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).GameBlocked}"
+													Command="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).ToggleCloneCommand}"
+													ToolTip.Tip="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).CloneHint}"
+													ToolTip.ShowOnDisabled="True">
+												<!-- Two sheets. -->
+												<Path Classes="pin" Data="{StaticResource [Glyph] Duplicate}"/>
+											</Button>
+										</Panel>
+
+										<!-- Backups: this character's, listed without opening it - any play mode, wherever the card
+										     can be deleted (a card of the list, none open). What its menu's row does. -->
+										<Panel IsVisible="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).CanDelete}">
+											<Button Classes="spend" VerticalAlignment="Center"
+													AutomationProperties.AutomationId="Card_Backups"
+													Classes.blocked="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).GameBlocked}"
+													IsEnabled="{Binding !$parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).GameBlocked}"
+													Command="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).ShowSelectedBackupsCommand}"
+													ToolTip.Tip="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).BackupsHint}"
+													ToolTip.ShowOnDisabled="True">
+												<!-- The archive box: stored copies, as Settings draws them - not the strip's history clock, which
+												     is the undo's. -->
+												<Path Classes="pin" Data="{StaticResource [Glyph] Archive}"/>
+											</Button>
+										</Panel>
+
+										<!-- Delete: any play mode. Asked first; the files and their backups go, nothing kept. -->
+										<Panel IsVisible="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).CanDelete}">
+											<Button Classes="spend bin" VerticalAlignment="Center"
+													Classes.blocked="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).GameBlocked}"
+													IsEnabled="{Binding !$parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).GameBlocked}"
+													Command="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).DeleteCharacterCommand}"
+													ToolTip.Tip="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).DeleteHint}"
+													ToolTip.ShowOnDisabled="True">
+												<!-- A bin. -->
+												<Path Classes="pin" Data="{StaticResource [Glyph] Bin}"/>
+											</Button>
+										</Panel>
+									</StackPanel>
+
+									<Panel Grid.Row="2" HorizontalAlignment="Right">
+										<!-- The card's one action, the primary: OPEN with Material's "open_in_full"
+										     (credited in THIRD-PARTY-NOTICES.md). Named "Open" for UI Automation: the
+										     tests open a character by it. -->
+										<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" VerticalAlignment="Bottom"
+												HorizontalContentAlignment="Stretch"
+												Theme="{DynamicResource [CtrlThm] Button_Primary}"
+												AutomationProperties.Name="Open"
+												Command="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).LoadCommand}"
+												ToolTip.Tip="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).LoadHint}">
+											<!-- The icon at the left edge, the label centred in the space it leaves. -->
+							<Grid ColumnDefinitions="Auto,*">
+												<Path Classes="pin label" Data="{StaticResource [Glyph] Enter}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+												<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).OpenLabel}"/>
+											</Grid>
+										</Button>
+									</Panel>
+								</Grid>
+							</Grid>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+			</Panel>
+		</Border>
+	</DockPanel>
+
+	<!-- The open character's backups, over this page: by itself when a character will not load, which is when
+	     one is wanted here. Opened by hand it is Settings' (Storage), which shows the same list over itself. -->
+	<views:BackupPanel/>
+
+	<!-- Rename and clone asking for the name, over this page. -->
+	<views:NamePanel/>
+	</Panel>
+</UserControl>

@@ -1,0 +1,155 @@
+# Which UI cases a changed file calls for (tests/check.py changed): a pattern of paths, a tab, the tags of the
+# cases to run (tests/ui/units; kit.ps1 says what a case is). * stands for anything, folders included.
+# Kept beside the cases, so a case added for an area is found by the files of that area.
+#
+# Narrow before wide: a file that has its own line calls for its own cases and, by a folder's line under it,
+# for the folder's too. A unit file's own change calls for that file's cases, by the tag it wears - each wears
+# its script's name. `run.ps1 -List` shows every case with its tags.
+
+# ---- the search
+src/PD2SPCompanion.Shell/ViewModels/Shared/QuickSearch*	search
+src/PD2SPCompanion.Shell/ViewModels/Shared/Search*	search
+src/PD2SPCompanion.Shell/ViewModels/Shared/SearchPanel*	presets
+src/PD2SPCompanion.Shell/Views/Views/Shared/QuickSearch*	search
+src/PD2SPCompanion.Shell/Views/Views/Shared/Search*	search
+src/PD2SPCompanion.Shell/Views/Views/Shared/PresetSection*	presets
+src/PD2SPCompanion.Shell/CustomControls/Base/SearchBox.cs	search
+src/PD2SPCompanion.Shell/Services/Vault/VaultFilter.cs	search
+tests/ui/units/search*	search
+
+# ---- the Items page: the inventory, its panes, what is worn, the mercenary
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.WornSlots.cs	right-click
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.Menus.cs	right-click, menu
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.Clipboard.cs	clipboard
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.Mercenary.cs	mercenary
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.Socketing.cs	sockets
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L.Materials*	materials
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/Materials*	materials
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_L*	items
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Inventory/VP_View_Inv_L*	items, right-click, drag
+src/PD2SPCompanion.Shell/Services/Character/CharacterSession.Mercenary.cs	mercenary
+src/PD2SPCompanion.Shell/Services/Character/CharacterSession.Golem.cs	golem
+src/PD2SPCompanion.Shell/Services/Character/ItemLanding.cs	items, drag
+src/PD2SPCompanion.Shell/Services/Character/ItemLift.cs	items, drag
+src/PD2SPCompanion.Shell/Services/Character/CharacterSession.Sockets.cs	sockets
+src/PD2SPCompanion.Shell/Services/Character/SocketedEditHost.cs	sockets, edit
+src/PD2SPCompanion.Shell/Services/Character/CharacterSession*	items, edit
+src/PD2SPCompanion.Shell/Services/Character/AutoSave.cs	undo, edit, items
+src/PD2SPCompanion.Shell/Services/Character/SessionHistory.cs	undo, home
+src/PD2SPCompanion.Shell/Services/Character/LastSeasonGuard.cs	last-season
+src/PD2SPCompanion.Shell/Services/Character/SharedStashSession.cs	items, vault-drag-shared
+src/PD2SPCompanion.Shell/CustomControls/Base/ContainerGrid*	items, drag
+src/PD2SPCompanion.Shell/CustomControls/Base/MaterialsTab*	materials
+src/PD2SPCompanion.Shell/CustomControls/Base/SocketRow*	sockets
+src/PD2SPCompanion.Shell/CustomControls/Base/BinButton*	delete-key, vault-delete, items
+src/PD2SPCompanion.Shell/CustomControls/Base/PageDeck.cs	hidden-pages, window
+src/PD2SPCompanion.Shell/CustomControls/Base/OverflowRow.cs	vault-narrow
+src/PD2SPCompanion.Shell/CustomControls/Base/CrumbPanel.cs	vault-ways
+
+# ---- the Edit page: one item's editing
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_R.Properties.cs	properties
+src/PD2SPCompanion.Shell/ViewModels/Items/Editors/CraftingEditor.cs	craft
+src/PD2SPCompanion.Shell/ViewModels/Items/Editors/Corruption*	corruption, corrupt
+src/PD2SPCompanion.Shell/ViewModels/Items/Editors/Desecration*	corruption, corrupt
+src/PD2SPCompanion.Shell/ViewModels/Items/Editors/AffixEditor.cs	affixes
+src/PD2SPCompanion.Shell/ViewModels/Items/Editors/SocketsEditor.cs	sockets
+src/PD2SPCompanion.Shell/ViewModels/Items/SocketViewModel.cs	sockets
+src/PD2SPCompanion.Shell/Services/Generic/SocketCarry.cs	sockets, drag
+src/PD2SPCompanion.Shell/ViewModels/Items/Editors/BasicEditor.cs	basic, edit
+src/PD2SPCompanion.Shell/ViewModels/Items/Editors/*	edit, craft, corruption, affixes, forge
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Inventory/Editors/*	edit, craft, corruption, affixes, sockets, properties, forge
+src/PD2SPCompanion.Shell/ViewModels/Items/StatRow*	properties, edit
+src/PD2SPCompanion.Shell/ViewModels/Items/*	items, edit
+src/PD2SPCompanion.Shell/ViewModels/Shared/PropertyPicker*	properties
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Inventory/VP_ViewModel_Inv_R*	edit, sockets
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Inventory/VP_View_Inv_R*	edit, sockets, properties
+
+# ---- the vault, the Forge, the grail, the trade page
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Vault/ForgeViewModel.cs	forge
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Vault/ForgePanel*	forge
+src/PD2SPCompanion.Shell/Services/Vault/ForgeEditHost.cs	forge
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Vault/Grail*	grail
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_*	vault
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Vault/FolderCard.cs	vault
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Vault/VP_View_Vault_L*	vault, right-click
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Vault/*	vault
+src/PD2SPCompanion.Shell/Services/Vault/SeasonMigration*	season
+src/PD2SPCompanion.Shell/Services/Vault/*	vault
+src/PD2SPCompanion.Shell/Services/Settings/VaultLook.cs	vault
+src/PD2SPCompanion.Shell/CustomControls/Base/PageRowsHost*	vault
+src/PD2SPCompanion.Shell/CustomControls/Base/PagesMinimap*	vault
+src/PD2SPCompanion.Shell/CustomControls/Base/SortMenu*	vault, sort, stash-arrange
+src/PD2SPCompanion.Shell/ViewModels/Shared/SortChoice.cs	vault, sort, stash-arrange
+src/PD2SPCompanion.Shell/ViewModels/Shared/PickMenu.cs	vault, items
+src/PD2SPCompanion.Shell/ViewModels/Shared/MenuChoice.cs	vault, items
+src/PD2SPCompanion.Shell/CustomControls/Base/TileLayer*	vault, items, drag
+src/PD2SPCompanion.Shell/CustomControls/Base/CellLayer*	items, drag
+src/PD2SPCompanion.Shell/Views/Views/Shared/GrailPanel*	grail
+src/PD2SPCompanion.Shell/Views/Views/Shared/NamePanel*	vault, home
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Trade/*	trade
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Trade/*	trade
+
+# ---- the home page, the Character page, the guards
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Default/*	home
+src/PD2SPCompanion.Shell/Views/Views/Shared/BackupPanel*	backups
+src/PD2SPCompanion.Shell/Views/Views/Shared/HistoryList*	home, undo
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Default/*	home
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Char/*	character
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Char/*	character
+src/PD2SPCompanion.Shell/Services/Character/PatchGuard*	guards
+src/PD2SPCompanion.Shell/Services/Character/GameSync.cs	guards, home, game
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Experimental/*	experimental
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Experimental/*	experimental
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Extra/*	extra
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Extra/*	extra
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Settings/*	settings
+src/PD2SPCompanion.Shell/Views/Views/MainPages/Settings/*	settings
+
+# ---- the window: its keys, tooltips, scale, strips, fonts, folds
+src/PD2SPCompanion.Shell/Views/Windows/MainWindow*	scale, window
+src/PD2SPCompanion.Shell/Views/Views/MainView.axaml*	window, keys, frame
+src/PD2SPCompanion.Shell/ViewModels/MainViewModel.cs	window, keys
+src/PD2SPCompanion.Shell/Services/Settings/EditorSettings.cs	settings
+src/PD2SPCompanion.Shell/Services/Settings/UiScale.cs	scale
+src/PD2SPCompanion.Shell/Services/Settings/WhatsNewService.cs	whatsnew
+src/PD2SPCompanion.Shell/Services/Settings/TitleFont.cs	fonts
+src/PD2SPCompanion.Shell/Services/Settings/FoldMemory.cs	folds
+src/PD2SPCompanion.Shell/Services/Settings/KeySheetService.cs	keys
+src/PD2SPCompanion.Shell/Services/Generic/Messages/*	strip
+src/PD2SPCompanion.Shell/Services/Generic/TipActions.cs	tooltip
+src/PD2SPCompanion.Shell/CustomControls/Base/ItemActionTip*	tooltip
+src/PD2SPCompanion.Shell/CustomControls/Base/KeyedTip*	tooltip
+src/PD2SPCompanion.Shell/CustomControls/Base/Input/DragPick*	drag, vault-sheet, vault-folder-row
+src/PD2SPCompanion.Shell/CustomControls/Base/Input/NumericTextBox*	keys, edit
+src/PD2SPCompanion.Shell/CustomControls/Base/Input/*	keys
+src/PD2SPCompanion.Shell/Helper/ItemTipPlacement.cs	tooltip
+src/PD2SPCompanion.Shell/Helper/KeyedTips.cs	tooltip
+
+# ---- the cases themselves, and what they all stand on
+tests/ui/units/right-click*	right-click
+tests/ui/units/clipboard*	clipboard
+tests/ui/units/vault-sockets*	vault, sockets
+tests/ui/units/pages-scroll*	pages-list
+tests/ui/units/item-card*	edit
+
+# ---- the right-click menu, and the clipboard: one of each for the window
+src/PD2SPCompanion.Shell/ViewModels/Shared/ActMenu.cs	menu, right-click
+src/PD2SPCompanion.Shell/Services/Generic/ActMenuService.cs	menu, right-click
+src/PD2SPCompanion.Shell/CustomControls/Base/ActMenuHost*	menu, right-click, vault-tree
+src/PD2SPCompanion.Shell/Services/Generic/ItemClipboard.cs	clipboard
+src/PD2SPCompanion.Shell/Styles/CommonControls/ActMenu.axaml	menu, right-click
+src/PD2SPCompanion.Shell/Styles/CommonControls/KeyCap.axaml	menu, tooltip
+src/PD2SPCompanion.Shell/Styles/CommonControls/PaneEdge.axaml	vault, edit
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_L.Socketing.cs	vault, sockets
+src/PD2SPCompanion.Shell/ViewModels/Shared/SocketWords.cs	vault, sockets, items
+src/PD2SPCompanion.Shell/CustomControls/Base/KeepInView.cs	items
+src/PD2SPCompanion.Shell/CustomControls/Base/SidePanel.cs	items
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_L.Menus.cs	menu, right-click
+src/PD2SPCompanion.Shell/ViewModels/MainPages/Vault/VP_ViewModel_Vault_L.Clipboard.cs	clipboard
+tests/ui/units/forge*	forge
+tests/ui/units/vault*	vault
+tests/ui/units/merc-*	mercenary
+tests/ui/units/golem-panel*	golem
+tests/ui/units/tip-*	tooltip
+tests/ui/units/tooltip-again*	tooltip
+tests/ui/units/key*	keys

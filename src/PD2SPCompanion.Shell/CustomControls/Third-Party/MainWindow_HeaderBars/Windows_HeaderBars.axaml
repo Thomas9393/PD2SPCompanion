@@ -1,0 +1,164 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:chrome="using:Avalonia.Controls.Chrome"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+             x:Class="Layer_UserInterface.CustomControls.Windows_HeaderBars"
+			 
+			 mc:Ignorable="d" d:DesignWidth="{DynamicResource [UI] Windows MinWidth}" d:DesignHeight="{DynamicResource [UI] Windows MinHeight}"
+			 
+			 DockPanel.Dock="Top"
+			 >
+	<UserControl.Styles>
+		<!-- Its tooltips are the app's (Styles/CommonControls/ToolTip.axaml); a 2px copy here drifted. -->
+		<Style Selector="Button">
+			<Setter Property="CornerRadius" Value="0"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="Width" Value="{DynamicResource [UI] Windows HeaderBar_ButtonWidth}"/>
+			<Setter Property="Height" Value="{DynamicResource [UI] Windows HeaderBar_Height}"/>
+			<Setter Property="ToolTip.Placement" Value="Bottom"/>
+			<Setter Property="ToolTip.VerticalOffset" Value="{DynamicResource [UI] Windows HeaderBar_ToolTipOffset}"/>
+
+			<Style Selector="^ > Path">
+				<Setter Property="Margin" Value="10,0,10,0"/>
+				<Setter Property="Stretch" Value="Uniform"/>
+				<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+				<Setter Property="StrokeThickness" Value="1"/>
+				<Setter Property="Fill" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			</Style>
+		</Style>
+		<Style Selector="Button.Generic_HL">
+			<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="#44AAAAAA"/>
+			</Style>
+			<Style Selector="^:not(:pointerover):not(:focus-visible) /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="Transparent"/>
+			</Style>
+		</Style>
+		<Style Selector="Button.Alert_HL">
+			<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="{DynamicResource [Brush] Template - Border#1}"/>
+			</Style>
+			<Style Selector="^:not(:pointerover):not(:focus-visible) /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="Transparent"/>
+			</Style>
+			<Style Selector="^:pointerover > Path, ^:focus-visible > Path">
+				<Setter Property="Fill" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			</Style>
+			<Style Selector="^:not(:pointerover):not(:focus-visible) > Path">
+				<Setter Property="Fill" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			</Style>
+		</Style>
+	</UserControl.Styles>
+	
+	<StackPanel>
+		<!-- Avalonia 12 finds the drag region by hit test (HitTestChromeElement), so the
+		     element carrying the TitleBar role has to be hit-testable. A Panel with a null
+		     Background is not, which is why this strip needs the brush set on it directly.
+		     It used to be painted by a separate IsHitTestVisible="False" panel - under
+		     Avalonia 11 a non-hit-testable caption area was what made the window draggable,
+		     so that workaround has become the thing that breaks dragging. -->
+		<Grid chrome:WindowDecorationProperties.ElementRole="TitleBar"
+			  Background="{DynamicResource [Brush] Template - Header Background}">
+			<DockPanel Name="TitleBar">
+				<!-- Left Parts -->
+				<StackPanel Orientation="Horizontal"
+							DockPanel.Dock="Left"
+							Spacing="0">
+					<!-- Titles -->
+					<Border VerticalAlignment="Center"
+							MaxHeight="{DynamicResource [UI] Windows HeaderBar_Height}">
+						<!-- The name as the icon letters it: "PD2" large, and
+						     after it "SINGLE PLAYER" over "COMPANION", the upper line a little shorter than the
+						     lower. The whole name on one line ran under the search box in the row's middle. -->
+						<TextBlock Text=""
+								   FontSize="{StaticResource [Type] Display}"
+								   FontFamily="{StaticResource DiabloFont}"
+								   FontWeight="Heavy"
+								   Padding="8,0,0,0" Margin="0,-2,0,-6"
+								   Foreground="{DynamicResource [Text] Heading}"
+								   TextAlignment="Start"
+								   IsHitTestVisible="False"
+								   Name="HeaderTitle"/>
+					</Border>
+					<!-- The same margins as "PD2" wears, or the baselines part. They take the display line's
+					     height back to the bar's, and set the capitals 2 down, where the search bar sits. -->
+					<Panel VerticalAlignment="Center" Margin="3,-2,0,-6" IsHitTestVisible="False">
+						<!-- "COMPANION" stands on the line "PD2" stands on. Two text blocks share no baseline, so this
+						     one ends in a space
+						     at PD2's size: its line is then as tall as PD2's, and centered like it, the two
+						     baselines meet - in any font, with no measured offset. -->
+						<TextBlock Name="TitleEnd" HorizontalAlignment="Left" VerticalAlignment="Center"
+								   FontSize="{StaticResource [Type] Body}"
+								   FontFamily="{StaticResource DiabloFont}" FontWeight="Heavy"
+								   Foreground="{DynamicResource [Text] Heading}"><Run Text="{StaticResource [UI Text] App Title End}"/><Run Text="&#160;" FontSize="{StaticResource [Type] Display}"/></TextBlock>
+						<!-- The name's upper line starts where "COMPANION" starts and ends short of it, which the small
+						     tier (12) cannot do: at 12 it is the longer of the two. It
+						     sits in the room the taller line leaves over "COMPANION", its top at PD2's top (PD2 grew to
+						     the display size for it, where its
+						     capitals are as tall as the two lines and the air between them).
+						     type-guard-ok: lettering, as on the icon, at a size of its own. -->
+						<TextBlock Text="{StaticResource [UI Text] App Title Mid}" HorizontalAlignment="Left" VerticalAlignment="Top"
+								   Margin="0,5,0,0" FontSize="9"
+								   FontFamily="{StaticResource DiabloFont}" FontWeight="Heavy"
+								   Foreground="{DynamicResource [Text] Heading}"/>
+					</Panel>
+				</StackPanel>
+				<!-- Right Parts -->
+				<StackPanel HorizontalAlignment="Right"
+							Orientation="Horizontal"
+							Spacing="0">
+					<!-- A run on test copies says so (TestCopies): it looked exactly like the
+					     player's editor and was used as one. Before the window's buttons:
+					     after the title, the longer name pushed it over the search bar's arrows
+					     at the window's least width. -->
+					<Border Name="TestCopyBadge" IsVisible="False"
+							VerticalAlignment="Center" Margin="0,0,12,0" Padding="8,1"
+							CornerRadius="3" Background="#C0A01010">
+						<!-- color-guard-ok: white on the red TEST COPY badge. -->
+						<TextBlock Text="{L 'TEST COPY'}" FontSize="{StaticResource [Type] Small}" FontWeight="Bold" Foreground="White"
+								   VerticalAlignment="Center"/>
+					</Border>
+					<!-- Minimize Button -->
+					<Button Name="MinimizeButton"
+							chrome:WindowDecorationProperties.ElementRole="MinimizeButton"
+							Classes="Generic_HL">
+						<ToolTip.Tip>
+							<ToolTip Content="{L 'Minimize'}"
+									 Name="MinimizeToolTip"/>
+						</ToolTip.Tip>
+						<!-- Icon -->
+						<Path Data="M2048 1229v-205h-2048v205h2048z"></Path>
+					</Button>
+
+					<!-- Maximize Button -->
+					<Button Name="MaximizeButton"
+							chrome:WindowDecorationProperties.ElementRole="MaximizeButton"
+							Classes="Generic_HL">
+						<ToolTip.Tip>
+							<ToolTip Content="{L 'Maximize'}"
+									 Name="MaximizeToolTip"></ToolTip>
+						</ToolTip.Tip>
+						<!-- Icon -->
+						<Path Name="MaximizeIcon"
+							  Data="M2048 2048v-2048h-2048v2048h2048zM1843 1843h-1638v-1638h1638v1638z"></Path>
+					</Button>
+
+					<!-- Close Button -->
+					<Button Name="CloseButton"
+							chrome:WindowDecorationProperties.ElementRole="CloseButton"
+							Classes="Alert_HL">
+						<ToolTip.Tip>
+							<ToolTip Content="{L 'Close'}"
+									 Name="CloseToolTip"></ToolTip>
+						</ToolTip.Tip>
+						<Path Data="M1169 1024l879 -879l-145 -145l-879 879l-879 -879l-145 145l879 879l-879 879l145 145l879 -879l879 879l145 -145z"></Path>
+					</Button>
+				</StackPanel>
+			</DockPanel>
+		</Grid>
+	</StackPanel>
+</UserControl>

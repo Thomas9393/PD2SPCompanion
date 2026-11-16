@@ -1,0 +1,13 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  Every frame's fill stops at its inside edge (a corner radius, small or not, did not clip the
+	  content, which sometimes overlapped the frame).
+	  Avalonia's default draws a frame's fill out to the middle of its line, and at a rounded corner the fill's curve
+	  and the line's do not meet: the black of a grid or a slot showed past its gold corner as a dark notch, sharper
+	  at a scale of 125%. Drawn to the inside edge, the fill is never under the line.
+	-->
+	<Style Selector="Border">
+		<Setter Property="BackgroundSizing" Value="InnerBorderEdge"/>
+	</Style>
+</Styles>

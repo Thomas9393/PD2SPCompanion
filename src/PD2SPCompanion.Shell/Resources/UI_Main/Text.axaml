@@ -1,0 +1,18 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:sys="using:System">
+	<!-- Main UI Text -->
+	<sys:String x:Key="[UI Text] App Title">PROJECT DIABLO II SINGLE PLAYER COMPANION</sys:String>
+	<!-- The name in its parts. The splash sets "PROJECT DIABLO II" on a line and the
+	     rest on a second, at one size. The title row sets "PD2" large and, beside it, "SINGLE PLAYER" small
+	     over "COMPANION", as the icon letters it: on one line the name ran under the search box at the
+	     window's least width. -->
+	<sys:String x:Key="[UI Text] App Title Main">PROJECT DIABLO II</sys:String>
+	<sys:String x:Key="[UI Text] App Title Short">PD2</sys:String>
+	<sys:String x:Key="[UI Text] App Title Mid">SINGLE PLAYER</sys:String>
+	<sys:String x:Key="[UI Text] App Title End">COMPANION</sys:String>
+	<sys:String x:Key="[UI Text] App Title Rest">SINGLE PLAYER COMPANION</sys:String>
+	<!-- Game Info -->
+	<sys:String x:Key="[UI Text] Game Title">Project Diablo II</sys:String>
+
+</ResourceDictionary>

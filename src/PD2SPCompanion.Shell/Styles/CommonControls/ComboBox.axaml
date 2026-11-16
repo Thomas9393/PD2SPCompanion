@@ -1,0 +1,85 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  How a drop box looks in this editor. Lifted out of the inventory panel, where it was
+	  written and where it works, so that every page uses the one definition instead of a
+	  second description of the same thing.
+
+	  **A page has to include this itself.** Put in Application.Styles the /template/ rules
+	  never reach the popup, which has a visual tree of its own - the shared stash page spent
+	  several rounds with a white list proving it.
+
+	  The class is kept as it was. A page wanting a different size says so with a class of
+	  its own beside this one.
+	-->
+	<!-- The drop box brings its own chrome, and its list lives in a popup with a
+		     visual tree of its own - so the panel it opens into has to be dressed as
+		     well as the box itself, or the page has a white rectangle in it. -->
+	<!-- A locked drop box still says what it holds: Fluent's disabled text is near black on
+	     these panels, and the vault's Mode, locked to the loaded character, could not be read.
+	     Dimmed, not hidden. -->
+	<Styles.Resources>
+		<SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="#8C8C8C"/>
+	</Styles.Resources>
+	<Style Selector="ComboBox.slots /template/ Border#Background">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Field}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="2"/>
+	</Style>
+	<Style Selector="ComboBox.slots:pointerover /template/ Border#Background, ComboBox.slots:focus-visible /template/ Border#Background">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+	</Style>
+	<Style Selector="ComboBox.slots /template/ Path">
+		<Setter Property="Fill" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+	<!-- The chevron is a PathIcon, not a Path, and it takes its colour from Foreground
+		     rather than Fill - so the rule above never reached it and it stayed the theme's
+		     own grey beside gold text. -->
+	<Style Selector="ComboBox.slots /template/ PathIcon">
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+	<Style Selector="ComboBox.slots /template/ Border#PopupBorder">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Popup}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="3"/>
+	</Style>
+	<!-- A long list makes room for its scroll bar, as every scrolled list in the editor does: left to hide
+	     itself the bar lies over the list, and what a line says at its right edge - a base's tier - was
+	     under it. -->
+	<Style Selector="ComboBox.slots /template/ ScrollViewer">
+		<Setter Property="AllowAutoHide" Value="False"/>
+	</Style>
+	<Style Selector="ComboBox.slots ComboBoxItem">
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+		<Setter Property="Padding" Value="10,5"/>
+		<Setter Property="MinHeight" Value="0"/>
+	</Style>
+	<Style Selector="ComboBox.slots ComboBoxItem:pointerover /template/ ContentPresenter, ComboBox.slots ComboBoxItem:focus-visible /template/ ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		<Setter Property="TextElement.Foreground" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+	<Style Selector="ComboBox.slots ComboBoxItem:selected /template/ ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Field}"/>
+		<Setter Property="TextElement.Foreground" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+
+	<Style Selector="ComboBox.slots">
+		<Setter Property="MinHeight" Value="0"/>
+		<Setter Property="Height" Value="28"/>
+		<Setter Property="MinWidth" Value="150"/>
+		<Setter Property="Padding" Value="8,0"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Field}"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="2"/>
+	</Style>
+
+</Styles>

@@ -1,0 +1,426 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:vault="using:PD2SPCompanion.Shell.Services.Vault"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:controls="using:PD2SPCompanion.Shell.CustomControls.Base"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="760"
+             x:Class="PD2SPCompanion.Shell.Views.GrailPanel"
+             x:DataType="vm:GrailViewModel">
+
+	<!-- The grail, on the Items page's Grail bookmark and on the Extra page: moved whole from the Utilities page. Its
+	     view model says
+	     whether a card chosen searches (Items) or the grail is only browsed (Extra). -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ComboBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/BareIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemCard.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemWording.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemMarks.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Choice.axaml"/>
+
+		<!-- A grail card: the vault card's height, so the list reads as the vault's does and a
+		     long unique scrolls inside its card rather than stretching it. Greyed out until found. -->
+		<Style Selector="ListBox.grail ListBoxItem" x:DataType="vm:GrailCard">
+			<Setter Property="Height" Value="204"/>
+			<!-- Only a found card can be chosen: there is nothing in the vault to search for. Unseen
+			     by the pointer rather than disabled, so the press and the wheel go through to the list
+			     behind it - which scrolls (checked), and has nothing there to select - and no hover
+			     lights a card that does nothing. -->
+			<Setter Property="IsHitTestVisible" Value="{Binding TakesPointer}"/>
+		</Style>
+		<!-- Browsed (the Extra page): the pointer reaches a card so its properties scroll, but a card
+		     neither lights under it nor shows chosen - choosing does nothing there. -->
+		<Style Selector="ListBox.grail.browse ListBoxItem:pointerover /template/ ContentPresenter, ListBox.grail.browse ListBoxItem:selected /template/ ContentPresenter, ListBox.grail.browse ListBoxItem:focus-visible /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Card}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		</Style>
+		<Style Selector="ListBox.grail.browse ListBoxItem">
+			<Setter Property="Cursor" Value="Arrow"/>
+		</Style>
+		<!-- The tiers' row on the Uniques tab: its room kept, nothing drawn, nothing to press or reach by Tab. -->
+		<Style Selector="ItemsControl.grailtiers.away">
+			<Setter Property="Opacity" Value="0"/>
+			<Setter Property="IsHitTestVisible" Value="False"/>
+			<Setter Property="IsEnabled" Value="False"/>
+		</Style>
+		<Style Selector="Border.grailcard">
+			<Setter Property="Opacity" Value="0.45"/>
+		</Style>
+		<Style Selector="Border.grailcard.found">
+			<Setter Property="Opacity" Value="1"/>
+		</Style>
+		<!-- A card not found yet is only its name, its base and a line saying so: down the whole
+		     card and centred on it, level with the art beside it. -->
+		<Style Selector="DockPanel.grailhead.unfound">
+			<Setter Property="Grid.RowSpan" Value="2"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<!-- Details under the properties, and beside them once the card is wide enough for a
+		     column of their own. A container query, so it follows the card's width, not the
+		     window's: the panel between the two can be any width. Two copies of the section
+		     rather than one moved, because under the properties it scrolls with them. -->
+		<Style Selector="StackPanel.detailsbeside">
+			<Setter Property="IsVisible" Value="False"/>
+		</Style>
+		<ContainerQuery Name="grailcard" Query="min-width:520">
+			<Style Selector="StackPanel.detailsbeside">
+				<Setter Property="IsVisible" Value="True"/>
+			</Style>
+			<Style Selector="StackPanel.detailsbelow">
+				<Setter Property="IsVisible" Value="False"/>
+			</Style>
+		</ContainerQuery>
+		<!-- The small heading over each section, as the vault card's are. -->
+		<Style Selector="TextBlock.cardhead">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+			<Setter Property="Margin" Value="0,6,0,1"/>
+		</Style>
+		<!-- The tabs, in a row over the list (they stood in a column at
+		     the list's left, which took 130 of its width for the page's whole height and was the one column of
+		     choices in a program whose choices are rows). Each is two lines, always ("it worth always 2 lines"):
+		       its name, and after it - while the box holds anything - how many of its entries answer what is
+		         typed, in a pill; the pill comes into room that is there, so nothing moves for it;
+		       the grail's own mark and how many are found, "43 / 452";
+		     and along its foot that share as a line. The names are at the left: a tab with numbers on it is
+		     read as a row of a list is, name first, and a name in the middle left the pill nowhere to go. -->
+		<Style Selector="Button.choice.grailtab">
+			<Setter Property="Height" Value="48"/>
+			<Setter Property="Padding" Value="10,5,8,9"/>
+			<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+		</Style>
+		<!-- A tab that holds nothing of what is typed in the box steps back; it is still a tab, and clicked. -->
+		<Style Selector="Panel.grailtab.none">
+			<Setter Property="Opacity" Value="0.45"/>
+		</Style>
+		<!-- The second line and the pill take the button's own text color - the heading gold on a plain tab,
+		     dark on the filled one - so each reads on both. -->
+		<Style Selector="TextBlock.tabprogress">
+			<Setter Property="FontFamily" Value="{DynamicResource BodyFont}"/>
+			<Setter Property="FontWeight" Value="Normal"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Opacity" Value="0.8"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<Style Selector="Border.tabpill">
+			<Setter Property="CornerRadius" Value="8"/>
+			<Setter Property="Padding" Value="6,0"/>
+			<Setter Property="Margin" Value="6,0,0,0"/>
+			<Setter Property="Height" Value="16"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Background" Value="#70000000"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		</Style>
+		<Style Selector="Border.tabpill > TextBlock">
+			<Setter Property="FontFamily" Value="{DynamicResource BodyFont}"/>
+			<Setter Property="FontWeight" Value="Normal"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<!-- The mark before "43 / 452": the grail's own, small, in the line's color. -->
+		<Style Selector="Button.choice.grailtab Path.pin">
+			<Setter Property="Stroke" Value="{Binding $parent[Button].Foreground}"/>
+			<Setter Property="Opacity" Value="0.8"/>
+		</Style>
+		<!-- How far that part of the grail is: a line along the tab's foot, filled from the left. Over the
+		     button and not of it, so the button's own padding holds only its two lines. -->
+		<Style Selector="Border.tabtrack">
+			<Setter Property="Height" Value="2"/>
+			<Setter Property="Margin" Value="6,0,6,4"/>
+			<Setter Property="VerticalAlignment" Value="Bottom"/>
+			<Setter Property="IsHitTestVisible" Value="False"/>
+			<Setter Property="CornerRadius" Value="1"/>
+			<Setter Property="ClipToBounds" Value="True"/>
+			<Setter Property="Background" Value="#40A79066"/>
+		</Style>
+		<Style Selector="Border.tabtrack > Border">
+			<Setter Property="Background" Value="{DynamicResource [Text] Heading}"/>
+			<Setter Property="RenderTransformOrigin" Value="0%,50%"/>
+		</Style>
+		<Style Selector="Border.tabtrack.on">
+			<Setter Property="Background" Value="#40000000"/>
+		</Style>
+		<Style Selector="Border.tabtrack.on > Border">
+			<Setter Property="Background" Value="{DynamicResource [Text] On Primary}"/>
+		</Style>
+
+		<!-- The tabs and the tools, by the panel's own width - a container query, as the cards' is, so it
+		     follows the page and not the window (one line with room enough, two without):
+		     the tabs' row over the tools' row; on a wide page the two on one row, the tabs at the left. -->
+		<Style Selector="ItemsControl.grailtabs">
+			<Setter Property="Grid.Row" Value="0"/>
+			<Setter Property="Grid.Column" Value="0"/>
+			<Setter Property="Grid.ColumnSpan" Value="2"/>
+			<Setter Property="Margin" Value="0,0,0,8"/>
+		</Style>
+		<Style Selector="Grid.grailtools">
+			<Setter Property="Grid.Row" Value="1"/>
+			<Setter Property="Grid.Column" Value="0"/>
+			<Setter Property="Grid.ColumnSpan" Value="2"/>
+		</Style>
+		<ContainerQuery Name="grailpanel" Query="min-width:860">
+			<Style Selector="ItemsControl.grailtabs">
+				<Setter Property="Grid.ColumnSpan" Value="1"/>
+				<Setter Property="Width" Value="468"/>
+				<Setter Property="Margin" Value="0,0,12,0"/>
+			</Style>
+			<Style Selector="Grid.grailtools">
+				<Setter Property="Grid.Row" Value="0"/>
+				<Setter Property="Grid.Column" Value="1"/>
+				<Setter Property="Grid.ColumnSpan" Value="1"/>
+				<Setter Property="VerticalAlignment" Value="Center"/>
+			</Style>
+		</ContainerQuery>
+	</UserControl.Styles>
+
+	<!-- Grail: every unique and set piece as a vault card - the art, then its name, what it is made of, its
+	     properties with their ranges, and the copies held. Greyed out until the game discovers it; a click searches
+	     the vault for it by name, except where it is only browsed. Over the list: the tabs - PD2's own stash's - and
+	     the tools: the search, a quick filter and the sort. -->
+	<DockPanel Container.Name="grailpanel" Container.Sizing="Width">
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,0,0,6">
+			<ItemsControl Classes="grailtabs" ItemsSource="{Binding Tabs}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<UniformGrid Rows="1" ColumnSpacing="6"/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="vm:GrailTab">
+						<Panel Classes="grailtab" Classes.none="{Binding IsEmpty}">
+							<Button Classes="choice grailtab" Classes.current="{Binding IsCurrent}"
+									AutomationProperties.AutomationId="{Binding TabId}"
+									AutomationProperties.Name="{Binding Label}"
+									Command="{Binding $parent[ItemsControl].((vm:GrailViewModel)DataContext).ShowTabCommand}"
+									CommandParameter="{Binding Key}">
+								<Grid RowDefinitions="Auto,Auto" RowSpacing="2">
+									<StackPanel Grid.Row="0" Orientation="Horizontal">
+										<TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
+										<Border Classes="tabpill" IsVisible="{Binding HasMatches}">
+											<TextBlock AutomationProperties.AutomationId="{Binding MatchesId}" Text="{Binding Matches}"/>
+										</Border>
+									</StackPanel>
+									<StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="4">
+										<Path Classes="pin small" Data="{StaticResource [Glyph] Grail}"/>
+										<TextBlock Classes="tabprogress" AutomationProperties.AutomationId="{Binding ProgressId}" Text="{Binding Progress}"/>
+									</StackPanel>
+								</Grid>
+							</Button>
+							<Border Classes="tabtrack" Classes.on="{Binding IsCurrent}">
+								<Border>
+									<Border.RenderTransform>
+										<ScaleTransform ScaleX="{Binding Share}"/>
+									</Border.RenderTransform>
+								</Border>
+							</Border>
+						</Panel>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+
+			<!-- MinWidth 0 on the boxes: their theme's minimum is wider than a third of a
+			     narrow panel, and a box wider than its column is centred on it - which
+			     pushed the drop-down out past the cards' left edge. -->
+			<Grid Classes="grailtools" ColumnDefinitions="*,12,*,6,Auto">
+				<!-- The search first, as on every page that has one (the tools' order: what finds at
+				     the left, what shows at the right); then the item type for uniques, as the vault search
+				     lists them; the set for set pieces; the wiki's group for runewords. -->
+				<ComboBox Grid.Column="2" Classes="slots" MinWidth="0"
+						  HorizontalAlignment="Stretch" VerticalAlignment="Center"
+						  ItemsSource="{Binding QuickChoices}"
+						  SelectedItem="{Binding Quick, Mode=TwoWay}"
+						  ToolTip.Tip="{Binding QuickHint}">
+					<ComboBox.ItemTemplate>
+						<DataTemplate x:DataType="vault:FilterChoice">
+							<TextBlock Text="{Binding Shown}"/>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+
+				<base:SearchBox Grid.Column="0" Classes="value" Height="28" FontSize="{StaticResource [Type] Body}" MinWidth="0"
+						 VerticalAlignment="Center" Padding="2,0"
+						 Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"/>
+
+				<!-- No whose finds and no ethereal list after it: the game's Discovery keeps neither. -->
+				<controls:SortMenu Grid.Column="4" DataContext="{Binding Order}"
+								   VerticalAlignment="Center"/>
+			</Grid>
+
+			<!-- The game's five ways to show its tab (the game's tabs, our cards). -->
+			<ItemsControl Grid.Row="2" Grid.ColumnSpan="2" Margin="0,8,0,0" ItemsSource="{Binding Shows}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<UniformGrid Rows="1" ColumnSpacing="6"/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="vm:GrailShow">
+						<Button Classes="choice" Classes.current="{Binding IsCurrent}"
+								AutomationProperties.AutomationId="{Binding Id}"
+								Content="{Binding Label}"
+								Command="{Binding $parent[ItemsControl].((vm:GrailViewModel)DataContext).ShowOnlyCommand}"
+								CommandParameter="{Binding Key}"/>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+
+			<!-- The Sets tab's tiers, as the game's icons over it: All, Common, Uncommon, Class. Its
+			     room kept on the Uniques tab, nothing drawn there, so the cards do not move between the tabs. -->
+			<ItemsControl Grid.Row="3" Grid.ColumnSpan="2" Margin="0,6,0,0" Classes="grailtiers" Classes.away="{Binding !IsSets}"
+						  ItemsSource="{Binding Tiers}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<UniformGrid Rows="1" ColumnSpacing="6"/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="vm:GrailShow">
+						<Button Classes="choice" Classes.current="{Binding IsCurrent}"
+								AutomationProperties.AutomationId="{Binding Id}"
+								Content="{Binding Label}"
+								Command="{Binding $parent[ItemsControl].((vm:GrailViewModel)DataContext).ShowTierCommand}"
+								CommandParameter="{Binding Key}"/>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</Grid>
+
+		<!-- Selecting a card is what searches for it: the list's own selection look, rather
+		     than a button inside each card with a hover and press of its own. -->
+		<!-- Toggle: a second click on the card chosen lets it go, and its search with it. -->
+		<!-- Its cards' left edge under the tabs' and the title's: the card list's own room - its padding and a
+		     card's margin - set it 9 in, which was level with the tools while the tabs stood in a column. -->
+		<ListBox Classes="itemcards grail" Padding="0,0,0,6" Margin="-3,0,0,0"
+				 Classes.browse="{Binding BrowseOnly}"
+				 ItemsSource="{Binding Cards}"
+				 SelectedItem="{Binding Selected}"
+				 SelectionMode="Single,Toggle"
+				 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+				 ScrollViewer.AllowAutoHide="False">
+			<ListBox.ItemTemplate>
+				<DataTemplate x:DataType="vm:GrailCard">
+					<!-- The vault card's split: one part art, two parts words. Details
+					     beside take their own column first, so the split holds. -->
+					<!-- In colour once discovered or deposited, as the game's tab draws a deposited card. -->
+					<Border Classes="grailcard" Classes.found="{Binding ShowsProperties}"
+							Background="Transparent"
+							Container.Name="grailcard" Container.Sizing="Width">
+						<Grid ColumnDefinitions="1*,2*,Auto" RowDefinitions="Auto,*">
+							<!-- The item. -->
+							<!-- Faint while discovered and not stored, as the game draws a card not stored (GrailCard.SpriteOpacity). -->
+							<Panel Grid.Column="0" Grid.RowSpan="2" Margin="2,0,10,0"
+								   HorizontalAlignment="Center" VerticalAlignment="Center">
+								<Image Source="{Binding Sprite}" Stretch="Uniform"
+									   Width="{Binding SpriteWidth}" Height="{Binding SpriteHeight}" MaxHeight="132"
+									   Opacity="{Binding SpriteOpacity}"/>
+							</Panel>
+
+							<!-- Its name and what it is made of; at its right the compendium's two acts, as the game's tab
+							     has them: Store a copy held here, Take out the one deposited. -->
+							<DockPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
+									   Classes="grailhead" Classes.unfound="{Binding !ShowsProperties}">
+								<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top" Margin="8,0,0,0">
+									<Button Classes="bareicon" AutomationProperties.AutomationId="Grail_Store"
+											IsVisible="{Binding CanStore}"
+											Command="{Binding $parent[ListBox].((vm:GrailViewModel)DataContext).StoreCommand}"
+											CommandParameter="{Binding}"
+											ToolTip.Tip="{L 'Store in compendium (G)'}">
+										<Path Classes="pin" Data="{StaticResource [Glyph] Arrow down}"/>
+									</Button>
+									<Button Classes="bareicon" AutomationProperties.AutomationId="Grail_TakeOut"
+											IsVisible="{Binding CanTakeOut}"
+											Command="{Binding $parent[ListBox].((vm:GrailViewModel)DataContext).TakeOutCommand}"
+											CommandParameter="{Binding}"
+											ToolTip.Tip="{L 'Take out of compendium (G)'}">
+										<Path Classes="pin" Data="{StaticResource [Glyph] Arrow up}"/>
+									</Button>
+								</StackPanel>
+								<StackPanel>
+									<!-- A wrap panel so a long name still wraps, the mark
+									     following it, as the vault card puts "(runeword)". -->
+									<WrapPanel>
+										<TextBlock Text="{Binding Name}" FontWeight="Bold" TextWrapping="Wrap"
+												   Foreground="{Binding RarityBrush}" VerticalAlignment="Center"/>
+										<TextBlock Classes="etherealmark" Text="{L '(Ethereal)'}" Margin="6,0,0,0"
+												   VerticalAlignment="Center"
+												   IsVisible="{Binding ShowsEthereal}"/>
+									</WrapPanel>
+									<TextBlock Text="{Binding Subtitle}" Classes="dim" FontSize="{StaticResource [Type] Small}" TextWrapping="Wrap"/>
+									<!-- A copy deposited in the game's Compendium: the stash's Uniques or Sets tab. -->
+									<TextBlock Classes="ownedmark" Text="{L 'In compendium'}" Margin="0,2,0,0"
+											   AutomationProperties.AutomationId="Grail_Owned"
+											   IsVisible="{Binding IsOwned}"/>
+									<!-- A special the Ubers or a dungeon boss drop: shown, its name unmasked (the game says "???"), and
+									     not counted - as the game's own note says. -->
+									<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Margin="0,2,0,0"
+											   AutomationProperties.AutomationId="Grail_NotCounted"
+											   Text="{L 'Does not count towards discovery'}" IsVisible="{Binding !Counts}"/>
+									<!-- Not discovered yet: the name and what it is made of, and only that. -->
+									<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Margin="0,6,0,0"
+											   Text="{L '(Not discovered yet)'}" IsVisible="{Binding !IsFound}"/>
+								</StackPanel>
+							</DockPanel>
+
+							<ScrollViewer Grid.Row="1" Grid.Column="1" HorizontalScrollBarVisibility="Disabled"
+										  VerticalScrollBarVisibility="Auto" AllowAutoHide="False"
+										  IsVisible="{Binding ShowsProperties}">
+								<StackPanel>
+									<TextBlock Classes="cardhead" Text="{L 'Properties'}"/>
+									<ItemsControl ItemsSource="{Binding Stats}"
+												  ItemTemplate="{StaticResource ItemLine}"/>
+
+									<!-- A panel carries the test: the container query sets the section's own visibility. -->
+									<Panel IsVisible="{Binding ShowsHeld}">
+										<StackPanel Classes="detailsbelow">
+											<TextBlock Classes="cardhead" Text="{L 'Details'}"/>
+											<!-- Copies held: the character's, with the shared stash, and the open collection's. -->
+											<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" IsVisible="{Binding ShowsHeld}">
+												<Run Text="{L 'Character'}"/><Run Text=" "/><Run Text="{Binding HeldOnCharacter}" Foreground="{DynamicResource [Text] Body}"/>
+												<Run Text="      "/><Run Text="{L 'Vault'}"/><Run Text=" "/><Run Text="{Binding HeldInVault}" Foreground="{DynamicResource [Text] Body}"/>
+											</TextBlock>
+											<!-- And on the other characters of its mode: always there, so the line does not come and go. -->
+											<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Margin="0,0,0,4" IsVisible="{Binding ShowsHeld}"
+													   AutomationProperties.AutomationId="Grail_HeldOnOthers">
+												<Run Text="{L 'Other characters'}"/><Run Text=" "/><Run Text="{Binding HeldOnOthers}" Foreground="{DynamicResource [Text] Body}"/>
+											</TextBlock>
+										</StackPanel>
+									</Panel>
+								</StackPanel>
+							</ScrollViewer>
+
+							<!-- The panel carries the found test: the container query
+							     sets the section's own visibility, and a binding on the
+							     same property would win over it. -->
+							<Panel Grid.Row="1" Grid.Column="2" IsVisible="{Binding ShowsHeld}">
+							<StackPanel Classes="detailsbeside" Width="150" Margin="16,0,0,0">
+								<TextBlock Classes="cardhead" Text="{L 'Details'}"/>
+								<!-- Copies held: the character's, with the shared stash, and the open collection's. -->
+								<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" IsVisible="{Binding ShowsHeld}">
+									<Run Text="{L 'Character'}"/><Run Text=" "/><Run Text="{Binding HeldOnCharacter}" Foreground="{DynamicResource [Text] Body}"/>
+									<Run Text="      "/><Run Text="{L 'Vault'}"/><Run Text=" "/><Run Text="{Binding HeldInVault}" Foreground="{DynamicResource [Text] Body}"/>
+								</TextBlock>
+								<!-- And on the other characters of its mode: always there, so the line does not come and go. -->
+								<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Margin="0,0,0,4" IsVisible="{Binding ShowsHeld}"
+										   AutomationProperties.AutomationId="Grail_HeldOnOthers">
+									<Run Text="{L 'Other characters'}"/><Run Text=" "/><Run Text="{Binding HeldOnOthers}" Foreground="{DynamicResource [Text] Body}"/>
+								</TextBlock>
+							</StackPanel>
+							</Panel>
+						</Grid>
+					</Border>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+	</DockPanel>
+</UserControl>

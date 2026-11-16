@@ -1,0 +1,78 @@
+﻿<UserControl xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base" xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:helper="using:PD2SPCompanion.Shell.Helper"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="760"
+             x:Class="PD2SPCompanion.Shell.Views.NamePanel"
+             x:DataType="vm:VP_ViewModel_Default_L">
+
+	<!-- Rename and clone ask for the name as delete asks its question: a small picker over the
+	     landing's left page - title, name box, Cancel and the answer (it was a
+	     box in place of the card's name). Enter answers, Escape cancels. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+	</UserControl.Styles>
+
+	<Border Classes="veil"
+			IsVisible="{Binding IsNamePickerPresent}"
+			Classes.shown="{Binding IsRenaming}"
+			IsHitTestVisible="{Binding IsRenaming}">
+		<Panel>
+			<Button Classes="backdrop" Command="{Binding CancelRenameCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<!-- As tall as what it asks, centred: the delete question's size, not a list's. -->
+				<Border Classes="pickerpanel" VerticalAlignment="Center">
+					<StackPanel>
+						<TextBlock base:TrimmedTip.Tip="{Binding NameTitle}" Classes="pickertitle" Text="{Binding NameTitle}" TextTrimming="CharacterEllipsis"/>
+
+						<TextBox x:Name="NameBox" Classes="value" Margin="0,12,0,0" Height="30" MaxLength="15"
+								 helper:CharacterNameInput.IsOn="True"
+								 FontSize="{StaticResource [Type] Body}"
+								 Foreground="{DynamicResource [Text] Body}" CaretBrush="White"
+								 HorizontalContentAlignment="Left" TextAlignment="Left" Padding="8,0"
+								 Text="{Binding NewName}"
+								 PlaceholderText="{Binding NamePlaceholder}">
+							<TextBox.KeyBindings>
+								<KeyBinding Gesture="Enter" Command="{Binding ConfirmNameCommand}"/>
+								<KeyBinding Gesture="Escape" Command="{Binding CancelRenameCommand}"/>
+							</TextBox.KeyBindings>
+						</TextBox>
+
+						<!-- The confirm dialog's two answers. -->
+						<StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" Margin="0,16,0,0">
+							<!-- Compact, fitted to their labels and grouped at the bottom right, as the cards' CREATE and APPLY; the answer first and cancel last, Fluent 2's order for a Windows dialog (the two stretched halves looked cramped). -->
+							<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+									HorizontalContentAlignment="Stretch"
+									Theme="{DynamicResource [CtrlThm] Button_Primary}"
+									Classes.blocked="{Binding GameBlocked}"
+									IsEnabled="{Binding !GameBlocked}"
+									ToolTip.Tip="{Binding NameHint}" ToolTip.ShowOnDisabled="True"
+									Command="{Binding ConfirmNameCommand}">
+								<!-- The icon at the left edge, the label centred in the space it leaves. -->
+							<Grid ColumnDefinitions="Auto,*">
+									<Path Classes="pin label" Data="{StaticResource [Glyph] Tick}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+									<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{Binding NameConfirmLabel}"/>
+								</Grid>
+							</Button>
+							<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+									HorizontalContentAlignment="Stretch"
+									Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+									Command="{Binding CancelRenameCommand}">
+								<!-- The icon at the left edge, the label centred in the space it leaves. -->
+							<Grid ColumnDefinitions="Auto,*">
+									<Path Classes="pin label" Data="{StaticResource [Glyph] Close}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+									<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'CANCEL'}"/>
+								</Grid>
+							</Button>
+						</StackPanel>
+					</StackPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+</UserControl>

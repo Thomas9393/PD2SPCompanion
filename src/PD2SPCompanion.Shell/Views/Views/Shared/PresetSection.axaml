@@ -1,0 +1,110 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:controls="using:PD2SPCompanion.Shell.CustomControls.Base"
+             mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="320"
+             x:Class="PD2SPCompanion.Shell.Views.PresetSection"
+             x:DataType="vm:IPresetSection">
+
+	<!-- A panel's presets, in the panel (no second panel opening up): the search's and the drop
+	     rates'. The current preset on the folding header; what things are now; the name box, whose Keep keeps them,
+	     renames the preset they are or updates the one of that name; the list at a fixed height with its own
+	     scrollbar ("the long preset list just took up all the space"), a click being the preset at once, a bin on
+	     each but the built-in ones - their column kept, so every row ends at one edge. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<!-- For the sort menu and the bin it hosts, which wear it (SortMenu, BinButton). -->
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+	</UserControl.Styles>
+
+	<Border Classes="section" Padding="10,8">
+		<StackPanel>
+			<Grid ColumnDefinitions="*,Auto">
+				<Button Grid.Column="0" Classes="fold" Command="{Binding TogglePresetsCommand}">
+					<Grid ColumnDefinitions="Auto,Auto,*">
+						<Path Grid.Column="0" Classes="chevron"
+							  Classes.open="{Binding PresetsOpen}"
+							  Data="{StaticResource [Glyph] Chevron}"/>
+						<TextBlock Grid.Column="1" Classes="section" Text="{L 'Presets'}"/>
+						<TextBlock base:TrimmedTip.Tip="{Binding CurrentPresetName}" Grid.Column="2" Classes="dim" Margin="10,0,0,0" VerticalAlignment="Center"
+								   Text="{Binding CurrentPresetName}" TextTrimming="CharacterEllipsis"/>
+					</Grid>
+				</Button>
+				<!-- Where the list's order can be chosen (IPresetSection.Order): not for the search's presets. -->
+				<controls:SortMenu Grid.Column="1" DataContext="{Binding Order}">
+					<controls:SortMenu.IsVisible>
+						<MultiBinding Converter="{x:Static BoolConverters.And}">
+							<Binding Path="$parent[UserControl].((vm:IPresetSection)DataContext).PresetsOpen"/>
+							<Binding Path="$parent[UserControl].((vm:IPresetSection)DataContext).Order" Converter="{x:Static ObjectConverters.IsNotNull}"/>
+						</MultiBinding>
+					</controls:SortMenu.IsVisible>
+				</controls:SortMenu>
+			</Grid>
+
+			<StackPanel Spacing="6" Margin="0,8,0,0" IsVisible="{Binding PresetsOpen}">
+				<TextBlock Classes="dim" TextWrapping="Wrap" Text="{Binding Summary}" IsVisible="{Binding HasSummary}"/>
+				<Grid ColumnDefinitions="*,Auto">
+					<!-- Its own Enter, which keeps: no search box of the panel it sits in (the Custom play mode's, the drop
+					     rates'), which took Enter to step into the rows. -->
+					<TextBox Grid.Column="0" Classes="value" Height="28" MinWidth="0"
+							 base:PickerKeys.OwnsEnter="True"
+							 TextAlignment="Left" HorizontalContentAlignment="Left" Padding="6,0"
+							 FontSize="{StaticResource [Type] Body}"
+							 PlaceholderText="{L 'Name preset'}"
+							 Text="{Binding NameText}">
+						<TextBox.KeyBindings>
+							<KeyBinding Gesture="Enter" Command="{Binding KeepCommand}"/>
+						</TextBox.KeyBindings>
+					</TextBox>
+					<Button Grid.Column="1" Classes="spend" Margin="6,0,0,0" VerticalAlignment="Center"
+							Command="{Binding KeepCommand}"
+							ToolTip.Tip="{Binding KeepHint}" ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Bookmark}"/>
+					</Button>
+				</Grid>
+
+				<ScrollViewer Height="{Binding $parent[views:PresetSection].ListHeight}" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+					<ItemsControl ItemsSource="{Binding PresetRows}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate x:DataType="vm:PresetRowViewModel">
+								<Grid ColumnDefinitions="*,34" Margin="0,0,0,2">
+									<Button Grid.Column="0" Classes="pickone"
+											Classes.held="{Binding IsCurrent}"
+											Command="{Binding $parent[ItemsControl].((vm:IPresetSection)DataContext).ChooseCommand}"
+											CommandParameter="{Binding}">
+										<StackPanel>
+											<!-- In the page's own font: the headings' font on a name the user typed did not
+											     look good in the list. The headings' color still. -->
+											<TextBlock Text="{Binding Name}"
+													   Foreground="{DynamicResource [Text] Heading}"/>
+											<TextBlock Text="{Binding Summary}" Classes="dim" TextWrapping="Wrap"/>
+										</StackPanel>
+									</Button>
+
+									<!-- Asks twice, as every bin that deletes for good. -->
+									<base:BinButton Grid.Column="1" Compact="True"
+													VerticalAlignment="Center" Margin="6,0,0,0"
+													IsVisible="{Binding CanForget}"
+													Tip="{L 'Delete preset'}"
+													IsArmed="{Binding IsArmed}"
+													Command="{Binding $parent[ItemsControl].((vm:IPresetSection)DataContext).ForgetCommand}"
+													CommandParameter="{Binding}"/>
+								</Grid>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</ScrollViewer>
+			</StackPanel>
+		</StackPanel>
+	</Border>
+</UserControl>

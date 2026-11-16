@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="PD2SPCompanion.Testing" />
+    <Compile Include="..\TestPaths.cs" Link="TestPaths.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Items\SeasonFourteenListings.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PD2SPCompanion.Core\PD2SPCompanion.Core.csproj" />
+    <!-- Built first, and run as a player runs it (Cli/CommandLineTests.cs): nothing of it is compiled against. -->
+    <ProjectReference Include="..\..\src\PD2SPCompanion.Cli\PD2SPCompanion.Cli.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>

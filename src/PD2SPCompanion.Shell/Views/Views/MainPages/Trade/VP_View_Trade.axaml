@@ -1,0 +1,424 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:mvm="using:PD2SPCompanion.Shell.ViewModels"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Trade"
+			 x:DataType="vm:VP_ViewModel_Trade"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_R CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Trade/>
+	</Design.DataContext>
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemWording.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Choice.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Alert.axaml"/>
+
+	</UserControl.Styles>
+
+	<UserControl.Resources>
+		<!-- As the vault card lays an item out: one part art, with what is in its sockets in a row
+		     beneath, and two parts words, scrolling on their own. The listing's notes under the words,
+		     while buying. -->
+		<DataTemplate x:Key="TradeItem" x:DataType="vm:ItemTileViewModel">
+			<Grid ColumnDefinitions="1*,2*" Margin="12" TextElement.FontSize="{StaticResource [Type] Body}">
+				<StackPanel Grid.Column="0" Margin="0,0,12,0"
+							HorizontalAlignment="Center" VerticalAlignment="Center">
+					<Image Source="{Binding Sprite}" Stretch="None" HorizontalAlignment="Center"
+						   Opacity="{Binding SpriteOpacity}"/>
+					<base:SocketRow IsOneRow="True" Scale="0.65"
+									HorizontalAlignment="Center" Margin="0,6,0,0"/>
+				</StackPanel>
+
+				<ScrollViewer Grid.Column="1"
+							  HorizontalScrollBarVisibility="Disabled"
+							  VerticalScrollBarVisibility="Auto" AllowAutoHide="False">
+					<!-- No gutter held for a scrollbar: the bar takes its own room only when it shows. -->
+					<StackPanel VerticalAlignment="Center">
+						<TextBlock Text="{Binding Title}"
+								   Foreground="{Binding RarityBrush}"
+								   FontWeight="Bold" TextWrapping="Wrap"/>
+
+						<!-- The item's lines as its tooltip has them, and as the Edit page's summary: what its
+						     sockets give summed in, as the game reads it; Shift held, the item's own and each
+						     socket's beneath (one behavior for the three). The frame named
+						     each socket with what it gives at all times until then, the trade site's way. -->
+						<ItemsControl ItemsSource="{Binding Tooltip}"
+									  ItemTemplate="{StaticResource ItemLine}"/>
+
+						<!-- The key, where the item has something in a socket: no tooltip's strip says it here. -->
+						<base:KeyHints Hints="{Binding SocketHints}" IsVisible="{Binding HasFilledSockets}"
+									   Margin="0,8,0,0" HorizontalAlignment="Left"
+									   AutomationProperties.AutomationId="Trade_SocketKey"/>
+
+						<!-- What the listing had that could not be carried over. -->
+						<ItemsControl ItemsSource="{Binding $parent[UserControl].((vm:VP_ViewModel_Trade)DataContext).Notes}"
+									  IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Trade)DataContext).ShowsNotes}"
+									  Margin="0,8,0,0">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="x:String">
+									<TextBlock Classes="warn" Text="{Binding}" TextWrapping="Wrap"/>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</StackPanel>
+				</ScrollViewer>
+			</Grid>
+		</DataTemplate>
+	</UserControl.Resources>
+
+	<Panel>
+		<!-- Virtual Trading: a PD2 trade listing's link goes in the box, and the item it sells is
+		     rebuilt and shown in the black frame above it, as the game's own tooltip would show
+		     it. The waypoints are not this side: they are a panel on the right. -->
+		<DockPanel Margin="16" IsVisible="{Binding Session.IsLoaded}">
+			<!-- The title, and the page's fact at its right: what the materials tab
+			     is worth, the only currency a trade touches. -->
+			<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+				<TextBlock Grid.Column="0" Classes="title" Text="{L 'Virtual trading'}" VerticalAlignment="Center"/>
+				<TextBlock Grid.Column="1" Classes="dim" VerticalAlignment="Center"
+						   Text="{Binding HoldingText}"/>
+			</Grid>
+
+			<!-- Which side of a trade - a flat choice pair, the chosen one gold (they
+			     were the ornate tabs) - and what the materials tab holds. -->
+			<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,10">
+				<UniformGrid Grid.Column="0" Columns="2" Width="{StaticResource [UI] Pair Width}" VerticalAlignment="Center" Margin="-3,0">
+					<Button Classes="choice" Classes.current="{Binding IsBuying}" Margin="3,0"
+							Command="{Binding ShowBuyCommand}" Content="{L 'BUY'}"/>
+					<Button Classes="choice" Classes.current="{Binding IsSelling}" Margin="3,0"
+							Command="{Binding ShowSellCommand}" Content="{L 'SELL'}"/>
+				</UniformGrid>
+
+				<!-- What was bought and sold, listed (the ledger was written at
+				     every trade and shown nowhere). -->
+				<Button Grid.Column="2" Classes="spend" Margin="0,0,6,0"
+						AutomationProperties.AutomationId="Trade_Records"
+						Command="{Binding ShowRecordsCommand}"
+						ToolTip.Tip="{L 'Trade records'}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] List}"/>
+				</Button>
+
+				<!-- The trade site itself, in the browser. The price table is the Settings page's Trade
+				     section. -->
+				<Button Grid.Column="3" Classes="spend"
+						Command="{Binding OpenTradeSiteCommand}"
+						ToolTip.Tip="{L 'Trade site'}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Globe}"/>
+				</Button>
+			</Grid>
+
+			<!-- The link first, where buying starts: pasted, its item in the frame, then the price and Buy
+			     under it (it was under the frame). A whole listing link shows its item
+			     as soon as it is pasted; anything else turns the box red. Left-aligned and white: a link is
+			     words, not a number. -->
+			<TextBox DockPanel.Dock="Top" Classes="value" Margin="0,0,0,10"
+					 Height="28" FontSize="{StaticResource [Type] Body}"
+					 Foreground="{DynamicResource [Text] Body}" CaretBrush="White"
+					 HorizontalContentAlignment="Left" TextAlignment="Left" Padding="6,0"
+					 PlaceholderText="{L 'Paste a PD2 trade listing link'}"
+					 Classes.invalid="{Binding IsLinkInvalid}"
+					 ToolTip.Tip="{Binding LinkProblem}"
+					 IsVisible="{Binding IsBuying}"
+					 Text="{Binding Link}"/>
+
+			<!-- The listing's price on the left, as the seller typed it, and what to do about it on the
+			     right - always there while buying, off until a listing is shown (the
+			     row used to appear with the item). The sale's $ in the same place. -->
+			<Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,12,0,0"
+				  IsVisible="{Binding IsBuying}">
+				<TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="{StaticResource [Type] Body}"
+						   Foreground="{DynamicResource [Text] Body}"
+						   Opacity="{Binding PriceOpacity}"
+						   TextTrimming="CharacterEllipsis"
+						   ToolTip.Tip="{Binding PriceText}"
+						   Text="{Binding PriceText}"/>
+				<!-- Bought before, where the play mode buys once: the app's warning mark beside Buy, saying
+				     who bought it and when - and Buy still buys (it refused until then). -->
+				<!-- A Label around it, as the health mark has: a Path has no automation peer, so a test cannot find it. -->
+				<Label Grid.Column="1" Background="Transparent" Padding="0" VerticalAlignment="Center"
+					   AutomationProperties.AutomationId="Trade_BoughtBefore"
+					   IsVisible="{Binding WasBoughtBefore}"
+					   ToolTip.Tip="{Binding BoughtBefore}">
+					<Path Classes="pin alert" Data="{StaticResource [Glyph] Alert}"/>
+				</Label>
+				<!-- The dollar sign, as the sale's: money changes hands. -->
+				<Button Grid.Column="2" Classes="spend" Margin="0,0,6,0"
+						Command="{Binding ConfirmCommand}"
+						ToolTip.Tip="{L 'Buy'}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Dollar}"/>
+				</Button>
+				<Button Grid.Column="3" Classes="spend"
+						Command="{Binding ClearCommand}"
+						ToolTip.Tip="{L 'Clear'}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Clean}"/>
+				</Button>
+			</Grid>
+
+			<!-- The item selected on the left page - the inventory's, or beside the vault the card's - up for sale: selling it - the search and the
+			     price together. No clear: selecting another, or none, changes it. The dollar sign, since the price table
+			     left this page for Settings. Always there
+			     while selling, off with nothing selected. -->
+			<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right"
+						Margin="0,12,0,0" IsVisible="{Binding IsSelling}">
+				<Button Classes="spend"
+						Command="{Binding OpenSaleCommand}"
+						ToolTip.Tip="{L 'Sell'}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Dollar}"/>
+				</Button>
+			</StackPanel>
+
+			<!-- Gold, and black inside, like the game's tooltip; 1 thick, as the character card's (it was 2). -->
+			<Border BorderBrush="{DynamicResource [UI] GradBrush - Frame - Golden#02}"
+					BorderThickness="1" CornerRadius="3"
+					Background="Black">
+				<Panel>
+					<!-- Nothing to sell: the item is the one selected on the page beside this one, inventory or vault. -->
+					<base:LoadCharacterNotice IsVisible="{Binding ShowsSellHint}"
+											  Message="{L 'Please select an item.'}"/>
+
+					<!-- As the page says when no character is open: one line, words only - not a click. -->
+					<base:LoadCharacterNotice IsVisible="{Binding ShowsLinkHint}"
+											  Message="{L 'Please enter a trade link.'}"/>
+
+					<!-- A listing on its way, in place of that line; the strip says if it failed. -->
+					<base:LoadCharacterNotice IsVisible="{Binding ShowsLoading}"
+											  Message="{L 'Loading...'}"/>
+
+					<!-- The listing's item while buying, the marked one while selling - one template. -->
+					<ContentControl IsVisible="{Binding ShowsItem}"
+									Content="{Binding Item}" ContentTemplate="{StaticResource TradeItem}"/>
+					<ContentControl IsVisible="{Binding ShowsSellItem}"
+									Content="{Binding SellItem}" ContentTemplate="{StaticResource TradeItem}"/>
+				</Panel>
+			</Border>
+		</DockPanel>
+
+		<!-- The payment for a purchase - see PaymentPanel. A sale's is in the sale's own panel, below. -->
+		<Border Classes="veil"
+				IsVisible="{Binding IsPaymentPresent}"
+				Classes.shown="{Binding IsPaymentOpen}"
+				IsHitTestVisible="{Binding IsPaymentOpen}">
+			<Panel>
+				<Button Classes="backdrop" Command="{Binding ClosePaymentCommand}"/>
+
+				<Panel Classes="pickerframe">
+					<views:PaymentPanel DataContext="{Binding Payment}"/>
+				</Panel>
+			</Panel>
+		</Border>
+
+		<!-- The trade records: every purchase and sale the vault's ledger holds, newest first, to read - the
+		     picker's own panel, as the backups' list. -->
+		<Border Classes="veil"
+				IsVisible="{Binding IsRecordsPresent}"
+				Classes.shown="{Binding IsRecordsOpen}"
+				IsHitTestVisible="{Binding IsRecordsOpen}">
+			<Panel>
+				<Button Classes="backdrop" Command="{Binding CloseRecordsCommand}"/>
+
+				<Panel Classes="pickerframe">
+					<Border Classes="pickerpanel">
+						<DockPanel>
+							<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,8">
+								<TextBlock Grid.Column="0" Classes="pickertitle" Text="{L 'Trade records'}"/>
+								<TextBlock Grid.Column="1" Classes="dim" VerticalAlignment="Center" Margin="10,0,0,0"
+										   AutomationProperties.AutomationId="Trade_RecordsCount"
+										   IsVisible="{Binding HasRecords}"
+										   Text="{Binding RecordsCount}"/>
+								<Button Grid.Column="2" Classes="spend"
+										Command="{Binding CloseRecordsCommand}"
+										ToolTip.Tip="{L 'Close'}">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+								</Button>
+							</Grid>
+
+							<TextBlock DockPanel.Dock="Top" Classes="dim" IsVisible="{Binding !HasRecords}"
+									   Text="{L 'No trades yet.'}"/>
+
+							<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+								<!-- Rows built only where they are in sight: a ledger is every trade of every character,
+								     for as long as the vault is kept. -->
+								<ItemsControl ItemsSource="{Binding Records}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<VirtualizingStackPanel CacheLength="1"/>
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+									<ItemsControl.ItemTemplate>
+										<DataTemplate x:DataType="vm:VP_ViewModel_Trade+TradeLine">
+											<!-- The item and what was done with it on one line; what moved for it, and when,
+											     who and in which mode, under them. -->
+											<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" Margin="0,0,0,10" Background="Transparent"
+												  AutomationProperties.AutomationId="Trade_Record">
+												<!-- Cut where it does not fit, and said whole under the pointer: a price is the seller's
+												     own words, any length (one pushed its item's name off the row). -->
+												<ToolTip.Tip>
+													<TextBlock Text="{Binding Tip}" TextWrapping="Wrap" MaxWidth="420"/>
+												</ToolTip.Tip>
+												<TextBlock Grid.Row="0" Grid.Column="0" Classes="body"
+														   Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+												<TextBlock Grid.Row="0" Grid.Column="1" Classes="body" Margin="12,0,0,0"
+														   HorizontalAlignment="Right" Text="{Binding Deal}"
+														   TextTrimming="CharacterEllipsis" MaxWidth="240"/>
+												<TextBlock Grid.Row="1" Grid.Column="0" Classes="dim"
+														   Text="{Binding About}" TextTrimming="CharacterEllipsis"/>
+												<TextBlock Grid.Row="1" Grid.Column="1" Classes="dim" Margin="12,0,0,0"
+														   HorizontalAlignment="Right" Text="{Binding Moved}"
+														   TextTrimming="CharacterEllipsis" MaxWidth="260"/>
+											</Grid>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</ScrollViewer>
+						</DockPanel>
+					</Border>
+				</Panel>
+			</Panel>
+		</Border>
+
+		<!-- A sale: the listings like the marked item - what "like" means, edited by the player - and
+		     the sale itself, in one panel with a fold each, so the listings stay in sight while the
+		     price is set. -->
+		<Border Classes="veil"
+				IsVisible="{Binding IsSalePresent}"
+				Classes.shown="{Binding IsSaleOpen}"
+				IsHitTestVisible="{Binding IsSaleOpen}">
+			<Panel>
+				<Button Classes="backdrop" Command="{Binding CloseSaleCommand}"/>
+
+				<Panel Classes="pickerframe">
+					<Border Classes="pickerpanel">
+						<DockPanel>
+							<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,6">
+								<TextBlock Grid.Column="0" Classes="pickertitle" Text="{L 'Sell'}"/>
+
+								<Button Grid.Column="1" Classes="spend"
+										Command="{Binding CloseSaleCommand}"
+										ToolTip.Tip="{L 'Close'}">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+								</Button>
+							</Grid>
+
+							<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+								<!-- No gutter held for a scrollbar: the bar takes its own room only when it shows. -->
+								<StackPanel>
+									<!-- Similar listings: the filters, the properties, and what they find. -->
+									<!-- The fold, and on its right the search and the way back to the item's own, as the
+									     Properties card has its + (they were under the form). -->
+									<Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,4">
+										<Button Grid.Column="0" Classes="fold" Command="{Binding ToggleSearchSectionCommand}">
+											<Grid ColumnDefinitions="Auto,*">
+												<Path Grid.Column="0" Classes="chevron" Classes.open="{Binding IsSearchSectionOpen}"
+													  Data="{StaticResource [Glyph] Chevron}"/>
+												<TextBlock Grid.Column="1" Classes="pickertitle" Margin="8,0,0,0"
+														   Text="{L 'Similar listings'}"/>
+											</Grid>
+										</Button>
+										<Button Grid.Column="1" Classes="spend" Margin="6,0,0,0" VerticalAlignment="Center"
+												IsVisible="{Binding IsSearchSectionOpen}"
+												Command="{Binding Search.SearchCommand}"
+												ToolTip.Tip="{L 'Search'}">
+											<Path Classes="pin" Data="{StaticResource [Glyph] Magnifier}"/>
+										</Button>
+										<Button Grid.Column="2" Classes="spend" Margin="6,0,0,0" VerticalAlignment="Center"
+												IsVisible="{Binding IsSearchSectionOpen}"
+												Command="{Binding Search.ResetCommand}"
+												ToolTip.Tip="{L 'Reset'}">
+											<Path Classes="pin" Data="{StaticResource [Glyph] Undo}"/>
+										</Button>
+									</Grid>
+									<!-- The fold on a panel around the search, so it is read on this page, not the search. -->
+									<Panel IsVisible="{Binding IsSearchSectionOpen}">
+										<StackPanel Margin="0,0,0,10" Spacing="10"
+													DataContext="{Binding Search}" x:DataType="vm:SellSearchViewModel">
+											<!-- The vault's search, filled from the item. -->
+											<views:ItemSearchForm DataContext="{Binding Form}"/>
+
+											<!-- How the search went: the list's own caption. -->
+											<TextBlock Classes="dim" TextWrapping="Wrap" Text="{Binding Status}"
+													   IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+											<!-- The listings found. -->
+											<ItemsControl ItemsSource="{Binding Results}">
+												<ItemsControl.ItemTemplate>
+													<DataTemplate x:DataType="vm:SimilarListing">
+														<!-- The item's tooltip on the row, as a grid shows it on a tile. -->
+														<Grid ColumnDefinitions="36,*,Auto" Margin="8,4" Background="Transparent"
+															  Classes="itemtip">
+															<ToolTip.Tip>
+																<ContentControl Content="{Binding Tile}"
+																				ContentTemplate="{StaticResource ItemTip}"/>
+															</ToolTip.Tip>
+															<Image Grid.Column="0" Width="28" Height="28" Stretch="Uniform"
+																   Source="{Binding Tile.Sprite}"/>
+															<StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
+																<TextBlock Foreground="{Binding Tile.RarityBrush}"
+																		   TextTrimming="CharacterEllipsis"
+																		   Text="{Binding Tile.View.Name}"/>
+																<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{Binding Age}"/>
+															</StackPanel>
+															<TextBlock Grid.Column="2" VerticalAlignment="Center" MaxWidth="220"
+																	   TextTrimming="CharacterEllipsis"
+																	   Foreground="{DynamicResource [Text] Body}"
+																	   ToolTip.Tip="{Binding Price}"
+																	   Text="{Binding Price}"/>
+														</Grid>
+													</DataTemplate>
+												</ItemsControl.ItemTemplate>
+											</ItemsControl>
+										</StackPanel>
+									</Panel>
+
+									<!-- The sale: the price, and the currency coming in. -->
+									<Button Classes="fold" Command="{Binding ToggleSaleSectionCommand}" Margin="0,0,0,4">
+										<Grid ColumnDefinitions="Auto,*">
+											<Path Grid.Column="0" Classes="chevron" Classes.open="{Binding IsSaleSectionOpen}"
+												  Data="{StaticResource [Glyph] Chevron}"/>
+											<TextBlock Grid.Column="1" Classes="pickertitle" Margin="8,0,0,0"
+													   Text="{L 'Sale'}"/>
+										</Grid>
+									</Button>
+									<StackPanel IsVisible="{Binding IsSaleSectionOpen}">
+										<TextBlock Classes="dim" Margin="0,0,0,8" Text="{Binding Payment.Subtitle}"/>
+										<views:PaymentBody DataContext="{Binding Payment}"/>
+									</StackPanel>
+								</StackPanel>
+							</ScrollViewer>
+						</DockPanel>
+					</Border>
+				</Panel>
+			</Panel>
+		</Border>
+
+		<!-- The sale search's property picker, over the sale and only while it shows. -->
+		<Panel IsVisible="{Binding IsSalePresent}">
+			<Panel IsVisible="{Binding Search, Converter={x:Static ObjectConverters.IsNotNull}}">
+				<views:PropertyPicker DataContext="{Binding Search.Form.Properties}"/>
+			</Panel>
+		</Panel>
+
+		<!-- In place of the page while nothing is open. The line is the way back. -->
+		<base:LoadCharacterNotice
+			IsVisible="{Binding !Session.IsLoaded}"
+			Command="{Binding $parent[views:MainView].((mvm:MainViewModel)DataContext).GoHomeCommand}"/>
+	</Panel>
+</UserControl>

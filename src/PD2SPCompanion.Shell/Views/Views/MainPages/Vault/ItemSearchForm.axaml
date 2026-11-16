@@ -1,0 +1,255 @@
+﻿<UserControl xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base" xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             xmlns:vault="using:PD2SPCompanion.Shell.Services.Vault"
+             xmlns:controls="using:PD2SPCompanion.Shell.CustomControls.Base"
+             xmlns:views="using:PD2SPCompanion.Shell.Views"
+             x:Class="PD2SPCompanion.Shell.Views.ItemSearchForm"
+             x:DataType="vm:SearchForm">
+	<!--
+	  The vault's search form: the name, the basics, the property rows - the trade site's own panel,
+	  less what a single-player library has no use for. The vault's right page shows it over the
+	  vault's search; the trading page's sale over one filled from the item for sale, where the
+	  folders and dates, which a listing has none of, are left out. Its property picker is
+	  PropertyPicker, placed by the page over whatever it should cover.
+	-->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ComboBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/RowIcon.axaml"/>
+	</UserControl.Styles>
+
+	<!-- Labels over their fields, left as every form's (they were centred). -->
+	<StackPanel Spacing="12">
+		<Border Classes="section" Padding="12,10">
+			<StackPanel Spacing="8">
+				<!-- A heading, as Basics and Properties have; what the box reads - name, base or stat - is its
+				     placeholder, where a label stood
+				     over a box that said "Any". The box is known to a test by its id: it has no label to stand under.
+				     A search box as every other is: the magnifier, and the cross that empties it. -->
+				<TextBlock Classes="heading" Text="{L 'Keyword'}"/>
+				<base:SearchBox Classes="value" Height="28" FontSize="{StaticResource [Type] Body}"
+						 HorizontalContentAlignment="Left" TextAlignment="Left"
+						 AutomationProperties.AutomationId="Search_Keyword"
+						 AutomationProperties.Name="{Binding NameCaption}"
+						 PlaceholderText="{Binding NameCaption}"
+						 Text="{Binding Filter.Name, UpdateSourceTrigger=PropertyChanged}"/>
+
+				<!-- The vault's own. (Where to look - "Search in" - stood first here: every folder is looked
+				     through, and the list of finds says which each is in.) -->
+				<StackPanel Spacing="6" IsVisible="{Binding InVault}">
+					<!-- Items held more than once, while the play rule marks them. -->
+					<StackPanel Spacing="6" IsVisible="{Binding Filter.OffersDuplicates}">
+						<TextBlock Classes="fieldname" Text="{L 'Duplicates'}" Margin="0,6,0,0"/>
+						<ComboBox Classes="slots" HorizontalAlignment="Stretch"
+								  ItemsSource="{x:Static vault:VaultFilter.DuplicateChoices}"
+								  SelectedItem="{Binding Filter.Duplicates, Mode=TwoWay}">
+							<ComboBox.ItemTemplate>
+								<DataTemplate x:DataType="vault:FilterChoice">
+									<TextBlock Text="{Binding Shown}"/>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+					</StackPanel>
+
+					<!-- One item's copies, from a duplicate badge's click. -->
+					<Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0" IsVisible="{Binding Filter.HasSameId}">
+						<TextBlock Classes="dim" Text="{L 'One item\'s copies'}" VerticalAlignment="Center"/>
+						<Button Grid.Column="1" Classes="rowicon" Command="{Binding ClearSameIdCommand}"
+								ToolTip.Tip="{L 'Show all'}">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Clean}"/>
+						</Button>
+					</Grid>
+				</StackPanel>
+			</StackPanel>
+		</Border>
+
+		<Border Classes="section" Padding="12,10">
+			<StackPanel Spacing="8">
+				<TextBlock Classes="heading" Text="{L 'Basics'}"/>
+
+				<!-- Two to a row, each a label over its picker; the three yes-or-no ones share the last row.
+				     (Not two and one, with Ethereal beside Rarity: the Family box takes
+				     that place, and seven boxes two to a row leave a hole.) -->
+				<Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,Auto,8,Auto,Auto">
+					<TextBlock Grid.Row="0" Grid.Column="0" Classes="fieldname" Text="{L 'Type'}" Margin="0,0,0,4"/>
+					<ComboBox Grid.Row="1" Grid.Column="0" Classes="slots" HorizontalAlignment="Stretch"
+							  ItemsSource="{Binding Filter.TypeChoices}"
+							  SelectedItem="{Binding Filter.Type, Mode=TwoWay}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate x:DataType="vault:FilterChoice">
+								<TextBlock Text="{Binding Shown}" TextTrimming="CharacterEllipsis" base:TrimmedTip.Tip="{Binding Shown}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+
+					<TextBlock Grid.Row="0" Grid.Column="2" Classes="fieldname" Text="{L 'Base'}" Margin="0,0,0,4"/>
+					<!-- A base is picked within a type, so it waits for one. -->
+					<ComboBox Grid.Row="1" Grid.Column="2" Classes="slots" HorizontalAlignment="Stretch"
+							  IsEnabled="{Binding Filter.CanPickBase}"
+							  ItemsSource="{Binding Filter.BaseChoices}"
+							  SelectedItem="{Binding Filter.Base, Mode=TwoWay}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate x:DataType="vault:FilterChoice">
+								<TextBlock Text="{Binding Shown}" TextTrimming="CharacterEllipsis" base:TrimmedTip.Tip="{Binding Shown}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+
+					<TextBlock Grid.Row="3" Grid.Column="0" Classes="fieldname" Text="{L 'Rarity'}" Margin="0,0,0,4"/>
+					<ComboBox Grid.Row="4" Grid.Column="0" Classes="slots" HorizontalAlignment="Stretch"
+							  AutomationProperties.AutomationId="Search_Rarity"
+							  ItemsSource="{Binding Filter.RarityChoices}"
+							  SelectedItem="{Binding Filter.Rarity, Mode=TwoWay}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate x:DataType="vault:FilterChoice">
+								<TextBlock Text="{Binding Shown}" TextTrimming="CharacterEllipsis" base:TrimmedTip.Tip="{Binding Shown}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+
+					<TextBlock Grid.Row="3" Grid.Column="2" Classes="fieldname" Text="{L 'Family'}" Margin="0,0,0,4"/>
+					<!-- A craft's family - Blood, Caster... - is a crafted item's, so it waits for that rarity,
+					     as a base waits for a type: there always, dim until then. -->
+					<ComboBox Grid.Row="4" Grid.Column="2" Classes="slots" HorizontalAlignment="Stretch"
+							  AutomationProperties.AutomationId="Search_Family"
+							  IsEnabled="{Binding Filter.CanPickFamily}"
+							  ItemsSource="{Binding Filter.FamilyChoices}"
+							  SelectedItem="{Binding Filter.Family, Mode=TwoWay}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate x:DataType="vault:FilterChoice">
+								<TextBlock Text="{Binding Shown}" TextTrimming="CharacterEllipsis" base:TrimmedTip.Tip="{Binding Shown}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+				</Grid>
+
+				<Grid ColumnDefinitions="*,10,*,10,*" RowDefinitions="Auto,Auto">
+					<TextBlock Grid.Row="0" Grid.Column="0" Classes="fieldname" Text="{L 'Ethereal'}" Margin="0,0,0,4"/>
+					<ComboBox Grid.Row="1" Grid.Column="0" Classes="slots" HorizontalAlignment="Stretch" MinWidth="0"
+							  ItemsSource="{Binding Filter.YesNoChoices}"
+							  SelectedItem="{Binding Filter.Ethereal, Mode=TwoWay}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate x:DataType="vault:FilterChoice">
+								<TextBlock Text="{Binding Shown}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+
+					<TextBlock Grid.Row="0" Grid.Column="2" Classes="fieldname" Text="{L 'Corrupted'}" Margin="0,0,0,4"/>
+					<ComboBox Grid.Row="1" Grid.Column="2" Classes="slots" HorizontalAlignment="Stretch" MinWidth="0"
+							  ItemsSource="{Binding Filter.YesNoChoices}"
+							  SelectedItem="{Binding Filter.Corrupted, Mode=TwoWay}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate x:DataType="vault:FilterChoice">
+								<TextBlock Text="{Binding Shown}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+
+					<TextBlock Grid.Row="0" Grid.Column="4" Classes="fieldname" Text="{L 'Desecrated'}" Margin="0,0,0,4"/>
+					<ComboBox Grid.Row="1" Grid.Column="4" Classes="slots" HorizontalAlignment="Stretch" MinWidth="0"
+							  ItemsSource="{Binding Filter.YesNoChoices}"
+							  SelectedItem="{Binding Filter.Desecrated, Mode=TwoWay}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate x:DataType="vault:FilterChoice">
+								<TextBlock Text="{Binding Shown}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+				</Grid>
+
+				<!-- One range, [Min] - [Max], as the properties' bounds. -->
+				<StackPanel Spacing="4">
+					<TextBlock Classes="fieldname" Text="{L 'Sockets'}" Margin="0"/>
+					<!-- Each the width of a picker above, the columns' own (as the trade site has them). -->
+					<Grid ColumnDefinitions="*,10,*">
+						<controls:NumericTextBox Grid.Column="0" Classes="value" HorizontalAlignment="Stretch" MinWidth="0" Height="28" FontSize="{StaticResource [Type] Body}"
+												 Minimum="0" Maximum="6"
+												 PlaceholderText="{L 'Min'}"
+												 Text="{Binding Filter.SocketsMin, UpdateSourceTrigger=PropertyChanged}"/>
+						<TextBlock Grid.Column="1" Classes="dim" Text="–" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+						<controls:NumericTextBox Grid.Column="2" Classes="value" HorizontalAlignment="Stretch" MinWidth="0" Height="28" FontSize="{StaticResource [Type] Body}"
+												 Minimum="0" Maximum="6"
+												 PlaceholderText="{L 'Max'}"
+												 Text="{Binding Filter.SocketsMax, UpdateSourceTrigger=PropertyChanged}"/>
+					</Grid>
+				</StackPanel>
+			</StackPanel>
+		</Border>
+
+		<!-- Properties, as the trade site has them: as many rows as wanted, and an
+		     item must satisfy them all. A row with no bounds asks only that the
+		     item has the property. -->
+		<Border Classes="section" Padding="12,10">
+			<StackPanel Spacing="8">
+				<Grid ColumnDefinitions="*,Auto">
+					<TextBlock Grid.Column="0" Classes="heading" Text="{L 'Properties'}"
+							   VerticalAlignment="Center"/>
+					<Button Grid.Column="1" Classes="spend"
+							Command="{Binding OpenPropertyPickerCommand}"
+							ToolTip.Tip="{L 'Add property'}">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+					</Button>
+				</Grid>
+
+				<TextBlock Classes="dim" IsVisible="{Binding !Filter.HasProperties}"
+						   Text="{L 'No properties.'}" HorizontalAlignment="Center"/>
+
+				<ItemsControl ItemsSource="{Binding Filter.Properties}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate x:DataType="vault:PropertyFilterRow">
+							<StackPanel Spacing="4" Margin="0,0,0,10">
+								<Grid ColumnDefinitions="*,Auto,Auto">
+									<TextBlock Grid.Column="0" Text="{Binding Label}" TextWrapping="Wrap"
+											   VerticalAlignment="Center" Margin="0,0,8,0"
+											   Foreground="{DynamicResource [Text] Body}"/>
+									<!-- The item's own number, where the search was filled from one. -->
+									<TextBlock Grid.Column="1" Classes="dim" VerticalAlignment="Center" Margin="0,0,8,0"
+											   IsVisible="{Binding HasRoll}" Text="{Binding Roll}"/>
+									<Button Grid.Column="2" Classes="spend" VerticalAlignment="Top"
+											Command="{Binding $parent[UserControl].((vm:SearchForm)DataContext).RemovePropertyCommand}"
+											CommandParameter="{Binding}"
+											ToolTip.Tip="{L 'Remove property'}">
+										<Path Classes="pin" Data="{StaticResource [Glyph] Clean}"/>
+									</Button>
+								</Grid>
+
+								<!-- The skill, where the property names one, then the bounds. -->
+								<!-- Columns wide enough for the boxes: a box keeps the theme's
+								     minimum width, and in narrower ones the last ran past the row. -->
+								<Grid ColumnDefinitions="*,8,72,Auto,72">
+									<ComboBox Grid.Column="0" Classes="slots" HorizontalAlignment="Stretch"
+											  IsVisible="{Binding PicksSkill}"
+											  ItemsSource="{Binding SkillChoices}"
+											  SelectedItem="{Binding Skill, Mode=TwoWay}">
+										<ComboBox.ItemTemplate>
+											<DataTemplate x:DataType="vault:FilterChoice">
+												<TextBlock Text="{Binding Shown}" TextTrimming="CharacterEllipsis" base:TrimmedTip.Tip="{Binding Shown}"/>
+											</DataTemplate>
+										</ComboBox.ItemTemplate>
+									</ComboBox>
+									<!-- MinWidth 0: the theme's own minimum is wider than the column, and
+									     the last box ran past the row's edge. -->
+									<controls:NumericTextBox Grid.Column="2" Classes="value" Height="28" FontSize="{StaticResource [Type] Body}"
+															 MinWidth="0"
+															 PlaceholderText="{L 'Min'}"
+															 Text="{Binding Min, UpdateSourceTrigger=PropertyChanged}"/>
+									<TextBlock Grid.Column="3" Classes="dim" Text="–" VerticalAlignment="Center" Margin="6,0"/>
+									<!-- A little in from the edge, so it ends where the buttons above it do. -->
+									<controls:NumericTextBox Grid.Column="4" Classes="value" Height="28" FontSize="{StaticResource [Type] Body}"
+															 MinWidth="0" Margin="0,0,1,0"
+															 PlaceholderText="{L 'Max'}"
+															 Text="{Binding Max, UpdateSourceTrigger=PropertyChanged}"/>
+								</Grid>
+							</StackPanel>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</StackPanel>
+		</Border>
+	</StackPanel>
+</UserControl>

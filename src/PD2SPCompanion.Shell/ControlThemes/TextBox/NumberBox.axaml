@@ -1,0 +1,51 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  A number box's inside, slim. A box that takes a few digits wore the framework's whole text box: a
+	  validation host, a grid with room for content left and right of the text, a floating watermark, a scroll
+	  viewer with its two scroll bars, a watermark - 21 controls for one number, and a property row has one, an
+	  item a dozen rows. Here it is the frame and the text: 4.
+
+	  Based on the framework's theme, so every setter and every state of it stands - the pointer over it, the
+	  focus, disabled - and they find the frame by the name they always did (PART_BorderElement). Given up,
+	  and not missed by a number in a box as wide as nine digits: scrolling a text longer than the box, the
+	  watermark, content beside the text. A box of words keeps the framework's template (ValueBox.axaml hands
+	  this one to NumericTextBox alone).
+	-->
+	<ControlTheme x:Key="[CtrlThm] NumberBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Panel>
+					<Border Name="PART_BorderElement"
+							Background="{TemplateBinding Background}"
+							BorderBrush="{TemplateBinding BorderBrush}"
+							BorderThickness="{TemplateBinding BorderThickness}"
+							CornerRadius="{TemplateBinding CornerRadius}"
+							MinWidth="{TemplateBinding MinWidth}"
+							MinHeight="{TemplateBinding MinHeight}"/>
+					<Border Margin="{TemplateBinding BorderThickness}"
+							Padding="{TemplateBinding Padding}"
+							Cursor="IBeam" ClipToBounds="True">
+						<TextPresenter Name="PART_TextPresenter"
+									   Text="{TemplateBinding Text, Mode=TwoWay}"
+									   CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+									   CaretIndex="{TemplateBinding CaretIndex}"
+									   SelectionStart="{TemplateBinding SelectionStart}"
+									   SelectionEnd="{TemplateBinding SelectionEnd}"
+									   TextAlignment="{TemplateBinding TextAlignment}"
+									   TextWrapping="{TemplateBinding TextWrapping}"
+									   LineHeight="{TemplateBinding LineHeight}"
+									   LetterSpacing="{TemplateBinding LetterSpacing}"
+									   PasswordChar="{TemplateBinding PasswordChar}"
+									   RevealPassword="{TemplateBinding RevealPassword}"
+									   SelectionBrush="{TemplateBinding SelectionBrush}"
+									   SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+									   CaretBrush="{TemplateBinding CaretBrush}"
+									   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+									   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+					</Border>
+				</Panel>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+</ResourceDictionary>

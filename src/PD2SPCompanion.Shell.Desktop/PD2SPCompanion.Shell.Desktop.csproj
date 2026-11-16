@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>PD2SPCompanion</AssemblyName>
+    <RootNamespace>PD2SPCompanion.Shell.Desktop</RootNamespace>
+
+    <!-- The version is src/Directory.Build.props', shared by every project (AppVersion reads it). -->
+
+    <!-- The name Windows shows for the file: its properties, Task Manager, the taskbar's jump list
+         ("Project Diablo II Single Player Companion"). The file itself is PD2SPCompanion.exe,
+         named with the projects. -->
+    <Product>Project Diablo II Single Player Companion</Product>
+    <AssemblyTitle>Project Diablo II Single Player Companion</AssemblyTitle>
+
+    <!-- The icon Windows shows for the file and on the taskbar. Both windows already set
+         this same file as their own icon; without it here the executable kept the default
+         one, so the editor looked like a stock app everywhere outside its own frame. -->
+    <ApplicationIcon>..\PD2SPCompanion.Shell\Assets\pd2spc.ico</ApplicationIcon>
+
+    <!-- No profile-guided recompiling: with it, code used often was compiled a second time with counters
+         in it and ran slower while it counted - the first item selected froze 145 ms on average, 85 ms
+         without it, opening a character 463 ms against 414, and later selects the same (the published
+         build, ten starts each). -->
+    <TieredPGO>false</TieredPGO>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PD2SPCompanion.Shell\PD2SPCompanion.Shell.csproj" />
+  </ItemGroup>
+
+  <!-- Language packs and the translators' template, beside the exe. -->
+  <ItemGroup>
+    <None Include="Languages\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- The folder a player's own title font goes in, beside the exe, with its note (Services/Settings/TitleFont).
+       Only the note ships: a font file left here in the source tree is the developer's own and is not copied. -->
+  <ItemGroup>
+    <None Include="Fonts\README.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- What the licenses ask to travel with the program, beside the single exe. -->
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Link="LICENSE" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="..\..\THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="..\PD2SPCompanion.Shell\Assets\Fonts\Cinzel-OFL.txt" Link="Fonts\Cinzel-OFL.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(NetCoreTargetingPackRoot)\..\ThirdPartyNotices.txt" Link="DOTNET-THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

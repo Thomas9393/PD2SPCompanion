@@ -1,0 +1,71 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             x:Class="PD2SPCompanion.Shell.CustomControls.Base.SortMenu"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 x:DataType="vm:MenuChoice">
+	<!--
+	  A menu button - the order control, as Explorer's Sort, and any other MenuChoice such as a
+	  filter, which sets its own Glyph. The order control is an icon button that opens a menu of the modes, then
+	  Ascending and Descending, a tick beside the ones in force (a tick, not a bullet: one mark for "on").
+	  Picking the mode already in
+	  force turns the order the other way. Bind its DataContext to a SortChoice and it is wired.
+
+	      <base:SortMenu DataContext="{Binding Order}"/>
+
+	  Nothing here is new dress: the button is the toolbar's own spend button, the menu is a
+	  picker's section frame, and each line is a picker row (pickone), lit where it is in force.
+	  The row styles are included on the menu itself rather than on this control - the menu
+	  opens in a popup, and whether a style from outside reaches a popup has cost this project
+	  more than once.
+	-->
+	<!-- The opener's own two files (SpendButton, ActionButton) are its hosts' to include, as the guard has it
+	     (PD2UI005: "by every view that hosts it"): included here they were read again for every menu made -
+	     five of them with the Items page's sections at every character opened, 25 ms of it. -->
+
+	<Button Name="Opener"
+			Classes.spend="{Binding !$parent[base:SortMenu].IsLarge}"
+			Classes.lock="{Binding $parent[base:SortMenu].IsLarge}"
+			ToolTip.Tip="{Binding Hint}" ToolTip.ShowOnDisabled="True">
+		<Path Classes="pin" Data="{Binding $parent[base:SortMenu].Glyph}"/>
+
+		<Button.Flyout>
+			<!-- A few pixels off the button, so the menu is not pressed against it. A margin, not
+			     VerticalOffset: an offset always pushes down, so when there is no room below and
+			     the menu opens above the button instead, it pushed the menu into the button. A
+			     margin top and bottom keeps the gap on whichever side it opens. -->
+			<Flyout Placement="BottomEdgeAlignedRight">
+				<Border Classes="menupanel" MinWidth="150" Margin="0,4">
+					<Border.Styles>
+						<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+						<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+					</Border.Styles>
+
+					<ItemsControl ItemsSource="{Binding Options}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate x:DataType="vm:SortOption">
+								<!-- A rule above the directions sets them apart from the modes, as
+								     Explorer's does. -->
+								<Border BorderThickness="{Binding Rule}"
+										Padding="{Binding Room}"
+										BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}">
+									<Button Classes="pickone" Margin="0,1"
+											Classes.held="{Binding IsCurrent}"
+											Click="Row_Click">
+										<Grid ColumnDefinitions="20,*">
+											<Path Grid.Column="0" Classes="pin" HorizontalAlignment="Left" VerticalAlignment="Center"
+												  Data="{StaticResource [Glyph] Tick}"
+												  IsVisible="{Binding IsCurrent}"/>
+											<TextBlock Grid.Column="1" Text="{Binding Shown}"
+													   Foreground="{DynamicResource [Text] Body}"/>
+										</Grid>
+									</Button>
+								</Border>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</Border>
+			</Flyout>
+		</Button.Flyout>
+	</Button>
+</UserControl>

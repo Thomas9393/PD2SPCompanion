@@ -1,0 +1,85 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base">
+	<!--
+	  An item's tile in a grid or a worn slot, and the grid's frame: the grids (ContainerGrid) and the
+	  Items page's worn and mercenary slots draw items the same way (these seven were
+	  written out word for word in both).
+	-->
+	<!-- The charm section, ruled off across the inventory. -->
+	<Style Selector="Border.charmline">
+		<Setter Property="Height" Value="1"/>
+		<Setter Property="IsHitTestVisible" Value="False"/>
+		<Setter Property="VerticalAlignment" Value="Top"/>
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		<Setter Property="Opacity" Value="0.55"/>
+	</Style>
+	<Style Selector="Border.gridframe">
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="2"/>
+		<Setter Property="Background" Value="Black"/>
+		<Setter Property="Padding" Value="2"/>
+	</Style>
+	<!-- A grid's tiles are painted by one control (TileLayer): its colours. A tile's frame is the faint fill and
+	     thin edge its button had, lighter under the pointer. An idle charm reads red rather than by its rarity,
+	     over the wash and under the art; an item the character cannot use the same, stronger - red whatever the
+	     quality under it, or a set item's green turned it brown (M'avina's Caster without arrows);
+	     what is selected or picked wears Selection.axaml's ring. A socket's hole and a stack's count are
+	     SocketRow's and StackCount.axaml's, said here again for the one that paints them. -->
+	<!-- type-guard-ok: drawn on an item tile, as the game draws it. -->
+	<!-- color-guard-ok: drawn on an item tile, as the game draws it. -->
+	<Style Selector="base|TileLayer">
+		<Setter Property="TileBrush" Value="#14FFFFFF"/>
+		<Setter Property="HoverBrush" Value="#28FFFFFF"/>
+		<Setter Property="FrameBrush" Value="#4CA79066"/>
+		<Setter Property="HoverFrameBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}"/>
+		<Setter Property="TileCorner" Value="{DynamicResource ControlCornerRadius}"/>
+		<Setter Property="IdleBrush" Value="#66C01818"/>
+		<Setter Property="UnusableBrush" Value="#B0B01414"/>
+		<Setter Property="RingBrush" Value="{DynamicResource [Brush] Button - Primary Hover Edge}"/>
+		<Setter Property="TargetBrush" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+		<Setter Property="HoleBrush" Value="#7F000000"/>
+		<Setter Property="HoleEdgeBrush" Value="#B4000000"/>
+		<Setter Property="CountFont" Value="{StaticResource DiabloFont}"/>
+		<Setter Property="CountSize" Value="13"/>
+		<Setter Property="CountBrush" Value="White"/>
+		<Setter Property="CappedBrush" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+	</Style>
+	<!-- An item tile. The sprite is drawn unscaled, so the button is sized in cells. -->
+	<Style Selector="Button.tile">
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="Background" Value="#14FFFFFF"/>
+		<Setter Property="BorderBrush" Value="#4CA79066"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<!-- Its tooltip's place is every item tooltip's (ToolTip.axaml, itemtip). Set here, a local
+		     style, it would win over that. -->
+	</Style>
+	<!-- Dimmed (IsDimmed): the tiles not selected or picked step back - the whole tile, not the sprite,
+	     as an ethereal sprite's own opacity is a local value. A search's misses stay dimmer still. The
+	     class is on each tile: a descendant rule from the frame did not reach the item template's buttons. -->
+	<Style Selector="Button.tile.dimmed">
+		<Setter Property="Opacity" Value="0.45"/>
+	</Style>
+	<Style Selector="Button.tile.dimmed.marked">
+		<Setter Property="Opacity" Value="1"/>
+	</Style>
+	<Style Selector="Button.tile:pointerover /template/ ContentPresenter, Button.tile:focus-visible /template/ ContentPresenter">
+		<Setter Property="Background" Value="#28FFFFFF"/>
+	</Style>
+
+	<!-- Left out by the search standing, anywhere on a page - the inventory's, and the vault's, whose folders
+	     are pages: dimmed further than
+	     picking dims, so what the search found stands out where it lies.
+	     After the picking rules, so it wins over them. -->
+	<Style Selector="Button.tile.miss">
+		<Setter Property="Opacity" Value="0.25"/>
+	</Style>
+	<!-- What is selected is never dimmed: an item a search left out, clicked by hand, is
+	     the one being looked at and worked on - drawn at full strength, as a picked one is among the dimmed. -->
+	<Style Selector="Button.tile.miss.marked">
+		<Setter Property="Opacity" Value="1"/>
+	</Style>
+</Styles>

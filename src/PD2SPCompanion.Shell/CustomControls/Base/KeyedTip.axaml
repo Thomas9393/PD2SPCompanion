@@ -1,0 +1,14 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             x:Class="PD2SPCompanion.Shell.CustomControls.Base.KeyedTip">
+	<!-- A tooltip's words, with the lines that say what a key does drawn as an item's tooltip draws them - the
+	     key as a cap, what it does beside it (KeyHints; one
+	     shortcut stays in brackets after the name, two or more actions on one control become a strip under it).
+	     The words before the keys over them, as they were; the words after - a requirement, a warning - under. -->
+	<StackPanel>
+		<TextBlock Name="Lead" TextWrapping="Wrap"/>
+		<base:KeyHints Name="Keys"/>
+		<TextBlock Name="Foot" TextWrapping="Wrap"/>
+	</StackPanel>
+</UserControl>

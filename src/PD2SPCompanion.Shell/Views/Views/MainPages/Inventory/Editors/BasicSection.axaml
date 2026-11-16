@@ -1,0 +1,286 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:controls="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:helper="using:PD2SPCompanion.Shell.Helper"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="300"
+             x:Class="PD2SPCompanion.Shell.Views.BasicSection"
+             x:DataType="vm:BasicEditor">
+
+	<!-- A die (Button.spend.dice) per number the game rolls - picture, defense, durability, quantity, and the item level
+	     too, an even roll;
+	.idle keeps the place where nothing is rolled, styled on the Edit page that holds this section. -->
+	<!-- In every play mode: where the mode does not edit a field, its value stays and its
+	steppers go, the box read-only - Legit reads the item, it does not hide it. -->
+	<!-- What the item is before anything was rolled onto it, in a section of
+	its own so the properties below do not read as continuing from it. -->
+	<Border Classes="section" Margin="0,0,0,10" Padding="10,8"
+			IsVisible="{Binding HasBasic}">
+		<StackPanel>
+			<Grid ColumnDefinitions="*,Auto">
+				<Button Grid.Column="0" Classes="fold"
+						Command="{Binding ToggleBasicCommand}">
+					<Grid ColumnDefinitions="Auto,*">
+						<Path Grid.Column="0" Classes="chevron"
+							  Classes.open="{Binding BasicOpen}"
+							  Data="{StaticResource [Glyph] Chevron}"/>
+						<TextBlock Grid.Column="1" Classes="section" Text="{L 'Basic'}"/>
+					</Grid>
+				</Button>
+
+			</Grid>
+
+			<StackPanel IsVisible="{Binding BasicOpen}">
+		<!-- Ethereal. A flag rather than a number, so a check rather than a box,
+		     but on the same line shape as the rest so the section reads evenly. -->
+		<Grid ColumnDefinitions="Auto,*,Auto" Margin="0,10,0,0"
+			  IsVisible="{Binding HasEthereal}">
+			<TextBlock Grid.Column="0" Classes="fieldname" Margin="0,0,8,0"
+					   VerticalAlignment="Center" Text="{L 'Ethereal'}"/>
+			<!-- The app's one switch (Tick.axaml), as Settings'. -->
+			<ToggleButton Grid.Column="2" Classes="tick"
+						  IsChecked="{Binding IsEthereal, Mode=OneWay}"
+						  Command="{Binding ToggleEtherealCommand}"
+						  IsHitTestVisible="{Binding Rules.EditsEthereal}" Focusable="{Binding Rules.EditsEthereal}">
+				<Path Data="{StaticResource [Glyph] Tick}"
+					  IsVisible="{Binding IsEthereal}"/>
+			</ToggleButton>
+		</Grid>
+
+
+		<!-- Which of the base's pictures it wears. Says nothing about what the
+		     item does, which is why it sits at the bottom of the basics. -->
+		<Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0"
+			  IsVisible="{Binding HasGraphic}">
+			<StackPanel Grid.Column="0">
+				<TextBlock Classes="fieldname" Text="{L 'Graphic'}"/>
+				<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{Binding GraphicLimits}"/>
+			</StackPanel>
+
+			<StackPanel Grid.Column="1" Orientation="Horizontal"
+						Spacing="4" HorizontalAlignment="Right">
+				<Button Classes="spend" IsVisible="{Binding Rules.EditsDetails}" Command="{Binding LowerGraphicCommand}"
+						Tag="graphic:down"
+						ToolTip.Tip="{L 'Shift + LMB: min value'}"
+						IsEnabled="{Binding CanLowerGraphic}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+				</Button>
+				<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Value}" IsReadOnly="{Binding !Rules.EditsDetails}" Focusable="{Binding Rules.EditsDetails}"
+										 Minimum="{Binding GraphicMinimum}"
+										 Maximum="{Binding GraphicMaximum}"
+										 Text="{Binding Graphic, UpdateSourceTrigger=PropertyChanged}"/>
+				<Button Classes="spend" IsVisible="{Binding Rules.EditsDetails}" Command="{Binding RaiseGraphicCommand}"
+						Tag="graphic:up"
+						ToolTip.Tip="{L 'Shift + LMB: max value'}"
+						IsEnabled="{Binding CanRaiseGraphic}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+				</Button>
+				<base:RollButton Kind="Dice" IsVisible="{Binding Rules.EditsDetails}" Command="{Binding RerollGraphicCommand}"
+						Classes.idle="{Binding !CanRerollGraphic}"
+						ToolTip.Tip="{Binding GraphicRerollHint}"/>
+			</StackPanel>
+		</Grid>
+
+
+		<!-- What the item rolled at. Above the stack line and below the facts,
+		     with the same steppers as everything else here. -->
+		<Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0"
+			  IsVisible="{Binding HasItemLevel}">
+			<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0">
+				<TextBlock Classes="fieldname" Margin="0" Text="{L 'Item level'}"/>
+				<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{Binding ItemLevelLimits}"/>
+
+				<!-- What the affixes on it ask for, beside the field that would
+				     have to answer for it. -->
+				<TextBlock Classes="needslevel" FontSize="{StaticResource [Type] Small}" TextWrapping="Wrap"
+						   IsVisible="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Affixes.NeedsHigherLevel}"
+						   Text="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Affixes.AffixLevelNote}"/>
+			</StackPanel>
+			<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+				<Button Classes="spend" IsVisible="{Binding Rules.EditsItemLevel}" Command="{Binding LowerItemLevelCommand}"
+						Tag="itemlevel:down"
+						ToolTip.Tip="{Binding LowerItemLevelHint}"
+						IsEnabled="{Binding CanLowerItemLevel}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+				</Button>
+				<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Value}" IsReadOnly="{Binding !Rules.EditsItemLevel}" Focusable="{Binding Rules.EditsItemLevel}"
+										 Minimum="{Binding ItemLevelMinimum}"
+										 Maximum="{Binding ItemLevelMaximum}"
+										 Text="{Binding ItemLevel, UpdateSourceTrigger=PropertyChanged}"/>
+				<Button Classes="spend" IsVisible="{Binding Rules.EditsItemLevel}" Command="{Binding RaiseItemLevelCommand}"
+						Tag="itemlevel:up"
+						ToolTip.Tip="{Binding RaiseItemLevelHint}"
+						IsEnabled="{Binding CanRaiseItemLevel}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+				</Button>
+				<!-- An even roll among the levels nothing more is said against. -->
+				<base:RollButton Kind="Dice" IsVisible="{Binding Rules.EditsItemLevel}" Command="{Binding RerollItemLevelCommand}"
+						Classes.idle="{Binding !CanRerollItemLevel}"
+						ToolTip.Tip="{Binding ItemLevelRerollHint}"/>
+			</StackPanel>
+		</Grid>
+
+		<!-- The name on a personalized item - Anya's reward: typed as a character's name is
+		     (CharacterNameInput), none taking it off. Only where the play mode edits an item's details: the row
+		     is not there in Legit, where the tooltip's heading says whose the item is. -->
+		<Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+			<Grid.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="HasPersonalName"/>
+					<Binding Path="Rules.EditsDetails"/>
+				</MultiBinding>
+			</Grid.IsVisible>
+			<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0">
+				<TextBlock Classes="fieldname" Margin="0" Text="{L 'Personalized'}"/>
+				<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{Binding PersonalNameNote}"/>
+			</StackPanel>
+			<TextBox Grid.Column="1" Classes="value" Width="160" MaxLength="15" VerticalAlignment="Center"
+					 AutomationProperties.AutomationId="Edit_PersonalName"
+					 helper:CharacterNameInput.IsOn="True"
+					 PlaceholderText="{L 'None'}"
+					 Classes.invalid="{Binding PersonalNameIsBad}"
+					 Text="{Binding PersonalName, UpdateSourceTrigger=PropertyChanged}"/>
+		</Grid>
+
+		<Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0"
+			  IsVisible="{Binding HasDefense}">
+			<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0">
+				<TextBlock Classes="fieldname" Margin="0" Text="{L 'Defense'}"/>
+				<StackPanel Orientation="Horizontal">
+					<Border Classes="question"
+							ToolTip.Tip="{Binding DefenseNote}"
+							IsVisible="{Binding DefenseIsQuestionable}">
+						<TextBlock/>
+					</Border>
+					<TextBlock Classes="roll" FontSize="{StaticResource [Type] Small}" VerticalAlignment="Center"
+							   Classes.outside="{Binding DefenseIsQuestionable}"
+							   Text="{Binding DefenseBasis}"
+							   IsVisible="{Binding DefenseBasis, Converter={x:Static ObjectConverters.IsNotNull}}"/>				</StackPanel>
+			</StackPanel>
+			<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+				<Button Classes="spend" IsVisible="{Binding Rules.EditsDetails}" Command="{Binding LowerDefenseCommand}"
+						Tag="defense:down"
+						ToolTip.Tip="{Binding LowerDefenseHint}"
+						IsEnabled="{Binding CanLowerDefense}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+				</Button>
+				<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Value}" IsReadOnly="{Binding !Rules.EditsDetails}" Focusable="{Binding Rules.EditsDetails}"
+										 Minimum="{Binding DefenseMinimum}"
+										 Maximum="{Binding DefenseMaximum}"
+										 Text="{Binding Defense, UpdateSourceTrigger=PropertyChanged}"/>
+				<Button Classes="spend" IsVisible="{Binding Rules.EditsDetails}" Command="{Binding RaiseDefenseCommand}"
+						Tag="defense:up"
+						ToolTip.Tip="{Binding RaiseDefenseHint}"
+						IsEnabled="{Binding CanRaiseDefense}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+				</Button>
+				<base:RollButton Kind="Dice" IsVisible="{Binding Rules.EditsDetails}" Command="{Binding RerollDefenseCommand}"
+						Classes.idle="{Binding !CanRerollDefense}"
+						ToolTip.Tip="{Binding DefenseRerollHint}"/>
+			</StackPanel>
+		</Grid>
+
+		<Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0"
+			  IsVisible="{Binding HasDurability}">
+			<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0">
+				<TextBlock Classes="fieldname" Margin="0" Text="{L 'Durability'}"/>			</StackPanel>
+			<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+				<Button Classes="spend" IsVisible="{Binding Rules.EditsDetails}" Command="{Binding LowerDurabilityCommand}"
+						Tag="durability:down"
+						ToolTip.Tip="{L 'Ctrl + LMB: 10 at a time&#x0a;Shift + LMB: min value'}"
+						IsEnabled="{Binding CanLowerDurability}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+				</Button>
+				<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Value}" IsReadOnly="{Binding !Rules.EditsDetails}" Focusable="{Binding Rules.EditsDetails}"
+										 Minimum="{Binding DurabilityMinimum}"
+										 Maximum="{Binding DurabilityCeiling}"
+										 Text="{Binding Durability, UpdateSourceTrigger=PropertyChanged}"/>
+				<Button Classes="spend" IsVisible="{Binding Rules.EditsDetails}" Command="{Binding RaiseDurabilityCommand}"
+						Tag="durability:up"
+						ToolTip.Tip="{L 'Ctrl + LMB: 10 at a time&#x0a;Shift + LMB: max value'}"
+						IsEnabled="{Binding CanRaiseDurability}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+				</Button>
+				<base:RollButton Kind="Dice" IsVisible="{Binding Rules.EditsDetails}" Command="{Binding RerollDurabilityCommand}"
+						Classes.idle="{Binding !CanRerollDurability}"
+						ToolTip.Tip="{Binding DurabilityRerollHint}"/>
+			</StackPanel>
+		</Grid>
+
+		<Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0"
+			  IsVisible="{Binding HasDurability}">
+			<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0">
+				<TextBlock Classes="fieldname" Margin="0" Text="{L 'Max durability'}"/>
+				<StackPanel Orientation="Horizontal">
+					<Border Classes="question"
+							ToolTip.Tip="{Binding DurabilityNote}"
+							IsVisible="{Binding DurabilityIsQuestionable}">
+						<TextBlock/>
+					</Border>
+					<TextBlock Classes="roll" FontSize="{StaticResource [Type] Small}" VerticalAlignment="Center"
+							   Classes.outside="{Binding DurabilityIsQuestionable}"
+							   Text="{Binding DurabilityBasis}"
+							   IsVisible="{Binding DurabilityBasis, Converter={x:Static ObjectConverters.IsNotNull}}"/>				</StackPanel>
+			</StackPanel>
+			<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+				<Button Classes="spend" IsVisible="{Binding Rules.EditsDetails}" Command="{Binding LowerMaxDurabilityCommand}"
+						Tag="maxdurability:down"
+						ToolTip.Tip="{Binding LowerMaxDurabilityHint}"
+						IsEnabled="{Binding CanLowerMaxDurability}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+				</Button>
+				<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Value}" IsReadOnly="{Binding !Rules.EditsDetails}" Focusable="{Binding Rules.EditsDetails}"
+										 Minimum="{Binding MaxDurabilityMinimum}"
+										 Maximum="{Binding DurabilityMaximum}"
+										 Text="{Binding MaxDurability, UpdateSourceTrigger=PropertyChanged}"/>
+				<Button Classes="spend" IsVisible="{Binding Rules.EditsDetails}" Command="{Binding RaiseMaxDurabilityCommand}"
+						Tag="maxdurability:up"
+						ToolTip.Tip="{Binding RaiseMaxDurabilityHint}"
+						IsEnabled="{Binding CanRaiseMaxDurability}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+				</Button>
+				<!-- No die - nothing rolls a maximum: a die's room, so the steppers line up down the section (not a die never
+				     lit). -->
+				<Panel Width="26" IsVisible="{Binding Rules.EditsDetails}"/>
+			</StackPanel>
+		</Grid>
+
+		<!-- How many are in the stack. Above the KEEP line, since it is held back
+		     by it the way everything else on this page is. -->
+		<Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0"
+			  IsVisible="{Binding HasQuantity}">
+			<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0">
+				<TextBlock Classes="fieldname" Margin="0" Text="{L 'Quantity'}"/>
+				<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{Binding QuantityLimits}"/>
+			</StackPanel>
+			<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+				<Button Classes="spend" IsVisible="{Binding EditsQuantity}" Command="{Binding LowerQuantityCommand}"
+						Tag="quantity:down"
+						ToolTip.Tip="{L 'Ctrl + LMB: 10 at a time&#x0a;Shift + LMB: min value'}"
+						IsEnabled="{Binding CanLowerQuantity}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+				</Button>
+				<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Value}" IsReadOnly="{Binding !EditsQuantity}" Focusable="{Binding EditsQuantity}"
+										 Minimum="{Binding QuantityMinimum}"
+										 Maximum="{Binding QuantityMaximum}"
+										 Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"/>
+				<Button Classes="spend" IsVisible="{Binding EditsQuantity}" Command="{Binding RaiseQuantityCommand}"
+						Tag="quantity:up"
+						ToolTip.Tip="{L 'Ctrl + LMB: 10 at a time&#x0a;Shift + LMB: max value'}"
+						IsEnabled="{Binding CanRaiseQuantity}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+				</Button>
+				<base:RollButton Kind="Dice" IsVisible="{Binding EditsQuantity}" Command="{Binding RerollQuantityCommand}"
+						Classes.idle="{Binding !CanRerollQuantity}"
+						ToolTip.Tip="{Binding QuantityRerollHint}"/>
+			</StackPanel>
+		</Grid>
+
+			</StackPanel>
+		</StackPanel>
+	</Border>
+</UserControl>

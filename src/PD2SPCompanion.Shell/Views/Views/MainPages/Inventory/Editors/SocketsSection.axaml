@@ -1,0 +1,284 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="300"
+             x:Class="PD2SPCompanion.Shell.Views.SocketsSection"
+             x:DataType="vm:SocketsEditor">
+
+	<!-- Sockets. Shown on anything the base could take one in, since a plain
+	     item with no holes is exactly where boring one is worth doing.
+
+	     The sockets stand in a row, in the order they were
+	     filled - "more
+	     graphical" - one of them selected by a click; the tools that stood on each socket's own row are one line
+	     over the row, for the one selected ("move those individual buttons to header section tool strip"); and
+	     what a socket gives is said in one line under the row, for the one selected, where every row listed it
+	     under a fold of its own. No tooltip on a socket: the caption is its word (one or the other, not both). -->
+	<!-- Lit while a gem, a rune or a jewel the Items page carries is over it and would go in: let go of anywhere on
+	     the section, it is socketed as let go of on the item itself - into the next socket. -->
+	<Border Classes="section" Margin="0,0,0,10" Padding="10,8"
+			Classes.socketdrop="{Binding IsDropTarget}"
+			IsVisible="{Binding CanSocket}">
+		<StackPanel>
+			<Grid ColumnDefinitions="*,Auto" Classes="sectionhead">
+				<Button Grid.Column="0" Classes="fold"
+						Command="{Binding ToggleCommand}">
+					<Grid ColumnDefinitions="Auto,Auto,*">
+						<Path Grid.Column="0" Classes="chevron"
+							  Classes.open="{Binding IsOpen}"
+							  Data="{StaticResource [Glyph] Chevron}"/>
+						<TextBlock Grid.Column="1" Classes="section"
+								   Text="{Binding Header}"/>
+					</Grid>
+				</Button>
+
+				<!-- The count's stepper, as the Basic numbers have theirs - minus, the number typed, plus, a die -
+				     so the four stand in the same columns down the page. On the heading, so the count is changed with
+				     the section folded. -->
+				<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="6,0,0,0"
+							IsVisible="{Binding Rules.EditsSockets}">
+					<!-- Taking one away takes whatever is in it to the inventory, which is
+					     why the button says so rather than simply doing it. -->
+					<Button Classes="spend"
+							Command="{Binding RemoveCommand}" Tag="sockets:down"
+							IsEnabled="{Binding CanRemove}"
+							ToolTip.Tip="{Binding RemoveHint}">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+					</Button>
+					<base:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Value}"
+										 AutomationProperties.AutomationId="Sockets_Count"
+										 IsReadOnly="{Binding !CanType}" Focusable="{Binding CanType}"
+										 Minimum="{Binding Minimum}"
+										 Maximum="{Binding BoxMaximum}"
+										 Text="{Binding Count, UpdateSourceTrigger=PropertyChanged}"/>
+					<Button Classes="spend"
+							Command="{Binding AddCommand}" Tag="sockets:up"
+							IsEnabled="{Binding CanAdd}"
+							ToolTip.Tip="{Binding AddHint}">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+					</Button>
+					<!-- The die, which took the Puzzlebox's button in: the range of what gave the
+					     item its sockets - its own row or affix, its corruption - else the Puzzlebox's; Shift, one to the
+					     most the base takes. Its place held on a runeword, as on Max durability. -->
+					<base:RollButton Kind="Dice" Command="{Binding RollSocketsCommand}" Tag="sockets:roll" AutomationProperties.AutomationId="Sockets_Die"
+							Classes.idle="{Binding !CanRoll}"
+							ToolTip.Tip="{Binding RollHint}"/>
+				</StackPanel>
+			</Grid>
+
+			<!-- The tools, one line: for the socket selected - dimmed with none, or where it is not theirs, and
+			     never moved by it - then a rule, and what is done to them all. At the line's end, how many the base
+			     takes. A tool the play mode or the page forbids is not there. -->
+			<DockPanel Margin="22,6,0,0" IsVisible="{Binding IsOpen}">
+				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+					<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}"
+							   Text="{Binding Limits}"/>
+					<!-- The one corruption whose effect is not a property, so the
+					     one no stat row can carry the mark for. -->
+					<TextBlock Classes="corruptmark"
+							   IsVisible="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Corruption.SocketsAreCorrupted}"
+							   Text="{L '(corrupted)'}"/>
+				</StackPanel>
+
+				<StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Left">
+					<!-- A jewel is an item with affixes of its own: opened in a layer of its own, to be edited where it
+					     lies. A gem or a rune has nothing to open. Not on the Forge. -->
+					<Button Classes="spend" Tag="openjewel"
+							AutomationProperties.AutomationId="Sockets_EditJewel"
+							IsVisible="{Binding OpensJewels}"
+							IsEnabled="{Binding CanEditSelected}"
+							Command="{Binding EditSelectedCommand}"
+							ToolTip.Tip="{L 'Edit jewel'}" ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Open}"/>
+					</Button>
+
+					<!-- Cut: marked, and turned out by the paste - on a cell or a page of the Items page, in a folder of the
+					     vault. Where gems come out at all. -->
+					<Panel>
+						<Panel.IsVisible>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="Rules.EditsSockets"/>
+								<Binding Path="CanEmpty"/>
+							</MultiBinding>
+						</Panel.IsVisible>
+						<Button Classes="spend"
+								AutomationProperties.AutomationId="Sockets_Cut"
+								IsEnabled="{Binding CanCutSelected}"
+								Command="{Binding CutSelectedCommand}"
+								ToolTip.Tip="{L 'Cut'}" ToolTip.ShowOnDisabled="True">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Cut}"/>
+						</Button>
+					</Panel>
+
+					<!-- Copy: what is in it held to be pasted as a second of itself, the item keeping its own - where the
+					     play mode copies, on the character's page. -->
+					<Button Classes="spend"
+							AutomationProperties.AutomationId="Sockets_Copy"
+							IsVisible="{Binding CopiesSocketed}"
+							IsEnabled="{Binding CanCopySelected}"
+							Command="{Binding CopySelectedCommand}"
+							ToolTip.Tip="{L 'Copy'}" ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Duplicate}"/>
+					</Button>
+
+					<!-- Paste: the gems, runes or jewels the clipboard holds, into the item's sockets - a cut goes in, a
+					     copy's second
+					     goes in. Dimmed while what is held is no such thing, or the item has no socket for it. Where
+					     gems come out, they go in: the character's Edit page. -->
+					<Button Classes="spend"
+							AutomationProperties.AutomationId="Sockets_Paste"
+							IsVisible="{Binding CanEmpty}"
+							IsEnabled="{Binding CanPasteHere}"
+							Command="{Binding PasteHereCommand}"
+							ToolTip.Tip="{L 'Paste (Ctrl + V)'}" ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Paste}"/>
+					</Button>
+
+					<!-- A way out for what is in it. No unsocketing on the vault's Edit page. -->
+					<Panel>
+						<Panel.IsVisible>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="Rules.EditsSockets"/>
+								<Binding Path="CanEmpty"/>
+							</MultiBinding>
+						</Panel.IsVisible>
+						<Button Classes="spend"
+								AutomationProperties.AutomationId="Sockets_Unsocket"
+								IsEnabled="{Binding CanUnsocketSelected}"
+								Command="{Binding UnsocketSelectedCommand}"
+								ToolTip.Tip="{Binding UnsocketHint}" ToolTip.ShowOnDisabled="True">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Arrow up}"/>
+						</Button>
+					</Panel>
+
+					<!-- Deleted outright, asking twice as every bin does - where gems come out. -->
+					<base:BinButton AutomationProperties.AutomationId="Sockets_Delete"
+									IsVisible="{Binding DeletesGems}"
+									Command="{Binding DeleteSelectedCommand}"
+									IsArmed="{Binding DeleteArmed}"
+									IsEnabled="{Binding CanDeleteSelected}"
+									Tip="{Binding DeleteHint}"/>
+
+					<!-- The rule between the selected socket's tools and what is done to them all: there only with the
+					     latter, whose page shows the former too (Paste). It stood alone as a caret where neither is - the
+					     Forge, a jewel opened in its socket - and at the line's end on the vault's. -->
+					<Border Classes="socketrule">
+						<Border.IsVisible>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="Rules.EditsSockets"/>
+								<Binding Path="CanEmpty"/>
+							</MultiBinding>
+						</Border.IsVisible>
+					</Border>
+
+					<!-- Every socketed item out at once, staged as one unsocket is. -->
+					<Panel>
+						<Panel.IsVisible>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="Rules.EditsSockets"/>
+								<Binding Path="CanEmpty"/>
+							</MultiBinding>
+						</Panel.IsVisible>
+						<Button Classes="spend"
+								AutomationProperties.AutomationId="Sockets_UnsocketAll"
+								Command="{Binding UnsocketAllCommand}"
+								IsEnabled="{Binding CanUnsocketAll}"
+								ToolTip.Tip="{Binding UnsocketAllHint}" ToolTip.ShowOnDisabled="True">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Arrows up}"/>
+						</Button>
+					</Panel>
+
+					<!-- The runeword builder: a word staged on this base. Only where the base can
+					     hold one - see CanBuildRuneword. -->
+					<Button Classes="spend"
+							Command="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Runeword.OpenPickerCommand}"
+							IsVisible="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Runeword.CanBuild}"
+							ToolTip.Tip="{L 'Build runeword'}">
+						<Image Source="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Runeword.Icon}"
+							   Width="18" Height="18"
+							   Stretch="Uniform"/>
+					</Button>
+				</StackPanel>
+			</DockPanel>
+
+			<!-- The sockets, in a row, in the order they were filled: a click selects one; one dragged out of the row is
+			     turned out where it is let go of, and the rest close up - the game has no gap between two. One on its
+			     way out - a socket being closed, what is in it leaving, or cut - is faint. A right click: its menu. -->
+			<ItemsControl ItemsSource="{Binding Rows}" Classes="picklist"
+						  AutomationProperties.AutomationId="Sockets_Strip"
+						  IsVisible="{Binding IsOpen}"
+						  HorizontalAlignment="Center"
+						  Margin="0,14,0,0">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel Orientation="Horizontal"/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="vm:SocketViewModel">
+						<Button Classes="socketcell"
+								Classes.on="{Binding IsSelected}"
+								Classes.going="{Binding IsGoing}"
+								Classes.cut="{Binding IsCut}"
+								AutomationProperties.AutomationId="Socket_Cell"
+								AutomationProperties.Name="{Binding Name}"
+								ToolTip.Tip="{Binding ShownTip}"
+								Click="Socket_Click">
+							<!-- The graphic at its own size, 28, in the ring's middle: 36 leaves it 4 on every side, which is
+							     whole pixels at the UI scales there are - at 40 it stood half a pixel up and left. A
+							     square graphic's corners are wider than the ring: cut
+							     by a circle inside it, not by the ring itself, whose glow is drawn outside it. -->
+							<Border Classes="socketbox" Classes.empty="{Binding IsEmpty}">
+								<Border CornerRadius="17" ClipToBounds="True">
+									<Image Source="{Binding Sprite}" Stretch="Uniform"
+										   Width="28" Height="28"
+										   HorizontalAlignment="Center" VerticalAlignment="Center"
+										   IsVisible="{Binding IsFilled}"/>
+								</Border>
+							</Border>
+						</Button>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+
+			<!-- What the selected socket is, and what it gives this item: under the row's middle, a line to each
+			     thing it gives, horizontally centered. One room, whatever is selected and on every item (editing jewels, a
+			     click on a jewel revealed its stats and the panel grew, a click on another shifted it, and on an empty hole it
+			     shrank): a jewel's name and six
+			     lines of what it gives - laid out, not drawn. A socket is always selected (SocketsEditor), so it is
+			     there wherever the item has one, and what it says stands in its middle. A caption longer than the room
+			     scrolls in it (a jewel edited to tons of stats is shown all the same). -->
+			<Panel Margin="0,4,0,2">
+				<Panel.IsVisible>
+					<MultiBinding Converter="{x:Static BoolConverters.And}">
+						<Binding Path="IsOpen"/>
+						<Binding Path="HasSelection"/>
+					</MultiBinding>
+				</Panel.IsVisible>
+				<StackPanel Name="CaptionRoom" Opacity="0" IsHitTestVisible="False" AutomationProperties.AccessibilityView="Raw">
+					<TextBlock Text="x" AutomationProperties.AccessibilityView="Raw"
+					           FontSize="{StaticResource [Type] Body}"/>
+					<TextBlock Text="x&#10;x&#10;x&#10;x&#10;x&#10;x" AutomationProperties.AccessibilityView="Raw"
+					           FontSize="{StaticResource [Type] Small}"/>
+				</StackPanel>
+				<ScrollViewer Name="CaptionScroll" MaxHeight="{Binding #CaptionRoom.Bounds.Height}" VerticalAlignment="Center"
+				              HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" AllowAutoHide="False">
+					<StackPanel HorizontalAlignment="Center">
+						<TextBlock Name="CaptionNameText" AutomationProperties.AutomationId="Sockets_Caption"
+						           Text="{Binding CaptionName}" HorizontalAlignment="Center"
+						           Foreground="{Binding CaptionBrush}"
+						           FontSize="{StaticResource [Type] Body}"/>
+						<TextBlock Name="CaptionEffectText" AutomationProperties.AutomationId="Sockets_CaptionEffect"
+						           Text="{Binding CaptionEffect}" TextAlignment="Center" HorizontalAlignment="Center"
+						           FontSize="{StaticResource [Type] Small}" TextWrapping="Wrap"
+						           Foreground="{DynamicResource [Brush] Rarity - Magic items}"/>
+					</StackPanel>
+				</ScrollViewer>
+			</Panel>
+		</StackPanel>
+	</Border>
+</UserControl>

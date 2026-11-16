@@ -1,0 +1,17 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  What is selected or picked: a light-gold ring, 2 thick, over the art and with no
+	  fill - an item's rarity wash stays readable, and red keeps its one meaning, unusable or danger. Picks
+	  wear the same ring - with the rest of the section dimmed, it is plain enough, and a check badge was
+	  left out (it would cover the quantity or the corner marks):
+	      <Border Classes="selring" IsVisible="{Binding IsMarked}"/>
+	  The grids' tiles, the worn and mercenary slots, and the vault's ticked cards. The vault and grail lists'
+	  own selection is ItemCard.axaml's, the same ring.
+	-->
+	<Style Selector="Border.selring">
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary Hover Edge}"/>
+		<Setter Property="IsHitTestVisible" Value="False"/>
+	</Style>
+</Styles>

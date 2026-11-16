@@ -1,0 +1,20 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The big action buttons' glyphs - Load, Save, Undo, Close on the home page, Respec and Refit on
+	  the character's, the settings page's own - a Button with class "action" holding a Path:
+	  stroked in unique gold, lighter under the pointer. Written once here, not out identically
+	  on each of the four pages that wear them.
+	-->
+		<Style Selector="Button.action">
+			<Setter Property="ToolTip.Placement" Value="Bottom"/>
+			<Setter Property="ToolTip.VerticalOffset" Value="6"/>
+		</Style>
+		<!-- The glyph's colour; its size and stroke are every icon's (Glyph.axaml). -->
+		<Style Selector="Button.action Path">
+			<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		</Style>
+		<Style Selector="Button.action:pointerover Path, Button.action:focus-visible Path">
+			<Setter Property="Stroke" Value="#F2E9D2"/>
+		</Style>
+</Styles>

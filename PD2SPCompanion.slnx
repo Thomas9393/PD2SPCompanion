@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PD2SPCompanion.Cli/PD2SPCompanion.Cli.csproj" />
+    <Project Path="src/PD2SPCompanion.Core/PD2SPCompanion.Core.csproj" />
+    <Project Path="src/PD2SPCompanion.D2S/PD2SPCompanion.D2S.csproj" />
+    <Project Path="src/PD2SPCompanion.Shell.Desktop/PD2SPCompanion.Shell.Desktop.csproj" />
+    <Project Path="src/PD2SPCompanion.Shell/PD2SPCompanion.Shell.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PD2SPCompanion.Shell.Tests/PD2SPCompanion.Shell.Tests.csproj" />
+    <Project Path="tests/PD2SPCompanion.Tests/PD2SPCompanion.Tests.csproj" />
+  </Folder>
+  <Folder Name="/src/_vendor/">
+    <Project Path="src/_vendor/HyperText.Avalonia/HyperText.Avalonia.csproj" />
+  </Folder>
+</Solution>

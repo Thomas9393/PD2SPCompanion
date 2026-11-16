@@ -1,0 +1,121 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:ctrl_HyperLink="using:HyperText.Avalonia.Controls"
+			 
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+			 
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Default_R"
+			 x:DataType="vm:VP_ViewModel_Default_R"
+			 
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_R CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Default_R/>
+	</Design.DataContext>
+	
+	<!-- Styles -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<Style Selector="ctrl_HyperLink|Hyperlink">
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="Margin" Value="0 12"/>
+			<Setter Property="Padding" Value="10 5"/>
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="TextAlignment" Value="Center"/>
+			<Setter Property="Cursor" Value="Hand"/>
+			<Setter Property="Effect" Value="drop-shadow(0 0 12 black)"/>
+			<Style Selector="^ Run.Title">
+				<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+				<Setter Property="FontSize" Value="{DynamicResource [UI] TextSize CommonText_Title}"/>
+				<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+				<Setter Property="FontWeight" Value="Heavy"/>
+			</Style>
+			<Style Selector="^ Run.Text">
+				<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+				<Setter Property="FontWeight" Value="ExtraLight"/>
+				<Setter Property="FontSize" Value="{DynamicResource [UI] TextSize CommonText}"/>
+			</Style>
+
+		</Style>
+	</UserControl.Styles>
+	
+	<!-- Main Content -->
+	<Grid RowDefinitions="*,4*">
+		<!-- Header Banner -->
+		<Border Grid.Row="0"
+				Background="Black"
+				BorderThickness="0 0 0 0.5"
+				CornerRadius="{DynamicResource [UI] MainViewPage_R CornerSize_RT}"
+				BorderBrush="{DynamicResource [UI] GradBrush - Frame - Golden#02}">
+			<!-- The game's burning title logo, read from the install and played (Imaging/FrontEndArt, FrameImage), not a
+			     shipped GIF of it. Nothing before a folder is set. -->
+			<base:FrameImage Frames="{DynamicResource [Art] D2 Logo Burning}" Margin="6" MaxHeight="72"
+							 IsHitTestVisible="False"
+							 VerticalAlignment="Center" HorizontalAlignment="Center"/>
+		</Border>
+		
+		<!-- Background Logo -->
+		<Image Grid.Row="0" Grid.RowSpan="2"
+			   Classes="D2LogoBG"/>
+		
+		<!-- Text Block -->
+		<Border Classes="section" Grid.Row="1"
+				Margin="8">
+			<Grid RowDefinitions="Auto,Auto,*"
+				  Margin="12">
+				<!-- The title, the season and the jeweled rule: shared with the vault's page of doors. -->
+				<base:SeasonBanner Grid.Row="0" Grid.RowSpan="2"/>
+				<!-- List the links. -->
+				<!-- Hidden until the list has been measured a second time, then faded in: on a fresh
+				     start its first height is out of date and it would be seen jumping into place.
+				     See the code-behind. -->
+				<Panel Name="LinksReveal" Grid.Row="2" Opacity="0">
+					<Panel.Transitions>
+						<Transitions>
+							<DoubleTransition Property="Opacity" Duration="{StaticResource [Anim] ViewPage Transition}"/>
+						</Transitions>
+					</Panel.Transitions>
+				<StackPanel Name="Links"
+							Margin="0 0 0 64"
+							VerticalAlignment="Center"
+							Opacity="0.85">
+
+					<ctrl_HyperLink:Hyperlink Url="https://www.projectdiablo2.com"
+											  Text="">
+						<Run Classes="Title" Text="{L 'MAIN SITE'}"/>
+						<LineBreak/>
+						<Run Classes="Text" Text="ProjectDiablo2.com"/>
+					</ctrl_HyperLink:Hyperlink>
+
+					<ctrl_HyperLink:Hyperlink Url="https://projectdiablo2.miraheze.org/wiki/Main_Page"
+						  Text="">
+						<Run Classes="Title" Text="{L 'WIKI'}"/>
+						<LineBreak/>
+						<Run Classes="Text" Text="wiki.projectdiablo2.com"/>
+					</ctrl_HyperLink:Hyperlink>
+
+					<ctrl_HyperLink:Hyperlink Url="https://discord.gg/projectdiablo2"
+											  Text="">
+						<Run Classes="Title" Text="{L 'DISCORD'}"/>
+						<LineBreak/>
+						<Run Classes="Text" Text="{L 'PD2\'s Discord'}"/>
+					</ctrl_HyperLink:Hyperlink>
+
+					<ctrl_HyperLink:Hyperlink Url="https://www.reddit.com/r/ProjectDiablo2"
+											  Text="">
+						<Run Classes="Title" Text="{L 'REDDIT'}"/>
+						<LineBreak/>
+						<Run Classes="Text" Text="r/ProjectDiablo2"/>
+					</ctrl_HyperLink:Hyperlink>
+				</StackPanel>
+				</Panel>
+			</Grid>
+		</Border>
+	</Grid>
+</UserControl>

@@ -1,0 +1,12 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Add Styles Here -->
+	<Style Selector="Image.D2LogoBG">
+		<!-- The game's logo, read from the install (Imaging/FrontEndArt.Provide); none before a folder is set. -->
+		<Setter Property="Source" Value="{DynamicResource [Art] D2 Logo}"/>
+		<Setter Property="MaxWidth" Value="512"/>
+		<Setter Property="Opacity" Value="0.33"/>
+		<Setter Property="Margin" Value="64"/>
+		<Setter Property="IsHitTestVisible" Value="False"/>
+	</Style>
+</Styles>

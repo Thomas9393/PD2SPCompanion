@@ -1,0 +1,162 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The chrome every picker in the app wears: the veil that dims the page behind it, the
+	  invisible button filling that page so clicking away closes it, and the title at the top
+	  of the panel.
+
+	  Shared because the item panel's pickers and the map seed picker are the same component
+	  seen twice, and the inventory page had written it out first.
+
+	  Every picker is the same four layers, and only the last is its own:
+
+	    Border.veil > Panel > (Button.backdrop, Panel.pickerframe > Border.pickerpanel > ...)
+
+	  The inset and the panel were once written out in each picker, and had drifted to five
+	  margins (56, 40, 24, 16, 2) and two paddings; one set here, and the
+	  build refuses a picker without its frame (PD2UI009, build/ReuseGuard.targets).
+	-->
+
+	<!-- The list arrives rather than appearing. Short enough not to be waited on, long enough
+	     to say where it came from. The dim is the veil's; the rune wizard alone opens in its
+	     page's place, with nothing under it to dim, and says Transparent. -->
+	<Style Selector="Border.veil">
+		<Setter Property="Background" Value="{DynamicResource [ABrush] Veil}"/>
+		<Setter Property="Opacity" Value="0"/>
+		<Setter Property="Transitions">
+			<Transitions>
+				<DoubleTransition Property="Opacity" Duration="0:0:0.12"/>
+			</Transitions>
+		</Setter>
+	</Style>
+	<Style Selector="Border.veil.shown">
+		<Setter Property="Opacity" Value="1"/>
+	</Style>
+
+	<!-- How far in from the page's edges every picker sits: one inset, whatever the page. It
+	     grows into place as it fades in, which only the item page's pickers used to do. -->
+	<Style Selector="Border.veil > Panel > Panel.pickerframe">
+		<Setter Property="Margin" Value="56"/>
+		<Setter Property="RenderTransform" Value="scale(0.97)"/>
+		<Setter Property="Transitions">
+			<Transitions>
+				<TransformOperationsTransition Property="RenderTransform"
+											  Duration="0:0:0.14"
+											  Easing="CubicEaseOut"/>
+			</Transitions>
+		</Setter>
+	</Style>
+	<Style Selector="Border.veil.shown > Panel > Panel.pickerframe">
+		<Setter Property="RenderTransform" Value="scale(1)"/>
+	</Style>
+
+	<!-- The panel: a section's frame, but nearly solid, unlike the sections behind it - it is
+	     read against whatever it happens to be covering, and the subtle section fill leaves the
+	     rows showing through the text. Not Border.section as well: two styles setting one
+	     background would be settled by include order, which differs from page to page. -->
+	<Style Selector="Border.pickerpanel">
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="4"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Popup}"/>
+		<Setter Property="Padding" Value="12,10"/>
+	</Style>
+
+	<!-- A menu that drops from a button - an order's choices, a card's figures, the history: the picker's own
+	     panel, closer round its rows (one panel: a menu was a section's frame in two
+	     places and a frame of its own in a third). -->
+	<Style Selector="Border.menupanel">
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="4"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Popup}"/>
+		<Setter Property="Padding" Value="4"/>
+	</Style>
+
+	<!-- Fills the page behind the list, so clicking away from it closes it. -->
+	<Style Selector="Button.backdrop">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="CornerRadius" Value="0"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="Focusable" Value="False"/>
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="VerticalAlignment" Value="Stretch"/>
+	</Style>
+	<Style Selector="Button.backdrop /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+	</Style>
+
+	<Style Selector="TextBlock.pickertitle">
+		<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Heading}"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
+
+	<!-- A place over its finds in a search's list (Resources/UI_Main/FoundRows.axaml). -->
+	<Style Selector="TextBlock.foundplace">
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+	</Style>
+
+	<!-- A find's row while it asks before loading the character it lies on: greyed under its question. -->
+	<Style Selector="Button.pickone.asking">
+		<Setter Property="Opacity" Value="0.25"/>
+		<Setter Property="IsHitTestVisible" Value="False"/>
+	</Style>
+
+	<!-- A row in a picker list: the whole row is the choice, so it is a button. -->
+	<Style Selector="Button.pickone">
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+
+		<!-- Stretch, not Left: Left sizes the content to itself, which collapses a
+		     starred column onto the text and leaves what should sit at the right edge -
+		     a corruption's chance - trailing immediately after it. -->
+		<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+		<Setter Property="Padding" Value="8,4"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="CornerRadius" Value="2"/>
+	</Style>
+
+	<!-- Every list row in every panel reads the same way: a frame of its own, lit
+	     gold under the pointer, and the one already in use framed and filled. The
+	     affix list had this and the other four panels did not, so picking a
+	     corruption felt like a different kind of act from picking an affix. -->
+	<Style Selector="Button.pickone /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="BorderBrush" Value="Transparent"/>
+		<Setter Property="CornerRadius" Value="2"/>
+	</Style>
+	<Style Selector="Button.pickone:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.pickone:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+	</Style>
+	<!-- The one the panel is already sitting on. Not merely hovered - it stays lit
+	     with the pointer elsewhere, which is what tells you where you are. Gold, as every
+	     "current" is (it was the red wash): a faint gold wash, so the
+	     row's own colours - magic blue, set green, a corruption's red - still read, and the
+	     selection ring's light gold for its edge. -->
+	<Style Selector="Button.pickone.held /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary Hover Edge}"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Selection - Current}"/>
+	</Style>
+
+	<!-- The glyph inside a picker's search box. Written first in the item panel, whose pickers
+	     are where searching a list began; the vault's property picker is the second. -->
+	<Style Selector="Path.magnifier">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Wiki - Text color}"/>
+		<Setter Property="StrokeThickness" Value="1.4"/>
+		<Setter Property="StrokeLineCap" Value="Round"/>
+		<Setter Property="Stretch" Value="None"/>
+		<Setter Property="Opacity" Value="0.75"/>
+		<Setter Property="Margin" Value="7,0,3,0"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
+</Styles>

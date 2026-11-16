@@ -1,0 +1,425 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:settings="using:PD2SPCompanion.Shell.Services.Settings"
+			 xmlns:save="using:PD2SPCompanion.Core.Saves"
+			 xmlns:core="using:PD2SPCompanion.Core"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Settings_L"
+			 x:DataType="vm:VP_ViewModel_Settings_L"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_L CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Settings_L/>
+	</Design.DataContext>
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/ActionIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SettingRow.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/GameLock.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ComboBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Tick.axaml"/>
+
+
+		<!-- The same pair of small square steppers the attributes use. -->
+
+		<!-- Chrome in Styles/CommonControls/SpendButton.axaml; only the glyph is local. -->
+
+	</UserControl.Styles>
+
+	<!-- The application side of the settings: where the game is, what is kept on disk, and
+	     what the machine is asked for. Gameplay is on the right panel. -->
+	<Panel>
+	<DockPanel Margin="16">
+		<TextBlock DockPanel.Dock="Top" Classes="title" Text="{L 'Settings'}" Margin="0,0,0,12"/>
+
+		<!-- The sections scroll under the heading when the window is too short for them. -->
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" AllowAutoHide="False">
+			<StackPanel>
+
+				<!-- The folders, each with the button that opens it (the data folder and the title
+				     font's sat under About). The game's first, because nothing else on this page means anything
+				     without it: every table, string and sprite the editor shows is read out of it. -->
+				<Border Classes="section" Margin="0,0,0,12">
+					<StackPanel Margin="16,14">
+						<TextBlock Classes="heading" Text="{L 'Folders'}" Margin="0,0,0,12"/>
+
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto">
+							<StackPanel Grid.Column="0" Margin="0,0,12,0" VerticalAlignment="Center">
+								<!-- Named as the rows under it are, since the section holds three folders. -->
+								<TextBlock Text="{L 'Game folder'}"
+										   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}"/>
+								<TextBlock Classes="dim" Text="{Binding GameFolder}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+								<TextBlock Text="{Binding GameFolderVersion}" Classes="dim"
+										   IsVisible="{Binding HasGameFolderVersion}"
+										   Margin="0,2,0,0"/>
+							</StackPanel>
+
+							<!-- A row's action, so the small square the other rows' actions are. -->
+							<Button Grid.Column="1" Classes="spend" VerticalAlignment="Center"
+									Command="{Binding ChangeGameFolderCommand}"
+									ToolTip.Tip="{L 'Change game folder'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Open folder}"/>
+							</Button>
+						</Grid>
+
+						<!-- The tables are loaded once and kept, so a folder changed now is a folder
+						     the running editor cannot move to. -->
+						<TextBlock Text="{Binding GameFolderNote}" TextWrapping="Wrap"
+								   Margin="0,10,0,0" FontSize="{StaticResource [Type] Small}"
+								   IsVisible="{Binding HasGameFolderNote}"
+								   Foreground="{DynamicResource [Text] Muted}"/>
+
+						<!-- The patch guard's hold: why, the files that did not read back, and Accept for
+						     after the new-season checklist. Nothing while writes are allowed. -->
+						<StackPanel Margin="0,12,0,0" Spacing="6" IsVisible="{Binding Guard.IsHeld}">
+							<TextBlock Text="{Binding Guard.Reason}" TextWrapping="Wrap" FontSize="{StaticResource [Type] Body}"
+									   Foreground="{DynamicResource [Text] Danger}"/>
+							<ItemsControl ItemsSource="{Binding Guard.Failed}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="save:PatchGuard+Checked">
+										<TextBlock TextWrapping="Wrap" FontSize="{StaticResource [Type] Small}" Classes="dim">
+											<Run Text="{Binding File}" Foreground="{DynamicResource [Text] Body}"/>
+											<Run Text="{Binding Problem}"/>
+										</TextBlock>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+							<!-- The files an earlier build wrote the old way (EncodingRepair), what REPAIR writes again. -->
+							<ItemsControl ItemsSource="{Binding Guard.Repairable}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="core:EncodingRepair+Finding">
+										<TextBlock TextWrapping="Wrap" FontSize="{StaticResource [Type] Small}" Classes="dim">
+											<Run Text="{Binding Name}" Foreground="{DynamicResource [Text] Body}"/>
+											<Run Text="{Binding Said}"/>
+										</TextBlock>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+							<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+								<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+										HorizontalContentAlignment="Stretch"
+										Theme="{DynamicResource [CtrlThm] Button_Primary}"
+										IsVisible="{Binding Guard.CanRepair}"
+										Command="{Binding Guard.RepairCommand}"
+										ToolTip.Tip="{L 'Repair these files&#10;Written again as this PD2 version reads them, every value kept, a backup first'}">
+									<Grid ColumnDefinitions="Auto,*">
+										<Path Classes="pin label" Data="{StaticResource [Glyph] Anvil}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+										<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'REPAIR'}"/>
+									</Grid>
+								</Button>
+								<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+										HorizontalContentAlignment="Stretch"
+										Theme="{DynamicResource [CtrlThm] Button_Primary}"
+										IsVisible="{Binding Guard.CanAccept}"
+										Command="{Binding Guard.AcceptCommand}"
+										ToolTip.Tip="{L 'Accept this PD2 version&#10;Writes go ahead with it'}">
+									<!-- The icon at the left edge, the label centred in the space it leaves. -->
+									<Grid ColumnDefinitions="Auto,*">
+										<Path Classes="pin label" Data="{StaticResource [Glyph] Tick}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+										<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'ACCEPT'}"/>
+									</Grid>
+								</Button>
+							</StackPanel>
+						</StackPanel>
+
+							<!-- Settings, vaults, logs and backups: one folder, opened in Explorer. -->
+							<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+								<StackPanel Grid.Column="0" Margin="0,0,12,0" VerticalAlignment="Center">
+									<TextBlock Text="{L 'Data folder'}"
+											   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}"/>
+									<!-- Where it is, and how much it holds: what is kept there is held to
+									     counts and ages, and this is where its size is seen. -->
+									<TextBlock Classes="dim" Text="{Binding DataFolderText}" TextWrapping="Wrap" Margin="0,2,0,0"
+											   AutomationProperties.AutomationId="Settings_DataFolder"/>
+								</StackPanel>
+
+								<Button Grid.Column="1" Classes="spend" VerticalAlignment="Center"
+										Command="{Binding OpenDataFolderCommand}"
+										ToolTip.Tip="{L 'Open data folder'}">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Open folder}"/>
+								</Button>
+							</Grid>
+
+							<!-- The titles' font, and the folder a player's own goes in (its README says how). -->
+							<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+								<StackPanel Grid.Column="0" Margin="0,0,12,0" VerticalAlignment="Center">
+									<TextBlock Text="{L 'Title font'}"
+											   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}"/>
+									<TextBlock Classes="dim" Text="{Binding TitleFontText}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+								</StackPanel>
+
+								<Button Grid.Column="1" Classes="spend" VerticalAlignment="Center"
+										Command="{Binding OpenFontsFolderCommand}"
+										ToolTip.Tip="{L 'Open fonts folder'}">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Open folder}"/>
+								</Button>
+							</Grid>
+
+							<!-- The rules sorted storing reads, a file in the loot filter's words: edited in the player's
+							     own program, or shown in its folder beside the default. -->
+							<Grid Classes="settingrow" ColumnDefinitions="*,Auto,Auto" Margin="0,10,0,0">
+								<StackPanel Grid.Column="0" Margin="0,0,12,0" VerticalAlignment="Center">
+									<TextBlock Text="{L 'Sorting rules'}"
+											   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}"/>
+									<TextBlock Classes="dim" Text="{Binding SortingRulesText}" TextWrapping="Wrap" Margin="0,2,0,0"
+											   AutomationProperties.AutomationId="Settings_SortingRules"/>
+								</StackPanel>
+
+								<Button Grid.Column="1" Classes="spend" VerticalAlignment="Center" Margin="0,0,6,0"
+										Command="{Binding OpenSortingRulesCommand}"
+										ToolTip.Tip="{L 'Edit sorting rules'}">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Pencil}"/>
+								</Button>
+								<Button Grid.Column="2" Classes="spend" VerticalAlignment="Center"
+										Command="{Binding ShowSortingRulesCommand}"
+										ToolTip.Tip="{L 'Show in folder'}">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Open folder}"/>
+								</Button>
+							</Grid>
+					</StackPanel>
+				</Border>
+				<!-- What the editor keeps on disk: backups of the characters, and the trade site's
+				     listings. -->
+				<Border Classes="section">
+					<StackPanel Margin="16,14">
+						<TextBlock Classes="heading" Text="{L 'Storage'}" Margin="0,0,0,12"/>
+
+						<!-- What the backup setting currently means is a sentence about its row, so it is the
+						     row's tooltip rather than a line competing with the controls. A drop-down as the right
+						     page's, as wide (it was a stepper). -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Background="Transparent"
+							  ToolTip.Tip="{Binding Policy}">
+							<TextBlock Grid.Column="0" Classes="body" VerticalAlignment="Center" Text="{L 'Backups per character'}"/>
+							<ComboBox Grid.Column="1" Classes="slots" Width="{StaticResource [UI] Drop Small}" MinWidth="0"
+									  ItemsSource="{Binding BackupChoiceNames}"
+									  SelectedIndex="{Binding BackupIndex}"/>
+						</Grid>
+
+						<!-- The vault's own number: one copy is taken for each session that
+						     changed it, and a vault's copy is far larger than a character's - so under the row's
+						     name, what they take on disk. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0" Background="Transparent"
+							  ToolTip.Tip="{Binding VaultPolicy}">
+							<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+								<TextBlock Classes="body" Text="{L 'Backups per vault'}"/>
+								<TextBlock Classes="dim" Text="{Binding VaultBackupSummary}" AutomationProperties.AutomationId="Settings_VaultBackupSummary"/>
+							</StackPanel>
+							<ComboBox Grid.Column="1" Classes="slots" Width="{StaticResource [UI] Drop Small}" MinWidth="0"
+									  AutomationProperties.AutomationId="Settings_VaultBackups"
+									  ItemsSource="{Binding BackupChoiceNames}"
+									  SelectedIndex="{Binding VaultBackupIndex}"/>
+						</Grid>
+
+						<!-- What is kept, and the bin that empties it - the Vault card's rows, the bin the small square
+						     the other rows' actions are. Asked first. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+							<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+								<TextBlock Classes="body" Text="{L 'Character backups'}"/>
+								<TextBlock Classes="dim" Text="{Binding BackupSummary}" AutomationProperties.AutomationId="Settings_BackupSummary"/>
+							</StackPanel>
+							<Button Grid.Column="1" Classes="spend bin" VerticalAlignment="Center"
+									Command="{Binding DeleteAllCommand}"
+									IsEnabled="{Binding HasBackups}"
+									ToolTip.Tip="{L 'Delete all backups&#10;Cannot be undone'}" ToolTip.ShowOnDisabled="True">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Bin}"/>
+							</Button>
+						</Grid>
+
+						<!-- The open character's own backups, listed (it was a button on the home
+						     page's card): opened to look at, restored from the card that then shows it, or deleted. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0"
+							  IsVisible="{Binding Home, Converter={x:Static ObjectConverters.IsNotNull}}">
+							<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+								<TextBlock Classes="body" Text="{L 'Open character backups'}"/>
+								<TextBlock Classes="dim" Text="{Binding Home.BackupsLine}"/>
+							</StackPanel>
+							<Button Grid.Column="1" Classes="spend" VerticalAlignment="Center"
+									AutomationProperties.AutomationId="Settings_Backups"
+									Command="{Binding Home.ToggleBackupsCommand}"
+									Classes.blocked="{Binding Home.GameBlocked}"
+									IsEnabled="{Binding Home.CanShowBackups}"
+									ToolTip.Tip="{Binding Home.ShowBackupsHint}" ToolTip.ShowOnDisabled="True">
+								<!-- The archive box: stored copies, not the strip's history clock. -->
+								<Path Classes="pin" Data="{StaticResource [Glyph] Archive}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+							</Button>
+						</Grid>
+
+						<!-- The trade site's listings, one file each, kept so a listing opens without asking
+						     the site again. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+							<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+								<TextBlock Classes="body" Text="{L 'Trade cache'}"/>
+								<TextBlock Classes="dim" Text="{Binding CacheSummary}"/>
+							</StackPanel>
+							<Button Grid.Column="1" Classes="spend bin" VerticalAlignment="Center"
+									Command="{Binding ClearCacheCommand}"
+									IsEnabled="{Binding HasCache}"
+									ToolTip.Tip="{L 'Clear cached listings&#10;Sold listings cannot be reopened'}" ToolTip.ShowOnDisabled="True">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Bin}"/>
+							</Button>
+						</Grid>
+					</StackPanel>
+				</Border>
+
+				<!-- English is built in; each pack in the Languages folder beside the editor adds one.
+				     The choice takes effect on restart. Shown only once there is
+				     a choice: PD2 itself is English only, so no pack ships. -->
+				<Border Classes="section" Margin="0,12,0,0" IsVisible="{Binding OffersLanguages}">
+					<StackPanel Margin="16,14">
+						<TextBlock Classes="heading" Text="{L 'Language'}" Margin="0,0,0,12"/>
+
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto">
+							<TextBlock Grid.Column="0" Classes="body" VerticalAlignment="Center" Text="{L 'Language'}"/>
+							<ComboBox Grid.Column="1" Classes="slots" Width="{StaticResource [UI] Drop Medium}" MinWidth="0"
+									  ItemsSource="{Binding LanguageNames}"
+									  SelectedIndex="{Binding LanguageIndex}"/>
+						</Grid>
+						<TextBlock Text="{Binding LanguageNote}" TextWrapping="Wrap"
+								   Margin="0,10,0,0" FontSize="{StaticResource [Type] Small}"
+								   IsVisible="{Binding HasLanguageNote}"
+								   Foreground="{DynamicResource [Text] Muted}"/>
+					</StackPanel>
+				</Border>
+				<!-- How the editor is drawn and heard: how large, whether anything moves, whether it clicks. -->
+				<Border Classes="section" Margin="0,12,0,0">
+					<StackPanel Margin="16,14">
+						<TextBlock Classes="heading" Text="{L 'Display and sound'}" Margin="0,0,0,12"/>
+
+						<!-- The whole window's scale, over Windows' own (Services.Settings.UiScale):
+						     Automatic lays the editor out as on a 1440p screen at 125%, where there is less room or more. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Background="Transparent"
+							  ToolTip.Tip="{L 'Automatic fits the layout to the screen'}">
+							<TextBlock Grid.Column="0" Classes="body" VerticalAlignment="Center" Margin="0,0,12,0" Text="{L 'UI scale'}"/>
+							<ComboBox Grid.Column="1" Classes="slots" Width="{StaticResource [UI] Drop Small}" MinWidth="0"
+									  AutomationProperties.AutomationId="Settings_UiScale"
+									  ItemsSource="{x:Static settings:UiScale.ChoiceNames}"
+									  SelectedIndex="{Binding Settings.UiScaleIndex, Mode=TwoWay}"/>
+						</Grid>
+
+						<!-- Every fade, slide and page cross-fade, and the character GIFs. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+							<TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0"
+									   Text="{L 'Animations'}"
+									   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}" TextWrapping="Wrap"/>
+
+							<ToggleButton Grid.Column="1" Classes="tick"
+										  IsChecked="{Binding Settings.Animations, Mode=TwoWay}"
+										  ToolTip.Tip="{L 'UI and character animations'}">
+								<Path Data="{StaticResource [Glyph] Tick}"
+									  IsVisible="{Binding Settings.Animations}"/>
+							</ToggleButton>
+						</Grid>
+
+						<!-- The button click, the editor's one sound. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+							<TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0"
+									   Text="{L 'Sounds'}"
+									   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}" TextWrapping="Wrap"/>
+
+							<ToggleButton Grid.Column="1" Classes="tick"
+										  AutomationProperties.AutomationId="Settings_Sounds"
+										  IsChecked="{Binding Settings.Sounds, Mode=TwoWay}"
+										  ToolTip.Tip="{L 'Button clicks'}">
+								<Path Data="{StaticResource [Glyph] Tick}"
+									  IsVisible="{Binding Settings.Sounds}"/>
+							</ToggleButton>
+						</Grid>
+					</StackPanel>
+				</Border>
+				<!-- About: which build this is, where its data is, and what changed. -->
+				<Border Classes="section" Margin="0,12,0,0">
+					<StackPanel Margin="16,14">
+						<TextBlock Classes="heading" Text="{L 'About'}" Margin="0,0,0,12"/>
+
+						<!-- The build, and under it the day and the commit; its release notes, and the line a bug
+						     report needs (the game's version and season are on the Game folder card). -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto,Auto">
+							<StackPanel Grid.Column="0" Margin="0,0,12,0" VerticalAlignment="Center">
+								<TextBlock TextWrapping="Wrap"
+										   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}">
+									<Run Text="{Binding AppName}"/>
+									<Run Text="{Binding VersionLabel}"/>
+								</TextBlock>
+								<TextBlock Classes="dim" Text="{Binding VersionBuilt}" Margin="0,2,0,0"/>
+							</StackPanel>
+
+							<Button Grid.Column="1" Classes="spend" VerticalAlignment="Center"
+									Command="{Binding OpenWhatsNewCommand}"
+									ToolTip.Tip="{L 'What\'s new'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Open}"/>
+							</Button>
+							<Button Grid.Column="2" Classes="spend" VerticalAlignment="Center" Margin="6,0,0,0"
+									Command="{Binding CopyVersionCommand}"
+									ToolTip.Tip="{L 'Copy for a bug report'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Duplicate}"/>
+							</Button>
+						</Grid>
+
+						<TextBlock Classes="dim" TextWrapping="Wrap" Margin="0,8,0,0"
+								   Text="{L 'Not affiliated with or endorsed by Blizzard Entertainment or the Project Diablo 2 team. Diablo is a trademark of Blizzard Entertainment.'}"/>
+
+						<!-- A report of a problem (ProblemReport): the logs, the settings and what is
+						     running in one zip, made in the data folder and shown there - the player attaches it where the
+						     problem is reported; nothing is sent. The tick puts the open character's files and a copy of
+						     the vault in too: off as the program starts, each time. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto,Auto" Margin="0,10,0,0">
+							<StackPanel Grid.Column="0" Margin="0,0,12,0" VerticalAlignment="Center">
+								<TextBlock Text="{L 'Report a problem'}"
+										   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}"/>
+								<TextBlock Classes="dim" Text="{Binding ReportText}" TextWrapping="Wrap" Margin="0,2,0,0"
+										   AutomationProperties.AutomationId="Settings_ReportText"/>
+							</StackPanel>
+							<ToggleButton Grid.Column="1" Classes="tick" VerticalAlignment="Center"
+										  AutomationProperties.AutomationId="Settings_ReportWithSaves"
+										  IsChecked="{Binding ReportWithSaves, Mode=TwoWay}"
+										  ToolTip.Tip="{L 'Include open character and vault'}">
+								<Path Data="{StaticResource [Glyph] Tick}"
+									  IsVisible="{Binding ReportWithSaves}"/>
+							</ToggleButton>
+							<Button Grid.Column="2" Classes="spend" VerticalAlignment="Center" Margin="6,0,0,0"
+									AutomationProperties.AutomationId="Settings_Report"
+									Command="{Binding ReportProblemCommand}"
+									ToolTip.Tip="{L 'Make report'}">
+								<!-- A file written out: not the archive box, which is a backup's. -->
+								<Path Classes="pin" Data="{StaticResource [Glyph] Save}"/>
+							</Button>
+						</Grid>
+
+						<!-- The sheet of keys and gestures (KeySheetService): one page of what the tooltips say one
+						     control at a time. F1 opens it from anywhere. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+							<TextBlock Grid.Column="0" Classes="body" VerticalAlignment="Center" Margin="0,0,12,0"
+									   Text="{L 'Keys and gestures'}"/>
+							<Button Grid.Column="1" Classes="spend" VerticalAlignment="Center"
+									AutomationProperties.AutomationId="Settings_Keys"
+									Command="{Binding OpenKeysCommand}"
+									ToolTip.Tip="{Binding KeysHint}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Open}"/>
+							</Button>
+						</Grid>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+		</ScrollViewer>
+	</DockPanel>
+
+	<!-- The open character's backups, over this page, opened from Storage: the home
+	     page's own list (BackupPanel), on the model it is the list of. -->
+	<views:BackupPanel DataContext="{Binding Home}"/>
+	</Panel>
+</UserControl>

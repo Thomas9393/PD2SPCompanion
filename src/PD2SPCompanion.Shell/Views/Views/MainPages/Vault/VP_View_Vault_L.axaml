@@ -1,0 +1,896 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:controls="using:PD2SPCompanion.Shell.CustomControls.Base"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Vault_L"
+			 x:DataType="vm:VP_ViewModel_Vault_L"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_L CornerSize}">
+
+	<UserControl.Resources>
+		<!-- A folder's row, in the tree and in a list of folders alike: a chevron where it holds folders - they
+		     fold away under it and come back, as in the move picker and by the same fold -
+		     then the folder, its name, and how many items lie in it. The others keep the chevron's room, so the
+		     names line up - but for the vault itself, at the head, which stands at the edge. The folder shown is
+		     the row held. A name cut short by the edge of its list says its whole path in a tooltip. -->
+		<DataTemplate x:Key="FolderRow" x:DataType="vm:FolderPlace">
+			<Button Classes="pickone folderrow"
+					Classes.held="{Binding IsTreeHere}"
+					Classes.drop="{Binding IsDropTarget}" Classes.cut="{Binding IsCut}"
+					IsVisible="{Binding IsShown}"
+					AutomationProperties.AutomationId="FolderRow"
+					AutomationProperties.Name="{Binding Name}"
+					base:TrimmedTip.Tip="{Binding Path}"
+					ToolTip.VerticalOffset="4"
+					Click="Place_Click">
+				<!-- 22 tall, in a frame of 1: a row is 24, and 1 under it - the tree's column of locks is drawn to the same
+				     measure (TreeLocks). -->
+				<StackPanel Orientation="Horizontal" Height="22" Margin="{Binding Indent}">
+					<Panel Width="18" IsVisible="{Binding HasChevronRoom}">
+						<!-- A bare icon: no frame under the pointer, the chevron brightening. -->
+						<Button Classes="bareicon" Width="18" Height="22"
+								AutomationProperties.AutomationId="FoldPlace"
+								AutomationProperties.Name="{Binding Name}"
+								ToolTip.Tip="{Binding FoldHint}"
+								IsVisible="{Binding HoldsFolders}"
+								IsEnabled="{Binding CanFold}"
+								Click="Fold_Click">
+							<Path Classes="chevron small" Classes.open="{Binding IsOpen}"
+									Data="{StaticResource [Glyph] Chevron}"/>
+						</Button>
+					</Panel>
+					<!-- Filled, every one (for a day an outline said "holds no items"). -->
+					<Path Classes="pin small filled" Margin="3,0,5,0" VerticalAlignment="Center"
+							Data="{StaticResource [Glyph] Folder}"/>
+					<TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+					<!-- How many it holds, after the name - in a list of folders. The tree says it in its own column
+					     instead, always in sight (Panel.rowcount, hidden there). -->
+					<Panel Classes="rowcount">
+						<TextBlock Classes="dim" Margin="8,0,0,0" VerticalAlignment="Center"
+								FontSize="{StaticResource [Type] Small}" Text="{Binding ItemsText}"
+								IsVisible="{Binding HasItems}"/>
+					</Panel>
+				</StackPanel>
+			</Button>
+		</DataTemplate>
+
+		<!-- A folder's row in the folder tree and in quick access: a large folder, its name
+		     beside it and under the name how many items lie in it - a small lock before that where it is locked.
+		     A chevron before it where it holds folders; folded is how a folder is made, so the tree opens on the
+		     vault's own folders and goes as deep as it is unfolded by hand. -->
+		<DataTemplate x:Key="TreeRow" x:DataType="vm:FolderPlace">
+			<Button Classes="pickone folderrow treerow"
+					IsVisible="{Binding IsShown}"
+					Classes.held="{Binding IsTreeHere}"
+					Classes.drop="{Binding IsDropTarget}" Classes.cut="{Binding IsCut}"
+					AutomationProperties.AutomationId="FolderRow"
+					AutomationProperties.Name="{Binding Name}"
+					base:TrimmedTip.Tip="{Binding Path}"
+					ToolTip.VerticalOffset="4"
+					Click="Place_Click">
+				<Grid Height="38" Margin="{Binding Indent}" ColumnDefinitions="Auto,Auto,*">
+					<Panel Grid.Column="0" Width="16" IsVisible="{Binding HasChevronRoom}">
+						<Button Classes="bareicon" Width="16" Height="38"
+								AutomationProperties.AutomationId="FoldPlace"
+								AutomationProperties.Name="{Binding Name}"
+								ToolTip.Tip="{Binding FoldHint}"
+								IsVisible="{Binding HoldsFolders}"
+								IsEnabled="{Binding CanFold}"
+								Click="Fold_Click">
+							<Path Classes="chevron small" Classes.open="{Binding IsOpen}"
+									Data="{StaticResource [Glyph] Chevron}"/>
+						</Button>
+					</Panel>
+					<Panel Grid.Column="1" Width="30" Height="30" Margin="2,0,6,0" VerticalAlignment="Center">
+						<Path Classes="pin large filled" Data="{StaticResource [Glyph] Folder}"/>
+					</Panel>
+					<StackPanel Grid.Column="2" VerticalAlignment="Center">
+						<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+						<!-- Where the folder is locked, a small lock heads the line (on the folder's
+						     own face it was either too small to read or wanted a folder drawn out of shape). -->
+						<DockPanel>
+							<Path DockPanel.Dock="Left" Classes="pin small" Margin="0,0,4,0" VerticalAlignment="Center"
+								  Data="{StaticResource [Glyph] Lock}"
+								  AutomationProperties.AccessibilityView="Control" AutomationProperties.Name="{L 'Locked'}"
+								  AutomationProperties.AutomationId="FolderRow_Locked"
+								  IsVisible="{Binding IsLocked}"/>
+							<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{Binding ItemsLine}" TextTrimming="CharacterEllipsis"
+									   VerticalAlignment="Center"
+									   AutomationProperties.AutomationId="FolderRow_Count"/>
+						</DockPanel>
+					</StackPanel>
+				</Grid>
+			</Button>
+		</DataTemplate>
+	</UserControl.Resources>
+
+	<UserControl.Styles>
+		<!-- A row of the tree is as wide as the tree: its name is cut at the edge, not scrolled to. -->
+		<Style Selector="Button.folderrow.treerow">
+			<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+		</Style>
+		<!-- Quick access's heading over its rows, and the tree's own under them. -->
+		<Style Selector="TextBlock.treehead">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+			<Setter Property="Margin" Value="4,2,0,3"/>
+		</Style>
+		<StyleInclude Source="/Styles/CommonControls/Selection.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ComboBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/BareIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemWording.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemMarks.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/StackCount.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/GameLock.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/DuplicateBadge.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/FolderWays.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PaneEdge.axaml"/>
+
+		<!-- The title, as the way home it also is: it reads as a title and only shows it is a
+		     link when the pointer is on it. -->
+		<Style Selector="Button.crumb">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="Padding" Value="0"/>
+			<Setter Property="Cursor" Value="Hand"/>
+		</Style>
+		<Style Selector="Button.crumb:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.crumb:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="Button.crumb:pointerover TextBlock, Button.crumb:focus-visible TextBlock">
+			<Setter Property="Opacity" Value="0.75"/>
+		</Style>
+
+		<!-- The pages' scroll bar, and none while the folder's map stands in its place. Set here, not on the
+		     scroll itself: a value written on a control is not a style's to change. -->
+		<Style Selector="ScrollViewer.pages">
+			<Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+		</Style>
+		<Style Selector="ScrollViewer.pages.mapped">
+			<Setter Property="VerticalScrollBarVisibility" Value="Hidden"/>
+		</Style>
+	</UserControl.Styles>
+
+	<!-- The margin every page has (beside the inventory the vault stood two units out). -->
+	<Grid RowDefinitions="Auto,Auto,Auto,*" Margin="16">
+
+		<!-- 1. Header. The title is also the way home: from any folder, back to the top. -->
+		<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+			<Button Classes="crumb" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+					Command="{Binding GoHomeCommand}">
+				<TextBlock Classes="title" Text="{L 'Vault'}"/>
+			</Button>
+			<!-- The page's facts, on the title row at the right as every page's are:
+			     what the vault holds, and its gold. -->
+			<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+				<TextBlock Classes="dim" VerticalAlignment="Center">
+					<Run Text="{Binding CountText}"/>
+					<Run Text=" · "/>
+					<Run Text="{Binding GoldText}"/>
+				</TextBlock>
+
+				<!-- The vault's gold, set here and only here (the stepper only on the vault page, in the
+				     inventory only transfer), behind a button beside the gold - at the foot of the page it
+				     crowded the paging. Where the play mode types gold, as the purses'
+				     steppers. The panel is a popup, out of the page's tree: it takes ctrl and shift itself. -->
+				<!-- A unit in from top and bottom: the title row is as tall as its title, as the inventory's is, and
+				     the rows under it stand where the inventory's do. -->
+				<Button Classes="spend" VerticalAlignment="Center" Margin="0,-1"
+						IsVisible="{Binding Rules.TypesGold}"
+						ToolTip.Tip="{L 'Vault gold'}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Dollar}"/>
+
+					<Button.Flyout>
+						<!-- Framed in gold as a picker's panel is, and flush under the button (it had a gap). -->
+						<Flyout Placement="BottomEdgeAlignedRight">
+							<Border x:Name="GoldPanel" Classes="pickerpanel" Padding="14,10" Margin="0,4">
+								<Border.Styles>
+									<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+									<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+								</Border.Styles>
+								<StackPanel Orientation="Horizontal" Spacing="4">
+									<TextBlock Classes="fieldname" VerticalAlignment="Center" Margin="0,0,10,0" Text="{L 'Vault gold'}"/>
+									<Button Classes="spend" Tag="gold:down"
+											Command="{Binding LowerGoldCommand}"
+											IsEnabled="{Binding CanLowerGold}"
+											ToolTip.Tip="{Binding LowerGoldHint}">
+										<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+									</Button>
+									<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Wide}"
+															 Minimum="0" Maximum="2000000000"
+															 Text="{Binding GoldTyped}"/>
+									<Button Classes="spend" Tag="gold:up"
+											Command="{Binding RaiseGoldCommand}"
+											ToolTip.Tip="{Binding RaiseGoldHint}">
+										<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+									</Button>
+								</StackPanel>
+							</Border>
+						</Flyout>
+					</Button.Flyout>
+				</Button>
+			</StackPanel>
+		</Grid>
+
+		<!-- 2. Where the page is, as Explorer says it: Back, Forward and Up, then the path - every step a way to it, the
+		     chevron after a
+		     step the folders it holds, and the one at the bar's end every folder there is (the folder box that
+		     stood here, which the tree at the left now mostly is). The bar gives way from its front where the
+		     path is long (CrumbPanel), and the whole path is its tooltip then. At the row's end, what the folder
+		     holds. -->
+		<Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,6">
+			<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+				<Button Classes="lock"
+						AutomationProperties.AutomationId="Vault_Back"
+						Command="{Binding GoBackCommand}"
+						IsEnabled="{Binding CanGoBack}"
+						ToolTip.Tip="{L 'Back (Alt + Left)'}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Arrow left}"/>
+				</Button>
+				<Button Classes="lock"
+						AutomationProperties.AutomationId="Vault_Forward"
+						Command="{Binding GoForwardCommand}"
+						IsEnabled="{Binding CanGoForward}"
+						ToolTip.Tip="{L 'Forward (Alt + Right)'}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Arrow right}"/>
+				</Button>
+				<Button Classes="lock"
+						AutomationProperties.AutomationId="Vault_Up"
+						Command="{Binding GoUpCommand}"
+						IsEnabled="{Binding CanGoUp}"
+						ToolTip.Tip="{L 'Up one folder (Alt + Up)'}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Arrow up}"/>
+				</Button>
+			</StackPanel>
+
+			<Border Grid.Column="1" Name="PathBar" Classes="pathbar" Margin="6,0,0,0"
+					base:TrimmedTip.Tip="{Binding Place.Path, FallbackValue={x:Null}}"
+					ToolTip.VerticalOffset="4">
+				<DockPanel>
+					<!-- Every folder, as the tree has them: the way anywhere with the tree put away. It says the
+					     whole path to what reads the window, as the box that stood here did. -->
+					<Button DockPanel.Dock="Right" Classes="step list"
+							AutomationProperties.AutomationId="Vault_Folder"
+							AutomationProperties.Name="{Binding Place.Path, FallbackValue=''}"
+							Click="PathEnd_Click"
+							ToolTip.Tip="{L 'All folders'}">
+						<Path Classes="pin small" Data="{StaticResource [Glyph] Chevron}"/>
+					</Button>
+
+					<ItemsControl ItemsSource="{Binding Crumbs}" HorizontalAlignment="Left" VerticalAlignment="Center">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<base:CrumbPanel/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<!-- Docked, not stacked: a step given less room than its name (the last, alone and too long -
+							     CrumbPanel) keeps its chevron and cuts its name short with an ellipsis. -->
+							<DataTemplate x:DataType="vm:FolderCrumb">
+								<DockPanel>
+									<Button DockPanel.Dock="Right" Classes="step list"
+											AutomationProperties.AutomationId="Vault_CrumbList"
+											AutomationProperties.Name="{Binding Name}"
+											ToolTip.Tip="{L 'Folders in it'}"
+											IsVisible="{Binding HoldsFolders}"
+											Click="CrumbList_Click">
+										<Path Classes="pin small" Data="{StaticResource [Glyph] Chevron right}"/>
+									</Button>
+									<Button Classes="step"
+											AutomationProperties.AutomationId="Vault_Crumb"
+											AutomationProperties.Name="{Binding Name}"
+											Click="Crumb_Click">
+										<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+									</Button>
+								</DockPanel>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</DockPanel>
+			</Border>
+
+			<!-- (A folder's name is not typed here, where the path stands: it is typed on the folder's
+			     tile, the one selected - the tile's own name box, below.) -->
+
+			<!-- What the folder holds, and what of it is selected. -->
+			<TextBlock Grid.Column="2" Classes="dim" FontSize="{StaticResource [Type] Small}"
+					   VerticalAlignment="Center" Margin="10,0,4,0"
+					   AutomationProperties.AutomationId="Vault_Count"
+					   Text="{Binding PagesText}"
+					   IsVisible="{Binding ShowsPages}"/>
+
+			<!-- A list of folders under the bar: a step's own, or all of them. One popup for every chevron. -->
+			<Popup Name="FolderMenu" IsOpen="{Binding IsMenuOpen, Mode=TwoWay}" IsLightDismissEnabled="True"
+				   PlacementTarget="{Binding #PathBar}" Placement="BottomEdgeAlignedLeft">
+				<Border Classes="pickerpanel" Padding="6" Margin="0,4" MinWidth="220" MaxWidth="460">
+					<Border.Styles>
+						<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+						<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+						<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+						<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+						<StyleInclude Source="/Styles/CommonControls/FolderWays.axaml"/>
+					</Border.Styles>
+					<ScrollViewer MaxHeight="420" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+						<ItemsControl ItemsSource="{Binding MenuPlaces}" ItemTemplate="{StaticResource FolderRow}"/>
+					</ScrollViewer>
+				</Border>
+			</Popup>
+		</Grid>
+
+		<!-- 3. The tools, on a line of their own under the path, in Explorer's order: the
+		     search; what is done to the folder shown; what is done to what is selected - each off with nothing
+		     selected; how the folder is picked from and ordered; and what the page shows of its tree and its
+		     map. The line stays one line (OverflowRow): where the page is too narrow for all of them the
+		     least needed are left off it, in the order of their Leaves, and listed by the button at its end -
+		     Rename folder and New folder first, then the clipboard's three, then what the page shows, then Move to folder. The
+		     search, Withdraw, the bin, selecting and sorting never leave. -->
+		<base:OverflowRow Grid.Row="2" Name="Tools" Spacing="6" Margin="0,0,0,6">
+
+			<!-- (No search's button here: the search is the window's, in its
+			     top row, and its panel opens from there. No rule parts it from the folder's tools:
+			     the row begins with its first tool.) -->
+			<!-- Folders: a new one in the folder shown, and the selected one named. Move to folder and the bin,
+			     further along the line, take a selected folder as they take items. -->
+			<Button Classes="lock" base:OverflowRow.Leaves="4"
+					Command="{Binding NewFolderCommand}"
+					ToolTip.Tip="{L 'New folder'}">
+				<Path Classes="pin" Data="{StaticResource [Glyph] New folder}"/>
+			</Button>
+			<!-- Rename: the folder SELECTED, on its tile - Explorer's; dimmed with none. -->
+			<Button Classes="lock" base:OverflowRow.Leaves="3"
+					Command="{Binding RenameFolderCommand}"
+					IsEnabled="{Binding CanRenameFolder}"
+					AutomationProperties.AutomationId="Vault_RenameFolder"
+					ToolTip.Tip="{Binding RenameFolderHint}"
+					ToolTip.ShowOnDisabled="True">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Pencil}"/>
+			</Button>
+			<!-- (No Move folder and Delete folder here, for the folder SHOWN: a folder is moved
+			     by Move to folder and deleted by the bin, its tile selected - further along the line.) -->
+
+			<!-- What is selected: withdrawn, moved, cut or copied, deleted. -->
+			<Border Classes="toolrule" base:OverflowRow.IsRule="True"/>
+
+			<Button Classes="lock"
+					Command="{Binding WithdrawCommand}"
+					IsEnabled="{Binding CanWithdraw}"
+					Classes.blocked="{Binding GameBlocked}"
+					ToolTip.Tip="{Binding WithdrawHint}"
+					ToolTip.ShowOnDisabled="True">
+				<Path Classes="pin" Data="{StaticResource [Glyph] From vault}"/>
+			</Button>
+
+			<!-- Put on, and put on the mercenary, for the card selected (the Items page has the
+			     two on its tools line; here they were rows of a card's menu and nothing else). Dimmed, and saying
+			     why, with no character open, the Items page not beside, or an item nobody wears. -->
+			<Button Classes="lock" base:OverflowRow.Leaves="6"
+					AutomationProperties.AutomationId="Vault_Equip"
+					Command="{Binding EquipSelectedCommand}"
+					IsEnabled="{Binding CanEquip}"
+					ToolTip.Tip="{Binding EquipHint}"
+					ToolTip.ShowOnDisabled="True">
+				<Path Classes="pin art" Data="{StaticResource [Glyph] Battle gear}"/>
+			</Button>
+			<Button Classes="lock" base:OverflowRow.Leaves="6"
+					AutomationProperties.AutomationId="Vault_EquipMerc"
+					Command="{Binding EquipSelectedOnMercCommand}"
+					IsEnabled="{Binding CanEquipMerc}"
+					ToolTip.Tip="{Binding EquipMercHint}"
+					ToolTip.ShowOnDisabled="True">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Person plus}"/>
+			</Button>
+
+			<Button Classes="lock" base:OverflowRow.Leaves="11"
+					AutomationProperties.AutomationId="Vault_MoveItems"
+					Command="{Binding OpenMoveCommand}"
+					IsEnabled="{Binding CanMove}"
+					ToolTip.Tip="{Binding MoveHint}"
+					ToolTip.ShowOnDisabled="True">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Move to folder}"/>
+			</Button>
+
+			<!-- The clipboard's three, where Duplicate stood: cut marks the selected to be moved
+			     by the paste, copy holds them to be made seconds of - where the play mode duplicates, and there only - and
+			     paste puts what is held into the folder shown. -->
+			<Button Classes="lock" base:OverflowRow.Leaves="5"
+					AutomationProperties.AutomationId="Vault_Cut"
+					Command="{Binding CutCommand}"
+					IsEnabled="{Binding CanCut}"
+					ToolTip.Tip="{Binding CutHint}"
+					ToolTip.ShowOnDisabled="True">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Cut}"/>
+			</Button>
+			<Button Classes="lock" base:OverflowRow.Leaves="5"
+					AutomationProperties.AutomationId="Vault_Copy"
+					Command="{Binding CopySelectedCommand}"
+					IsVisible="{Binding Rules.Duplicates}"
+					IsEnabled="{Binding CanCopy}"
+					ToolTip.Tip="{Binding CopyHint}"
+					ToolTip.ShowOnDisabled="True">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Duplicate}"/>
+			</Button>
+			<Button Classes="lock" base:OverflowRow.Leaves="5"
+					AutomationProperties.AutomationId="Vault_Paste"
+					Command="{Binding PasteCommand}"
+					IsEnabled="{Binding CanPaste}"
+					ToolTip.Tip="{Binding PasteHint}"
+					ToolTip.ShowOnDisabled="True">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Paste}"/>
+			</Button>
+
+			<!-- Asks twice, as the inventory's bin does. -->
+			<base:BinButton Command="{Binding DeleteCommand}"
+							IsArmed="{Binding DeleteArmed}"
+							IsEnabled="{Binding CanDeleteSelection}"
+							Tip="{Binding DeleteHint}"/>
+
+			<!-- How the folder is picked from and ordered. Select all, none, or the other way round - there is no
+			     mode to turn on first. The sort's menu button, holding a
+			     different menu. -->
+			<Border Classes="toolrule" base:OverflowRow.IsRule="True"/>
+
+			<base:SortMenu DataContext="{Binding Picks}" VerticalAlignment="Center" IsLarge="True"
+						   Glyph="{StaticResource [Glyph] Select all}"/>
+
+			<base:SortMenu DataContext="{Binding Order}" VerticalAlignment="Center" IsLarge="True"/>
+
+			<!-- (No Close gaps here: the folder is laid out by a rule, and has no
+			     gaps of anyone's making.) -->
+
+			<!-- Quick access: lit while the folder shown is pinned to the list over the tree -
+			     pressed, it is pinned or taken off. Dead at the vault's top, which is the tree's first row already. -->
+			<Button Classes="lock" base:OverflowRow.Leaves="12"
+					AutomationProperties.AutomationId="Vault_Quick"
+					Classes.on="{Binding IsQuick}"
+					IsEnabled="{Binding CanQuick}"
+					Command="{Binding ToggleQuickCommand}"
+					ToolTip.Tip="{Binding QuickHint}" ToolTip.ShowOnDisabled="True">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Star}"/>
+			</Button>
+
+			<!-- The folder's lock: lit while the folder shown is locked - its items take no
+			     pick, and Store all's sorting delivers past it. A locked stash page's twin. Here always:
+			     the tree has no column of locks, and a locked folder wears a lock on its picture. -->
+			<Button Classes="lock" base:OverflowRow.Leaves="13"
+					AutomationProperties.AutomationId="Vault_FolderLock"
+					Classes.on="{Binding IsFolderLocked}"
+					Command="{Binding ToggleFolderLockCommand}"
+					ToolTip.Tip="{Binding FolderLockHint}">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Lock}"/>
+			</Button>
+			<!-- Identify, there only while a card acted on is unidentified - the near tools'
+			     last, so nothing moves when it comes and goes. -->
+			<Button Classes="lock" base:OverflowRow.Leaves="14"
+					AutomationProperties.AutomationId="Vault_Identify"
+					IsVisible="{Binding CanIdentify}"
+					Command="{Binding IdentifySelectedCommand}"
+					ToolTip.Tip="{Binding IdentifyHint}">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Magnifier}"/>
+			</Button>
+
+			<!-- What the page shows (each a toggle of its own, a minimal view or the
+			     full one), lit while it is on and kept a page: the folder tree at the left, the folder's
+			     map in place of the scroll bar. (The folder's folders have no toggle of their own:
+			     they are tiles of the sheet.) Lit is what
+			     was asked for: on a page too narrow the map and the tree are put away for the while, and say so.
+			     At the line's far end while every tool has its room - what is done at the left, what is shown at
+			     the right, Compare outermost, beside the page it opens (IsFar). -->
+			<Border Classes="toolrule" base:OverflowRow.IsRule="True" base:OverflowRow.IsFar="True"/>
+
+			<!-- The sockets shown or faded, and the socket guard: the Items page's two, over the same two states
+			     (synced with the inventory's). X does the first here too. -->
+			<Button Classes="lock" base:OverflowRow.Leaves="6" base:OverflowRow.IsFar="True"
+					AutomationProperties.AutomationId="Vault_Sockets"
+					Classes.on="{Binding !SocketsFaded}"
+					Command="{Binding ToggleSocketsCommand}"
+					ToolTip.Tip="{Binding SocketHint}">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Socket}"/>
+			</Button>
+			<Button Classes="lock" Tag="socketguard" base:OverflowRow.Leaves="6" base:OverflowRow.IsFar="True"
+					AutomationProperties.AutomationId="Vault_SocketGuard"
+					Classes.on="{Binding SocketGuard}"
+					Command="{Binding ToggleSocketGuardCommand}"
+					ToolTip.Tip="{Binding SocketGuardHint}">
+				<Panel>
+					<Path Classes="pin" Data="{StaticResource [Glyph] Socket lock}" IsVisible="{Binding SocketGuard}"/>
+					<Path Classes="pin" Data="{StaticResource [Glyph] Socket unlock}" IsVisible="{Binding !SocketGuard}"/>
+				</Panel>
+			</Button>
+
+			<Button Classes="lock" base:OverflowRow.Leaves="9" base:OverflowRow.IsFar="True"
+					AutomationProperties.AutomationId="Vault_TreeToggle"
+					Classes.on="{Binding ShowsTree}"
+					Command="{Binding ToggleTreeCommand}"
+					ToolTip.Tip="{Binding TreeHint}">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Side pane}"/>
+			</Button>
+			<Button Classes="lock" base:OverflowRow.Leaves="7" base:OverflowRow.IsFar="True"
+					AutomationProperties.AutomationId="Vault_Minimap"
+					Classes.on="{Binding IsMinimap}"
+					Command="{Binding ToggleMinimapCommand}"
+					ToolTip.Tip="{Binding MapHint}">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Minimap}"/>
+			</Button>
+
+			<!-- The vault on the right page too: the left page's button only, lit while
+			     the vault is on both - by this, or by the right page's Vault bookmark. -->
+			<Button Classes="lock" base:OverflowRow.Leaves="10" base:OverflowRow.IsFar="True"
+					AutomationProperties.AutomationId="Vault_Compare"
+					IsVisible="{Binding IsPrimary}"
+					Classes.on="{Binding IsComparing}"
+					Command="{Binding ToggleCompareCommand}"
+					ToolTip.Tip="{L 'Compare'}">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Compare}"/>
+			</Button>
+
+			<!-- What the line had no room for, listed (MoreMenu): there only while something is left off. -->
+			<Button Classes="lock" Name="MoreButton" base:OverflowRow.IsMore="True"
+					AutomationProperties.AutomationId="Vault_More"
+					Click="More_Click"
+					ToolTip.Tip="{L 'More'}">
+				<Path Classes="pin" Data="{StaticResource [Glyph] More}"/>
+			</Button>
+		</base:OverflowRow>
+
+		<!-- The tools the line had no room for: a row each, with its glyph and what its tooltip says; one that
+		     is on is ticked, one that is dead is faint. A rule where the line had one between two of them. -->
+		<Popup Grid.Row="2" Name="MoreMenu" IsLightDismissEnabled="True"
+			   PlacementTarget="{Binding #MoreButton}" Placement="BottomEdgeAlignedRight">
+			<Border Classes="pickerpanel" Padding="6" Margin="0,4" MinWidth="200">
+				<Border.Styles>
+					<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+					<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+					<StyleInclude Source="/Styles/CommonControls/FolderWays.axaml"/>
+				</Border.Styles>
+				<ItemsControl Name="MoreRows">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate x:DataType="views:ToolEntry">
+							<Panel>
+								<Border Classes="menurule" IsVisible="{Binding IsRule}"/>
+								<Button Classes="pickone toolrow"
+										IsVisible="{Binding !IsRule}"
+										IsEnabled="{Binding IsEnabled}"
+										AutomationProperties.AutomationId="Vault_MoreRow"
+										AutomationProperties.Name="{Binding Text}"
+										Click="MoreRow_Click">
+									<DockPanel>
+										<Path DockPanel.Dock="Left" Classes="pin" Margin="0,0,10,0" VerticalAlignment="Center"
+											  Data="{Binding Glyph}"/>
+										<Path DockPanel.Dock="Right" Classes="pin small" Margin="12,0,0,0" VerticalAlignment="Center"
+											  Data="{StaticResource [Glyph] Tick}"
+											  IsVisible="{Binding IsOn}"/>
+										<TextBlock Text="{Binding Text}" VerticalAlignment="Center"/>
+									</DockPanel>
+								</Button>
+							</Panel>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</Border>
+		</Popup>
+
+		<!-- 4. The vault itself: the folder tree at the left, and beside it the folder shown - its sheet, the
+		     folders it holds first on it. -->
+		<Grid Grid.Row="3" ColumnDefinitions="Auto,*">
+
+			<!-- The folder tree: every folder, the one shown lit; a click goes to it, and
+			     what is carried is let go of on a row to move it there - a folded row it is held over opens. It
+			     scrolls both ways, so a deep folder's name is read whole, a little in for each level; and its
+			     right edge is dragged by its grip to make it wider or narrower, kept a page - never more than a
+			     half of the page, however wide it was left on a wider one (TreeRoom). Dragged left past half its
+			     least width it shuts under the pointer, and is put away if let go of there (TreeEdge_Moved). A
+			     name the edge cuts across says its whole path in a tooltip. -->
+			<Grid Grid.Column="0" Name="TreePane" ColumnDefinitions="*,Auto" AutomationProperties.AutomationId="Vault_TreePane" AutomationProperties.AccessibilityView="Control"
+				  Width="{Binding TreePaneWidth}"
+				  IsVisible="{Binding ShowsTreeNow}">
+				<Border Grid.Column="0" Classes="section" ClipToBounds="True" IsVisible="{Binding !TreeDraggedShut}">
+					<!-- Quick access - the folders pinned - over the tree, staying where it is while the
+					     tree scrolls under it: a tree scrolled to the folder shown would have taken it out of sight. The
+					     tree's column of locks and counts is gone: a row says its own count under its name and wears its lock
+					     on its folder, and the lock's button is the tools' again. Nor does the tree scroll sideways: it opens on
+					     the vault's own folders, and a name too long for it is cut, and said whole in a tooltip. -->
+					<!-- By the keys (the view's TreeKey): Up and Down walk the rows - quick access's, then
+					     the tree's - without going anywhere, Enter goes to the folder of the row reached, Right and Left
+					     unfold and fold it. -->
+					<Grid RowDefinitions="Auto,Auto,*">
+						<StackPanel Grid.Row="0" IsVisible="{Binding HasQuick}" Margin="4,4,4,0">
+							<TextBlock Classes="treehead" Text="{L 'Quick access'}"/>
+							<ScrollViewer Name="QuickScroll" MaxHeight="162"
+										  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" AllowAutoHide="False">
+								<ItemsControl Name="QuickRows"
+											  AutomationProperties.AutomationId="Vault_QuickRows"
+											  ItemsSource="{Binding QuickPlaces}"
+											  ItemTemplate="{StaticResource TreeRow}"/>
+							</ScrollViewer>
+							<Border Height="1" Margin="2,5,2,0" Background="{DynamicResource [Brush] Frame - Golden Dim}"/>
+						</StackPanel>
+						<!-- The tree's own heading, and at its end the whole tree unfolded or folded - here, on the tree, and not
+						     on the page's tools line: they are the tree's, and go where it goes. -->
+						<DockPanel Grid.Row="1" Margin="4,4,4,0">
+							<Button DockPanel.Dock="Right" Classes="bareicon" Width="18" Height="18"
+									AutomationProperties.AutomationId="Vault_FoldTree"
+									Command="{Binding FoldTreeCommand}"
+									IsEnabled="{Binding CanFoldTree}"
+									ToolTip.Tip="{L 'Fold all'}">
+								<Path Classes="pin small" Data="{StaticResource [Glyph] Chevrons up}"/>
+							</Button>
+							<Button DockPanel.Dock="Right" Classes="bareicon" Width="18" Height="18" Margin="0,0,2,0"
+									AutomationProperties.AutomationId="Vault_UnfoldTree"
+									Command="{Binding UnfoldTreeCommand}"
+									IsEnabled="{Binding CanFoldTree}"
+									ToolTip.Tip="{L 'Unfold all'}">
+								<Path Classes="pin small" Data="{StaticResource [Glyph] Chevrons down}"/>
+							</Button>
+							<TextBlock Classes="treehead" Text="{L 'Folders'}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+						</DockPanel>
+						<ScrollViewer Grid.Row="2" Name="TreeScroll"
+									  AutomationProperties.AutomationId="Vault_Tree"
+									  HorizontalScrollBarVisibility="Disabled"
+									  VerticalScrollBarVisibility="Auto"
+									  AllowAutoHide="False">
+							<ItemsControl Name="TreeRows" Margin="4"
+										  ItemsSource="{Binding Places}"
+										  ItemTemplate="{StaticResource TreeRow}"/>
+						</ScrollViewer>
+					</Grid>
+				</Border>
+				<Border Grid.Column="1" Name="TreeEdge" Classes="paneedge" AutomationProperties.AutomationId="Vault_TreeEdge" AutomationProperties.AccessibilityView="Control"
+						PointerPressed="TreeEdge_Pressed"
+						PointerMoved="TreeEdge_Moved"
+						PointerReleased="TreeEdge_Released">
+					<StackPanel><Border/><Border/><Border/></StackPanel>
+				</Border>
+			</Grid>
+
+			<Grid Grid.Column="1" RowDefinitions="Auto,Auto,*">
+
+				<!-- (The folders the folder shown holds are not a strip over the sheet, with a grip under it:
+				     they are tiles of the sheet itself - below.) -->
+
+				<!-- The folder, in the container every section of the pages has (it was a black box in a gold frame). -->
+				<Border Grid.Row="2" Classes="section" ClipToBounds="True">
+					<Panel>
+						<!-- Worded and drawn as the pages' other notices - "Please load a character." - the
+						     watermark behind it. Nothing to click: there is nothing here to go to. -->
+						<base:LoadCharacterNotice Message="{Binding EmptyText}"
+												  IsVisible="{Binding IsPlainlyEmpty}"/>
+
+						<TextBlock Classes="dim" TextWrapping="Wrap" Margin="24"
+								   HorizontalAlignment="Center" VerticalAlignment="Center"
+								   Text="{Binding Trouble}"
+								   IsVisible="{Binding HasTrouble}"/>
+
+						<!-- The folder as its sheet: one grid as
+						     long as it needs, down a scroll that draws only the stretches in sight. As wide as the page
+						     has room for, in even columns, and laid out by a rule in the Sort menu's order: no item has a
+						     place of its own. -->
+						<Grid Name="SheetArea" ColumnDefinitions="*,Auto" IsVisible="{Binding ShowsPages}"
+							  SizeChanged="SheetArea_SizeChanged">
+							<ScrollViewer Name="PagesScroll" Classes="pages"
+										  Classes.mapped="{Binding ShowsMapNow}"
+										  AutomationProperties.AutomationId="Vault_Pages"
+										  HorizontalScrollBarVisibility="Auto"
+										  AllowAutoHide="False"
+										  SizeChanged="Pages_SizeChanged"
+										  ScrollChanged="Pages_Scrolled">
+								<!-- The sheet's stretches, as tall as all of them; those in sight and near it built, and one once
+								     built kept (PageRowsHost) - a list that built a row's tiles again each time it came back was
+								     the stutter of a long folder scrolled. No frame between two: it is one sheet. -->
+								<base:PageRowsHost Name="PageRows" Margin="6,8,6,8"
+												   Rows="{Binding PageRows}"
+												   Marks="{Binding Marks}"
+												   Hits="{Binding HitKeys}"
+												   Columns="{Binding SheetColumns}"
+												   RowHeight="{x:Static vm:VP_ViewModel_Vault_L.PageRowHeight}"
+												   SocketOpacity="{Binding SocketOpacity}"
+												   IsDimmed="{Binding HasSelection}"
+												   ClickTileCommand="{Binding ClickTileCommand}">
+									<!-- The folder's own folders, first on its sheet (a folder as a fake
+									     item in the grid, just like Windows Explorer): a tile each, four cells by four,
+									     in rows across the sheet - which is a whole number of fours wide, twelve columns at the
+									     least, so a row of them fills it - the items beginning under them. Selected by a click, opened by
+									     a double click or Enter, picked with the items by Ctrl, Shift and the rectangle
+									     (picklist), carried by a drag and let go of on another folder; what is carried is let
+									     go of on one to go into it. -->
+									<base:PageRowsHost.Over>
+										<ItemsControl Name="FolderTiles" Classes="picklist sheetfolders"
+													  AutomationProperties.AutomationId="Vault_FolderTiles"
+													  ItemsSource="{Binding SheetFolders}">
+											<ItemsControl.Styles>
+												<Style Selector="ItemsControl.sheetfolders > ContentPresenter" x:DataType="vm:FolderTile">
+													<Setter Property="Canvas.Left" Value="{Binding Left}"/>
+													<Setter Property="Canvas.Top" Value="{Binding Top}"/>
+												</Style>
+											</ItemsControl.Styles>
+											<ItemsControl.ItemsPanel>
+												<ItemsPanelTemplate>
+													<Canvas/>
+												</ItemsPanelTemplate>
+											</ItemsControl.ItemsPanel>
+											<ItemsControl.ItemTemplate>
+												<DataTemplate x:DataType="vm:FolderTile">
+												  <Panel Width="{x:Static vm:FolderTile.Width}"
+														 Height="{x:Static vm:FolderTile.Height}">
+													<Button Classes="sheetfolder pickitem"
+															Classes.cut="{Binding Place.IsCut}"
+															Classes.miss="{Binding IsSearchMiss}"
+															Classes.stepped="{Binding $parent[ItemsControl].((vm:VP_ViewModel_Vault_L)DataContext).HasSelection}"
+															Classes.marked="{Binding IsMarked}"
+															AutomationProperties.AutomationId="SheetFolder"
+															AutomationProperties.Name="{Binding Name}"
+															base:TrimmedTip.Tip="{Binding Place.Path}"
+															ToolTip.VerticalOffset="4"
+															Click="FolderTile_Click">
+														<Panel>
+															<Grid RowDefinitions="40,Auto,Auto" Margin="3,0">
+																<Panel Grid.Row="0" Width="36" Height="36" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+																	<Path Classes="pin tile filled" Data="{StaticResource [Glyph] Folder}"/>
+																</Panel>
+																<TextBlock Grid.Row="1" Text="{Binding Name}" Margin="0,2,0,0"
+																		   Classes.renamed="{Binding IsRenaming}"
+																		   FontSize="{StaticResource [Type] Body}"
+																		   TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"
+																		   TextAlignment="Center" HorizontalAlignment="Center"/>
+																<!-- What it holds, as its row of the tree says it, a line to each part. -->
+																<TextBlock Grid.Row="2" Classes="dim" Text="{Binding CountLines}"
+																		   AutomationProperties.AutomationId="SheetFolder_Count"
+																		   TextAlignment="Center" HorizontalAlignment="Center"/>
+															</Grid>
+															<Path Classes="pin small" Data="{StaticResource [Glyph] Lock}"
+																  HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,3,3,0"
+																  AutomationProperties.AccessibilityView="Control" AutomationProperties.Name="{L 'Locked'}"
+																  AutomationProperties.AutomationId="SheetFolder_Locked"
+																  IsVisible="{Binding Place.IsLocked}"/>
+															<Border Classes="selring" IsVisible="{Binding IsMarked}"/>
+															<Border Classes="dropring" IsVisible="{Binding Place.IsDropTarget}"/>
+														</Panel>
+													</Button>
+													<!-- The folder's name, typed where it stands (F2, its menu's Rename) - beside the
+													     tile's button and not in it: a box inside a button hands the button its Space
+													     and its presses. Over the name, which is not drawn the while. -->
+													<ContentControl Content="{Binding Rename}" IsVisible="{Binding IsRenaming}"
+																	VerticalAlignment="Top" Margin="3,41,3,0">
+														<ContentControl.ContentTemplate>
+															<DataTemplate x:DataType="vm:FolderRename">
+																<!-- input-guard-ok: as the path's name box - Enter and Escape only. -->
+																<TextBox Classes="value" Height="26" FontSize="{StaticResource [Type] Body}"
+																		 AutomationProperties.AutomationId="SheetFolder_Name"
+																		 HorizontalContentAlignment="Center" TextAlignment="Center"
+																		 Text="{Binding Name}"
+																		 AttachedToVisualTree="Rename_Attached"
+																		 KeyDown="Rename_KeyDown"
+																		 LostFocus="Rename_LostFocus"/>
+															</DataTemplate>
+														</ContentControl.ContentTemplate>
+													</ContentControl>
+												  </Panel>
+												</DataTemplate>
+											</ItemsControl.ItemTemplate>
+										</ItemsControl>
+									</base:PageRowsHost.Over>
+								</base:PageRowsHost>
+							</ScrollViewer>
+
+							<!-- What is carried, let go of here, comes into the folder shown: the cells under it are lit
+							     (VP_ViewModel_Vault_L.HoverFootprint). The sheet framed in green as a whole was
+							     too strong. -->
+
+							<!-- Which rows are in sight, beside the map's window while it is dragged: a long folder gone
+							     through by the map says where it is, as a long list says it beside a dragged thumb. -->
+							<Border Name="ScrubLabel" Grid.Column="0" IsVisible="False" IsHitTestVisible="False"
+									HorizontalAlignment="Right" VerticalAlignment="Top"
+									AutomationProperties.AutomationId="Vault_Scrub"
+									Background="#E6000000" CornerRadius="3" Padding="8,4"
+									BorderThickness="1" BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}">
+								<TextBlock Name="ScrubText" FontSize="{StaticResource [Type] Body}"
+										   Foreground="{DynamicResource [Text] Body}"/>
+							</Border>
+
+							<!-- The folder in small, in place of the scroll bar (PagesMinimap). In a thin gold frame:
+							     beside a sheet wider than its room the map stands at the sheet's cut
+							     edge, cells running up to it, and without it read as more of the sheet. A shade was tried
+							     with it and turned off the same day.
+							     The frame's one unit is taken out of its margins, all round: it is drawn in the gap the
+							     map already kept, and the map and the sheet lie where they lay. Given room of its own it
+							     moved the sheet by a unit and a quarter at 125% - off the pixel grid, two items side by
+							     side 34 pixels apart for 35 (found by the sort's window case). -->
+							<!-- Its corners rounded round the map's own 2 (PagesMinimap.Corner): 3 outside a line of 1. -->
+							<Border Name="MapFrame" Grid.Column="1" Margin="-1,7,5,7" CornerRadius="3"
+									BorderThickness="1" BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}"
+									IsVisible="{Binding ShowsMapNow}">
+								<base:PagesMinimap Name="Minimap"
+												   AutomationProperties.AutomationId="Vault_Map"/>
+							</Border>
+						</Grid>
+					</Panel>
+				</Border>
+			</Grid>
+		</Grid>
+
+		<!-- Where the selected or picked items should go. Dressed exactly as the item page's
+		     and the map seed's pickers are. -->
+		<!-- The search, over this page: the map seed picker's veil. Out to the page's edge, past the grid's
+		     margin, as the inventory's is: the two search panels are one size. -->
+		<!-- (The search panel does not open over this page: it is the window's - SearchWindow.) -->
+
+		<Border Grid.Row="0" Grid.RowSpan="5" Margin="-16" Classes="veil"
+				IsVisible="{Binding IsPickerPresent}"
+				Classes.shown="{Binding IsPickerOpen}"
+				IsHitTestVisible="{Binding IsPickerOpen}">
+			<Panel>
+				<Button Classes="backdrop" Command="{Binding ClosePickerCommand}"/>
+
+				<Panel Classes="pickerframe">
+					<Border Classes="pickerpanel">
+						<DockPanel>
+							<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+								<TextBlock base:TrimmedTip.Tip="{Binding MoveTitle}" Grid.Column="0" Classes="pickertitle" Text="{Binding MoveTitle}"
+										   TextTrimming="CharacterEllipsis"/>
+
+								<Button Grid.Column="1" Classes="spend"
+										Command="{Binding ClosePickerCommand}"
+										ToolTip.Tip="{L 'Close'}">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+								</Button>
+							</Grid>
+
+							<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+								<ItemsControl ItemsSource="{Binding Targets}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate x:DataType="vm:MoveTarget">
+											<!-- A folder holding folders has a chevron before its name: they fold away
+											     under it and come back, and the picker opens as it was left. The
+											     chevron's button is a square as tall as the name's row and
+											     lights as the row does (it was too small, not easy to click). The others
+											     keep the square's room, so the names line up. -->
+											<Grid ColumnDefinitions="Auto,*" Margin="{Binding Indent}" IsVisible="{Binding IsShown}">
+												<Panel Grid.Column="0" Margin="0,0,2,2" Width="{Binding $self.Bounds.Height}">
+													<Button Classes="pickone" Padding="0"
+															HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+															VerticalAlignment="Stretch"
+															AutomationProperties.AutomationId="FoldTarget"
+															AutomationProperties.Name="{Binding Name}"
+															IsVisible="{Binding HoldsFolders}"
+															Command="{Binding $parent[ItemsControl].((vm:VP_ViewModel_Vault_L)DataContext).FoldTargetCommand}"
+															ToolTip.Tip="{Binding FoldHint}"
+															CommandParameter="{Binding}">
+														<Path Classes="chevron small" Classes.open="{Binding IsOpen}"
+															  Data="{StaticResource [Glyph] Chevron}"/>
+													</Button>
+												</Panel>
+												<Button Grid.Column="1" Classes="pickone" Margin="0,0,0,2"
+														AutomationProperties.AutomationId="MoveTarget"
+														Command="{Binding $parent[ItemsControl].((vm:VP_ViewModel_Vault_L)DataContext).MoveToCommand}"
+														CommandParameter="{Binding}">
+													<TextBlock Text="{Binding Name}"
+															   Foreground="{DynamicResource [Text] Body}"/>
+												</Button>
+											</Grid>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</ScrollViewer>
+						</DockPanel>
+					</Border>
+				</Panel>
+			</Panel>
+		</Border>
+	</Grid>
+</UserControl>

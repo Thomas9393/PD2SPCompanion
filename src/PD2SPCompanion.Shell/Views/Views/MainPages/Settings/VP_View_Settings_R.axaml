@@ -1,0 +1,950 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:settings="using:PD2SPCompanion.Shell.Services.Settings"
+			 xmlns:core="using:PD2SPCompanion.Core.Collection"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Settings_R"
+			 x:DataType="vm:VP_ViewModel_Settings_R"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_R CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Settings_R/>
+	</Design.DataContext>
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PickField.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SettingRow.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Tick.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<!-- For the sort menu and the bin it hosts, which wear it (SortMenu, BinButton). -->
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Choice.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ComboBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/RowIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+
+		<!-- The price table in one column, and two once the section is wide enough for a row to keep
+		     "Larzuk's Puzzlebox" whole beside its box - about 264 each, and 56 between. In layout units, not screen pixels: at
+		     125% display scaling a 945-pixel panel is 756 wide here. A container query, so it
+		     follows the panel, not the window. Set here only: a Columns on the grid itself would
+		     beat the query. -->
+		<Style Selector="UniformGrid.prices">
+			<Setter Property="Columns" Value="1"/>
+		</Style>
+		<Style Selector="Grid.pricerow">
+			<Setter Property="Margin" Value="8,6,20,6"/>
+		</Style>
+		<ContainerQuery Name="pricetable" Query="min-width:680">
+			<Style Selector="UniformGrid.prices">
+				<Setter Property="Columns" Value="2"/>
+			</Style>
+			<!-- 56 between the columns, half each side of every row so the pair stays centred. -->
+			<Style Selector="Grid.pricerow">
+				<Setter Property="Margin" Value="28,6,28,6"/>
+			</Style>
+		</ContainerQuery>
+
+
+		<Style Selector="Button.pickfield > Grid > Path.chevron">
+			<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			<Setter Property="StrokeThickness" Value="1.4"/>
+			<Setter Property="Margin" Value="8,0,0,0"/>
+		</Style>
+
+		<!-- The Custom panel's group headings: the gold of a section title, smaller. -->
+		<!-- A Custom row that differs from its base: its label in the heading gold. -->
+		<Style Selector="Border.changebar">
+			<Setter Property="Width" Value="3"/>
+			<Setter Property="CornerRadius" Value="1.5"/>
+			<Setter Property="Margin" Value="0,4,8,4"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			<Setter Property="Opacity" Value="0"/>
+		</Style>
+		<Style Selector="Border.changebar.changed">
+			<Setter Property="Opacity" Value="1"/>
+		</Style>
+		<Style Selector="TextBlock.body.changed">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+		</Style>
+	</UserControl.Styles>
+
+	<!-- The game side of the settings: what the player may do, what the editor says while
+	     editing, and the vault. The left panel is the application's own. -->
+	<Panel>
+	<DockPanel Margin="16">
+		<!-- The left panel's title, unseen, so the first section here starts level with the
+		     first one there. The same text and class rather than a height, which would be a
+		     guess at the font's line height. -->
+		<TextBlock DockPanel.Dock="Top" Classes="title" Text="{L 'Settings'}" Margin="0,0,0,12"
+				   Opacity="0" IsHitTestVisible="False"/>
+
+		<!-- The sections scroll under the heading when the window is too short for them. -->
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" AllowAutoHide="False">
+			<StackPanel>
+
+				<!-- The play mode, first: what the editor lets the player do. The lit button is the
+				     mode; Custom opens every setting. -->
+				<Border Classes="section" Margin="0,0,0,12">
+					<StackPanel Margin="16,14" DataContext="{Binding PlayMode}" x:DataType="vm:PlayModeViewModel">
+						<TextBlock Classes="heading" Text="{L 'Play mode'}" Margin="0,0,0,12"/>
+
+						<!-- A flat choice group (Choice.axaml), as the first-run question's. -->
+						<UniformGrid Columns="4" Margin="-3,0">
+							<Button Classes="choice" Classes.current="{Binding IsLegit}" Margin="3,0"
+									Command="{Binding PickModeCommand}" CommandParameter="Legit" Content="{L 'LEGIT'}"/>
+							<Button Classes="choice" Classes.current="{Binding IsCasual}" Margin="3,0"
+									Command="{Binding PickModeCommand}" CommandParameter="Casual" Content="{L 'CASUAL'}"/>
+							<Button Classes="choice" Classes.current="{Binding IsFree}" Margin="3,0"
+									Command="{Binding PickModeCommand}" CommandParameter="Free" Content="{L 'FREE'}"/>
+							<!-- It opens a panel rather than choosing: an open_in_new glyph says so, in the button's own
+							     colour. -->
+							<Button Classes="choice" Classes.current="{Binding IsCustom}" Margin="3,0"
+									HorizontalContentAlignment="Stretch" Padding="12,4,8,4"
+									AutomationProperties.AutomationId="PlayMode_Custom"
+									base:TrimmedTip.Tip="{Binding CustomButton}"
+									Command="{Binding OpenCustomCommand}">
+								<!-- The icon at the right edge, the label centred in the space it leaves - the flat
+								     buttons' layout, mirrored; the icon nearer the edge, so the label keeps
+								     room at the narrowest window. -->
+								<Grid ColumnDefinitions="*,Auto">
+									<!-- The custom mode that is the mode, by its name; cut short where the button is, its
+									     whole name on the tooltip then. -->
+									<TextBlock Grid.Column="0" Text="{Binding CustomButton}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,4,0"
+											   TextTrimming="CharacterEllipsis"/>
+									<Path Classes="pin" Data="{StaticResource [Glyph] Open}" Grid.Column="1" VerticalAlignment="Center"/>
+								</Grid>
+							</Button>
+						</UniformGrid>
+					</StackPanel>
+				</Border>
+
+				<!-- What the editor says while editing: the gameplay settings come first on this page. -->
+				<Border Classes="section">
+					<StackPanel Margin="16,14">
+						<TextBlock Classes="heading" Text="{L 'Editing'}" Margin="0,0,0,12"/>
+
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto">
+							<TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0"
+									   Text="{L 'Flag illegal items'}"
+									   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}" TextWrapping="Wrap"/>
+
+							<ToggleButton Grid.Column="1" Classes="tick"
+										  ToolTip.Tip="{L 'Marks items and values the game cannot make'}"
+										  IsChecked="{Binding Settings.FlagIllegitimateValues, Mode=TwoWay}">
+								<Path Data="{StaticResource [Glyph] Tick}"
+									  IsVisible="{Binding Settings.FlagIllegitimateValues}"/>
+							</ToggleButton>
+						</Grid>
+
+						<!-- How far undo and redo reach for the open character. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+							<TextBlock Grid.Column="0" Classes="body" VerticalAlignment="Center" Margin="0,0,12,0"
+									   Text="{L 'Undo steps'}"/>
+							<ComboBox Grid.Column="1" Classes="slots" Width="{StaticResource [UI] Drop Small}" MinWidth="0"
+									  ItemsSource="{x:Static settings:EditorSettings.UndoStepChoices}"
+									  SelectedItem="{Binding Settings.UndoSteps, Mode=TwoWay}"
+									  ToolTip.Tip="{L 'Kept while a character is open'}"/>
+						</Grid>
+
+					</StackPanel>
+				</Border>
+
+				<!-- The vault: which one, what it holds, and the bin that empties it. -->
+				<Border Classes="section" Margin="0,12,0,0">
+					<StackPanel Margin="16,14">
+						<TextBlock Classes="heading" Text="{L 'Vault'}" Margin="0,0,0,12"/>
+
+						<!-- Which mode's vault: the loaded character's, chosen here only with none
+						     loaded. Each mode has one vault: its items, its grail, its ledger, its gold. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto"
+							  DataContext="{Binding Vaults}" x:DataType="vm:VaultManagerViewModel">
+							<TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0"
+									   Text="{L 'Mode'}"
+									   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}"/>
+							<!-- Two choices: a pair, as on Extra and at creation (it was a drop-down).
+							     Off while a character is open, whose mode it follows - each button's tooltip says so. -->
+							<UniformGrid Grid.Column="1" Columns="2" Width="{StaticResource [UI] Pair Width}" Margin="-3,0">
+								<Button Classes="choice" Classes.current="{Binding !IsHardcore}" Margin="3,0"
+										AutomationProperties.AutomationId="Vault_Softcore"
+										IsEnabled="{Binding CanChangeMode}" ToolTip.Tip="{Binding ModeHint}" ToolTip.ShowOnDisabled="True"
+										Command="{Binding ChooseModeCommand}" CommandParameter="0" Content="{L 'SOFTCORE'}"/>
+								<Button Classes="choice" Classes.current="{Binding IsHardcore}" Margin="3,0"
+										AutomationProperties.AutomationId="Vault_Hardcore"
+										IsEnabled="{Binding CanChangeMode}" ToolTip.Tip="{Binding ModeHint}" ToolTip.ShowOnDisabled="True"
+										Command="{Binding ChooseModeCommand}" CommandParameter="1" Content="{L 'HARDCORE'}"/>
+							</UniformGrid>
+						</Grid>
+
+						<!-- The open vault, picked as the mode is: a mode has several, and the box
+						     opens their list - where one is made, copied, renamed, written out, deleted, and a file
+						     brought in. Under it what the open one holds, and the play mode it keeps. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0"
+							  DataContext="{Binding Vaults}" x:DataType="vm:VaultManagerViewModel">
+							<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+								<TextBlock Text="{L 'Vault'}"
+										   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}"/>
+								<TextBlock Classes="dim" Text="{Binding Summary}" TextWrapping="Wrap"/>
+							</StackPanel>
+
+							<!-- Opens the vaults' list: the open one's name, as a drop box shows its choice. -->
+							<Button Grid.Column="1" Classes="pickfield" Width="150"
+									AutomationProperties.AutomationId="Vault_Open"
+									Command="{Binding OpenPickerCommand}"
+									ToolTip.Tip="{L 'Vaults'}">
+								<Grid ColumnDefinitions="*,Auto">
+									<TextBlock Grid.Column="0" Text="{Binding OpenName}"
+											   VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+									<Path Classes="pin" Data="{StaticResource [Glyph] Open}" Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0"/>
+								</Grid>
+							</Button>
+						</Grid>
+
+						<!-- What the open vault holds, cleaned out by parts: the row's bin opens a check list - items, grail,
+						     trade records, gold (it was the grail's bin alone, then "Delete" with
+						     a bin - which the vaults' list has for deleting a vault). -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0"
+							  DataContext="{Binding Vaults}" x:DataType="vm:VaultManagerViewModel">
+							<TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{L 'Clean'}"
+									   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}"/>
+							<Button Grid.Column="1" Classes="rowicon" VerticalAlignment="Center"
+									AutomationProperties.AutomationId="Vault_Clear"
+									IsEnabled="{Binding CanClear}"
+									Command="{Binding OpenClearCommand}"
+									ToolTip.Tip="{Binding ClearHint}" ToolTip.ShowOnDisabled="True">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Bin}"/>
+							</Button>
+						</Grid>
+
+						<!-- Older seasons' vaults, migrated into this one:
+						     only while an older season has one. Opens the migration panel, a picker over the page. -->
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0"
+							  DataContext="{Binding Migration}" x:DataType="vm:SeasonMigrationViewModel"
+							  IsVisible="{Binding HasSource, FallbackValue=False}">
+							<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+								<TextBlock Text="{Binding RowTitle}"
+										   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}"/>
+								<TextBlock Classes="dim" Text="{Binding RowSummary}" TextWrapping="Wrap"/>
+							</StackPanel>
+							<Button Grid.Column="1" Classes="rowicon" VerticalAlignment="Center"
+									Command="{Binding OpenPanelCommand}"
+									IsEnabled="{Binding HasPending}"
+									ToolTip.Tip="{Binding RowHint}"
+									ToolTip.ShowOnDisabled="True">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Open}"/>
+							</Button>
+						</Grid>
+					</StackPanel>
+				</Border>
+
+				<!-- Trade: the price table - what each currency is worth in HR - behind its $, as it was
+				     on the trading page. -->
+				<Border Classes="section" Margin="0,12,0,0">
+					<StackPanel Margin="16,14">
+						<TextBlock Classes="heading" Text="{L 'Trade'}" Margin="0,0,0,12"/>
+
+						<Grid Classes="settingrow" ColumnDefinitions="*,Auto">
+							<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+								<TextBlock Text="{L 'Price table'}"
+										   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}"/>
+								<TextBlock Classes="dim" Text="{Binding PriceSummary}" TextWrapping="Wrap"/>
+							</StackPanel>
+
+							<Button Grid.Column="1" Classes="spend"
+									Command="{Binding OpenPriceTableCommand}"
+									ToolTip.Tip="{L 'Price table'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Dollar}"/>
+							</Button>
+						</Grid>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+		</ScrollViewer>
+	</DockPanel>
+
+	<!-- Custom: every setting, starting from the current mode (it was a flat list,
+	     always a mess). The title, and under it which preset the settings match; Start from sets
+	     every row to a preset - the one lit is the one they match. The settings in cards, one per
+	     heading, rows on the Settings page's beat; SAVE at the foot; the cross closes it and keeps nothing. -->
+	<Border Classes="veil"
+			IsVisible="{Binding PlayMode.IsPanelPresent}"
+			Classes.shown="{Binding PlayMode.IsPanelOpen}"
+			IsHitTestVisible="{Binding PlayMode.IsPanelOpen}">
+		<Panel DataContext="{Binding PlayMode}" x:DataType="vm:PlayModeViewModel">
+			<Button Classes="backdrop" Command="{Binding CloseCustomCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<Border Classes="pickerpanel" VerticalAlignment="Center">
+					<DockPanel>
+						<!-- The title, and under it what the rows are measured against - the preset they started from,
+						     and how many differ from it - with a reset for them all. No "Based on" box (the play mode
+						     presets made it redundant): the
+						     Presets below are what the rows start from, a click on one. -->
+						<StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+							<!-- Closed by the header's cross, as every panel is: no CANCEL. -->
+							<Grid ColumnDefinitions="*,Auto">
+								<TextBlock Grid.Column="0" Classes="pickertitle" Text="{L 'Custom play mode'}"/>
+								<Button Grid.Column="1" Classes="spend"
+										Command="{Binding CloseCustomCommand}"
+										ToolTip.Tip="{L 'Close'}">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+								</Button>
+							</Grid>
+							<Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+								<TextBlock base:TrimmedTip.Tip="{Binding ChangesText}" Grid.Column="0" Classes="dim" VerticalAlignment="Center"
+										   AutomationProperties.AutomationId="PlayMode_Changes"
+										   Text="{Binding ChangesText}" TextTrimming="CharacterEllipsis"/>
+								<Button Grid.Column="1" Classes="rowicon"
+										Command="{Binding ResetAllCommand}"
+										ToolTip.Tip="{L 'Reset all'}" ToolTip.ShowOnDisabled="True">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Undo}"/>
+								</Button>
+							</Grid>
+
+							<!-- Custom modes kept under names, with the search's and the drop rates' preset tools: Legit,
+							     Casual and Free first, a click setting the rows to one. -->
+							<views:PresetSection Margin="0,10,0,0"/>
+						</StackPanel>
+
+						<!-- The popup's answer: SAVE. The cross above closes it unsaved. -->
+						<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6"
+									HorizontalAlignment="Right" Margin="0,12,0,0">
+							<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch"
+									Theme="{DynamicResource [CtrlThm] Button_Primary}"
+									Command="{Binding ConfirmCustomCommand}">
+								<Grid ColumnDefinitions="Auto,*">
+									<Path Classes="pin label" Data="{StaticResource [Glyph] Tick}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+									<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'SAVE'}"/>
+								</Grid>
+							</Button>
+
+						</StackPanel>
+
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+							<ItemsControl ItemsSource="{Binding Sections}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel Spacing="10"/>
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:PolicySection">
+										<!-- The Settings page's card. -->
+										<Border Classes="section">
+											<StackPanel Margin="16,14">
+												<TextBlock Classes="heading" Text="{Binding Title}" Margin="0,0,0,12"/>
+												<ItemsControl ItemsSource="{Binding Rows}">
+													<ItemsControl.ItemsPanel>
+														<ItemsPanelTemplate>
+															<StackPanel Spacing="10"/>
+														</ItemsPanelTemplate>
+													</ItemsControl.ItemsPanel>
+													<ItemsControl.ItemTemplate>
+														<DataTemplate x:DataType="vm:PolicyRow">
+															<!-- A gold bar and a gold label where the row differs from the base, and its reset
+															     beside the control; what the label cannot say, the row's tooltip. -->
+															<Grid Classes="settingrow" ColumnDefinitions="Auto,*,Auto,Auto" Background="Transparent"
+																  ToolTip.Tip="{Binding Tip}"
+																  ToolTip.ServiceEnabled="{Binding Tip, Converter={x:Static ObjectConverters.IsNotNull}}">
+																<Border Grid.Column="0" Classes="changebar" Classes.changed="{Binding IsChanged}"/>
+																<TextBlock Grid.Column="1" Classes="body" Classes.changed="{Binding IsChanged}"
+																		   VerticalAlignment="Center" Margin="0,0,12,0"
+																		   TextWrapping="Wrap" Text="{Binding Title}"/>
+																<Button Grid.Column="2" Classes="rowicon" Margin="0,0,6,0"
+																		IsVisible="{Binding IsChanged}"
+																		Command="{Binding ResetCommand}"
+																		ToolTip.Tip="{Binding ResetTip}">
+																	<Path Classes="pin" Data="{StaticResource [Glyph] Undo}"/>
+																</Button>
+																<!-- One column: every drop-down as wide, the ticks on its right edge. -->
+																<ComboBox Grid.Column="3" Classes="slots" Width="{StaticResource [UI] Drop Medium}" MinWidth="0"
+																		  IsVisible="{Binding IsChoice}"
+																		  ItemsSource="{Binding Options}"
+																		  SelectedIndex="{Binding Selected}"/>
+																<ToggleButton Grid.Column="3" Classes="tick" HorizontalAlignment="Right"
+																			  IsVisible="{Binding IsSwitch}"
+																			  AutomationProperties.AutomationId="Policy_Switch"
+																			  AutomationProperties.Name="{Binding Title}"
+																			  IsChecked="{Binding IsOn}">
+																	<Path Data="{StaticResource [Glyph] Tick}"
+																		  IsVisible="{Binding IsOn}"/>
+																</ToggleButton>
+															</Grid>
+														</DataTemplate>
+													</ItemsControl.ItemTemplate>
+												</ItemsControl>
+											</StackPanel>
+										</Border>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</DockPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+
+	<!-- The price table: what each currency is worth in HR, as the player judges it - the Trade
+	     section's $ opens it (moved from the trading page, the same panel).
+	     Opened and closed as this page's other pickers are. -->
+	<Border Classes="veil"
+			IsVisible="{Binding IsPriceTablePresent}"
+			Classes.shown="{Binding IsPriceTableOpen}"
+			IsHitTestVisible="{Binding IsPriceTableOpen}">
+		<Panel>
+			<Button Classes="backdrop" Command="{Binding ClosePriceTableCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<!-- As wide as the other panels, as tall as its rows: centred, and scrolling
+				     only once the window is too short for them. -->
+				<Border Classes="pickerpanel"
+						VerticalAlignment="Center"
+						Container.Name="pricetable" Container.Sizing="Width">
+					<DockPanel>
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+							<TextBlock Grid.Column="0" Classes="pickertitle" Text="{L 'Price table'}"/>
+
+							<Button Grid.Column="1" Classes="spend"
+									Command="{Binding ClosePriceTableCommand}"
+									ToolTip.Tip="{L 'Close'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</Grid>
+
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+							<!-- One column at the default window size, where two cut the names to
+							     "W..." and "La..."; two when the panel allows. See UniformGrid.prices. -->
+							<!-- Sized to its rows, top and centre: stretched, the grid spread its rows
+							     over the panel's whole height and its names far from their boxes. -->
+							<ItemsControl ItemsSource="{Binding PriceRows}"
+										  HorizontalAlignment="Center" VerticalAlignment="Top">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<UniformGrid Classes="prices"/>
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:TradePriceRow">
+										<Grid Classes="pricerow" ColumnDefinitions="36,*,Auto,Auto">
+											<Image Grid.Column="0" Width="28" Height="28" Stretch="Uniform"
+												   Source="{Binding Tile.Sprite}"/>
+											<TextBlock Grid.Column="1" VerticalAlignment="Center"
+													   Foreground="{DynamicResource [Text] Body}"
+													   TextTrimming="CharacterEllipsis" Margin="0,0,6,0"
+													   ToolTip.Tip="{Binding Name}"
+													   Text="{Binding Name}"/>
+											<base:NumericTextBox Grid.Column="2" Classes="value" Width="{StaticResource [UI] Box Value}" FontSize="{StaticResource [Type] Body}"
+																	 Decimals="3" Minimum="0"
+																	 Classes.invalid="{Binding IsInvalid}"
+																	 PlaceholderText="-"
+																	 Text="{Binding Worth}"/>
+											<TextBlock Grid.Column="3" Classes="dim" Margin="8,0,0,0"
+													   VerticalAlignment="Center" Text="{L 'HR'}"/>
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</DockPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+
+	<!-- The mode's vaults, in a picker over the page as the app's other pickers are: a long list would
+	     push the page apart inline. A row clicked opens that vault. -->
+	<Border Classes="veil"
+			DataContext="{Binding Vaults}" x:DataType="vm:VaultManagerViewModel"
+			IsVisible="{Binding IsPickerPresent, FallbackValue=False}"
+			Classes.shown="{Binding IsPickerOpen}"
+			IsHitTestVisible="{Binding IsPickerOpen}">
+		<Panel>
+			<Button Classes="backdrop" Command="{Binding ClosePickerCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<Border Classes="pickerpanel">
+					<DockPanel>
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto,Auto,Auto" Margin="0,0,0,8">
+							<TextBlock Grid.Column="0" Classes="pickertitle" Text="{L 'Vaults'}"/>
+							<Button Grid.Column="1" Classes="rowicon" VerticalAlignment="Center" Margin="0"
+									AutomationProperties.AutomationId="Vault_New"
+									Command="{Binding StartNewCommand}"
+									ToolTip.Tip="{L 'New vault'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+							</Button>
+							<Button Grid.Column="2" Classes="rowicon" VerticalAlignment="Center" Margin="6,0,0,0"
+									AutomationProperties.AutomationId="Vault_Import"
+									Command="{Binding ImportCommand}"
+									ToolTip.Tip="{L 'Import vault'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Download}"/>
+							</Button>
+							<!-- The vaults' backups: listed, and one brought back by the import. -->
+							<Button Grid.Column="3" Classes="rowicon" VerticalAlignment="Center" Margin="6,0,0,0"
+									AutomationProperties.AutomationId="Vault_Backups"
+									Command="{Binding OpenCopiesCommand}"
+									ToolTip.Tip="{L 'Vault backups'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Archive}"/>
+							</Button>
+							<Button Grid.Column="4" Classes="spend" Margin="6,0,0,0"
+									Command="{Binding ClosePickerCommand}"
+									ToolTip.Tip="{L 'Close'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</Grid>
+
+						<base:SearchBox DockPanel.Dock="Top" Classes="value"
+								 Margin="0,0,0,8"
+								 Padding="2,0"
+								 Text="{Binding Search, Mode=TwoWay}"/>
+
+						<!-- Naming a new one: Enter makes it, Esc lets it go, as a rename does (no tick and
+						     cross). -->
+						<Grid DockPanel.Dock="Top" Margin="0,0,0,8"
+							  IsVisible="{Binding IsNaming}">
+							<!-- input-guard-ok: KeyDown here only reads Enter and Escape, which a
+							     single-line box does not insert or handle - the vault's name box does
+							     the same. Nothing is refused. -->
+							<TextBox Grid.Column="0" Classes="value" Height="24" FontSize="{StaticResource [Type] Body}"
+									 Foreground="{DynamicResource [Text] Body}" CaretBrush="White"
+									 TextAlignment="Left" HorizontalContentAlignment="Left"
+									 Text="{Binding NewName}"
+									 MaxLength="{x:Static core:VaultLibrary.LongestName}"
+									 PlaceholderText="{L 'Name'}"
+									 AutomationProperties.AutomationId="Vault_NewName"
+									 IsVisible="{Binding IsNaming}"
+									 base:PickerKeys.OwnsEnter="True"
+									 KeyDown="NewName_KeyDown"
+									 AttachedToVisualTree="Box_Attached"/>
+						</Grid>
+
+						<TextBlock DockPanel.Dock="Top" Classes="dim"
+								   FontSize="{StaticResource [Type] Small}" Margin="6,0,0,6"
+								   IsVisible="{Binding NoMatches}"
+								   Text="{L 'No match.'}"/>
+
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+							<ItemsControl ItemsSource="{Binding Rows}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:VaultListRow">
+										<!-- The row is the choice, as the other pickers' rows: a click opens that vault and closes
+										     the picker; the open one is framed and filled, not ticked. Rename, copy, export and
+										     delete are the row's own and do not open it. -->
+										<Button Classes="pickone" Classes.held="{Binding IsOpen}" Margin="0,2"
+												AutomationProperties.AutomationId="Vault_Row"
+												AutomationProperties.Name="{Binding Name}"
+												Command="{Binding $parent[ItemsControl].((vm:VaultManagerViewModel)DataContext).OpenVaultCommand}"
+												CommandParameter="{Binding}">
+											<Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
+												<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0"
+															IsVisible="{Binding !IsRenaming}">
+													<TextBlock base:TrimmedTip.Tip="{Binding Name}" Text="{Binding Name}" Foreground="{DynamicResource [Text] Body}" FontSize="{StaticResource [Type] Body}"
+															   TextTrimming="CharacterEllipsis"/>
+													<TextBlock Text="{Binding Summary}" Classes="dim small"/>
+												</StackPanel>
+												<!-- input-guard-ok: Enter and Escape only, as the name box above. -->
+												<TextBox Grid.Column="0" Classes="value" Height="24" FontSize="{StaticResource [Type] Body}" Margin="0,0,8,0"
+														 Foreground="{DynamicResource [Text] Body}" CaretBrush="White"
+														 TextAlignment="Left" HorizontalContentAlignment="Left"
+														 IsVisible="{Binding IsRenaming}"
+														 Text="{Binding EditName}"
+														 MaxLength="{x:Static core:VaultLibrary.LongestName}"
+														 base:PickerKeys.OwnsEnter="True"
+														 KeyDown="Rename_KeyDown"
+														 AttachedToVisualTree="Box_Attached"/>
+
+												<Button Grid.Column="1" Classes="rowicon"
+														Command="{Binding $parent[ItemsControl].((vm:VaultManagerViewModel)DataContext).StartRenameCommand}"
+														CommandParameter="{Binding}"
+														ToolTip.Tip="{L 'Rename'}">
+													<Path Classes="pin" Data="{StaticResource [Glyph] Pencil}"/>
+												</Button>
+												<Button Grid.Column="2" Classes="rowicon"
+														AutomationProperties.AutomationId="Vault_Copy"
+														AutomationProperties.Name="{Binding Name}"
+														Command="{Binding $parent[ItemsControl].((vm:VaultManagerViewModel)DataContext).CopyVaultCommand}"
+														CommandParameter="{Binding}"
+														ToolTip.Tip="{L 'Clone'}">
+													<Path Classes="pin" Data="{StaticResource [Glyph] Duplicate}"/>
+												</Button>
+												<Button Grid.Column="3" Classes="rowicon"
+														Command="{Binding $parent[ItemsControl].((vm:VaultManagerViewModel)DataContext).ExportVaultCommand}"
+														CommandParameter="{Binding}"
+														ToolTip.Tip="{L 'Export'}">
+													<Path Classes="pin" Data="{StaticResource [Glyph] Upload}"/>
+												</Button>
+												<!-- A whole vault: the bin asks its question once (the confirm), as a character's deletion does. -->
+												<base:BinButton Grid.Column="4" Compact="True"
+																Command="{Binding $parent[ItemsControl].((vm:VaultManagerViewModel)DataContext).DeleteVaultCommand}"
+																CommandParameter="{Binding}"
+																IsEnabled="{Binding CanDelete}"
+																Tip="{Binding DeleteHint}"/>
+											</Grid>
+										</Button>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</DockPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+
+	<!-- The vaults' backups: every copy there is, newest first - whose, why, when, how large.
+	     A row clicked brings that copy back through the import below, which never writes over a vault; its bin
+	     deletes the one copy, asked twice. -->
+	<Border Classes="veil"
+			DataContext="{Binding Vaults}" x:DataType="vm:VaultManagerViewModel"
+			IsVisible="{Binding IsCopiesPresent, FallbackValue=False}"
+			Classes.shown="{Binding IsCopiesOpen}"
+			IsHitTestVisible="{Binding IsCopiesOpen}">
+		<Panel>
+			<Button Classes="backdrop" Command="{Binding CloseCopiesCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<Border Classes="pickerpanel">
+					<DockPanel>
+						<!-- Back, a layer up: the vaults' list this was opened from. -->
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,8">
+							<Button Grid.Column="0" Classes="spend" Margin="0,0,8,0"
+									AutomationProperties.AutomationId="VaultCopies_Back"
+									Command="{Binding BackToVaultsCommand}"
+									ToolTip.Tip="{L 'Back to vaults'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Back}"/>
+							</Button>
+							<TextBlock Grid.Column="1" Classes="pickertitle" Text="{L 'Vault backups'}"/>
+							<Button Grid.Column="2" Classes="spend"
+									Command="{Binding CloseCopiesCommand}"
+									ToolTip.Tip="{L 'Close'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</Grid>
+
+						<TextBlock DockPanel.Dock="Top" Classes="dim"
+								   FontSize="{StaticResource [Type] Small}" Margin="6,0,0,6"
+								   IsVisible="{Binding NoCopies}"
+								   Text="{L 'No backups.'}"/>
+
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+							<ItemsControl ItemsSource="{Binding Copies}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:VaultCopyRow">
+										<Button Classes="pickone" Margin="0,2"
+												AutomationProperties.AutomationId="VaultCopy_Row"
+												AutomationProperties.Name="{Binding Name}"
+												Command="{Binding $parent[ItemsControl].((vm:VaultManagerViewModel)DataContext).BringBackCommand}"
+												CommandParameter="{Binding}"
+												ToolTip.Tip="{L 'Bring back'}">
+											<Grid ColumnDefinitions="*,Auto">
+												<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0">
+													<TextBlock base:TrimmedTip.Tip="{Binding Name}" Text="{Binding Name}" Foreground="{DynamicResource [Text] Body}" FontSize="{StaticResource [Type] Body}"
+															   TextTrimming="CharacterEllipsis"/>
+													<TextBlock Text="{Binding Summary}" Classes="dim small"/>
+												</StackPanel>
+												<base:BinButton Grid.Column="1" Compact="True"
+																Command="{Binding $parent[ItemsControl].((vm:VaultManagerViewModel)DataContext).DeleteCopyCommand}"
+																CommandParameter="{Binding}"
+																IsArmed="{Binding IsArmed}"
+																Tip="{L 'Delete backup'}"/>
+											</Grid>
+										</Button>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</DockPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+
+	<!-- The import: one file, and two ways in - a vault of its own, which is opened, or
+	     a folder of the open vault, with a check list of the file's folders: under each its folders, and last
+	     the items lying in that folder itself. -->
+	<Border Classes="veil"
+			DataContext="{Binding Vaults}" x:DataType="vm:VaultManagerViewModel"
+			IsVisible="{Binding IsImportPresent, FallbackValue=False}"
+			Classes.shown="{Binding IsImportOpen}"
+			IsHitTestVisible="{Binding IsImportOpen}">
+		<Panel>
+			<Button Classes="backdrop" Command="{Binding CloseImportCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<Border Classes="pickerpanel">
+					<DockPanel>
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,8">
+							<!-- Of a backup: Back goes to the backups' list again, nothing brought in. -->
+							<Button Grid.Column="0" Classes="spend" Margin="0,0,8,0"
+									IsVisible="{Binding ImportIsOfCopy}"
+									AutomationProperties.AutomationId="Import_Back"
+									Command="{Binding BackToCopiesCommand}"
+									ToolTip.Tip="{L 'Back to backups'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Back}"/>
+							</Button>
+							<TextBlock base:TrimmedTip.Tip="{Binding ImportTitle}" Grid.Column="1" Classes="pickertitle" Text="{Binding ImportTitle}" TextTrimming="CharacterEllipsis"/>
+							<Button Grid.Column="2" Classes="spend"
+									Command="{Binding CloseImportCommand}"
+									ToolTip.Tip="{L 'Close'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</Grid>
+
+						<!-- The two ways in, the one chosen framed and filled as a picker's open row is. -->
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*,*" Margin="0,0,0,8">
+							<Button Grid.Column="0" Classes="pickone" Classes.held="{Binding AsVault}" Margin="0,0,3,0"
+									AutomationProperties.AutomationId="Import_AsVault"
+									Command="{Binding ChooseVaultCommand}">
+								<TextBlock Text="{L 'New vault'}" Foreground="{DynamicResource [Text] Body}"
+										   TextTrimming="CharacterEllipsis"/>
+							</Button>
+							<Button Grid.Column="1" Classes="pickone" Classes.held="{Binding AsFolder}" Margin="3,0,0,0"
+									AutomationProperties.AutomationId="Import_AsFolder"
+									Command="{Binding ChooseFolderCommand}">
+								<TextBlock base:TrimmedTip.Tip="{Binding FolderChoice}" Text="{Binding FolderChoice}" Foreground="{DynamicResource [Text] Body}"
+										   TextTrimming="CharacterEllipsis"/>
+							</Button>
+						</Grid>
+
+						<!-- The popup's answer: IMPORT; what comes, beside it. The cross above closes it. -->
+						<Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,12,0,0">
+							<TextBlock Grid.Column="0" Classes="dim" VerticalAlignment="Center"
+									   AutomationProperties.AutomationId="Import_Count"
+									   Text="{Binding ImportCount}"/>
+							<Button Grid.Column="1" Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch"
+									Theme="{DynamicResource [CtrlThm] Button_Primary}"
+									AutomationProperties.AutomationId="Import_Confirm"
+									Command="{Binding ConfirmImportCommand}">
+								<Grid ColumnDefinitions="Auto,*">
+									<Path Classes="pin label" Data="{StaticResource [Glyph] Tick}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+									<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'IMPORT'}"/>
+								</Grid>
+							</Button>
+
+						</Grid>
+
+						<!-- The check list, for a folder only: a vault takes the whole file. A row a line - its chevron
+						     where it holds rows, its name, how many of its items come, its tick. -->
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False"
+									  IsVisible="{Binding AsFolder}">
+							<ItemsControl ItemsSource="{Binding Nodes}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:ImportNode">
+										<Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="{Binding Indent}" IsVisible="{Binding IsShown}"
+											  MinHeight="28">
+											<Panel Grid.Column="0" Width="24" Margin="0,0,2,0">
+												<Button Classes="pickone" Padding="0"
+														HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+														VerticalAlignment="Stretch"
+														IsVisible="{Binding HoldsRows}"
+														Command="{Binding $parent[ItemsControl].((vm:VaultManagerViewModel)DataContext).FoldNodeCommand}"
+														ToolTip.Tip="{Binding FoldHint}"
+														CommandParameter="{Binding}">
+													<Path Classes="chevron small" Classes.open="{Binding IsOpen}"
+														  Data="{StaticResource [Glyph] Chevron}"/>
+												</Button>
+											</Panel>
+											<TextBlock base:TrimmedTip.Tip="{Binding Name}" Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center"
+													   Classes.dim="{Binding IsItems}"
+													   Foreground="{DynamicResource [Text] Body}"
+													   TextTrimming="CharacterEllipsis"/>
+											<TextBlock Grid.Column="2" Classes="dim small" Text="{Binding Count}" VerticalAlignment="Center"
+													   Margin="8,0"/>
+											<ToggleButton Grid.Column="3" Classes="tick" VerticalAlignment="Center"
+														  AutomationProperties.AutomationId="Import_Tick"
+														  AutomationProperties.Name="{Binding Name}"
+														  IsChecked="{Binding IsTicked, Mode=TwoWay}">
+												<Path Data="{StaticResource [Glyph] Tick}" IsVisible="{Binding IsTicked}"/>
+											</ToggleButton>
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</DockPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+
+	<!-- Clean the open vault: a check list of what it holds, nothing ticked to begin
+	     with, and CLEAN for what is ticked. The vault is copied to Backups first. -->
+	<Border Classes="veil"
+			DataContext="{Binding Vaults}" x:DataType="vm:VaultManagerViewModel"
+			IsVisible="{Binding IsClearPresent, FallbackValue=False}"
+			Classes.shown="{Binding IsClearOpen}"
+			IsHitTestVisible="{Binding IsClearOpen}">
+		<Panel>
+			<Button Classes="backdrop" Command="{Binding CloseClearCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<Border Classes="pickerpanel" VerticalAlignment="Center">
+					<DockPanel>
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+							<TextBlock base:TrimmedTip.Tip="{Binding ClearTitle}" Grid.Column="0" Classes="pickertitle" Text="{Binding ClearTitle}" TextTrimming="CharacterEllipsis"/>
+							<Button Grid.Column="1" Classes="spend"
+									Command="{Binding CloseClearCommand}"
+									ToolTip.Tip="{L 'Close'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</Grid>
+
+						<!-- The popup's answer: CLEAN. The cross above closes it. -->
+						<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6"
+									HorizontalAlignment="Right" Margin="0,12,0,0">
+							<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch"
+									Theme="{DynamicResource [CtrlThm] Button_Primary}"
+									AutomationProperties.AutomationId="Clear_Confirm"
+									Command="{Binding ConfirmClearCommand}">
+								<Grid ColumnDefinitions="Auto,*">
+									<Path Classes="pin label" Data="{StaticResource [Glyph] Bin}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+									<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'CLEAN'}"/>
+								</Grid>
+							</Button>
+
+						</StackPanel>
+
+						<StackPanel>
+							<Grid ColumnDefinitions="*,Auto,Auto" MinHeight="32">
+								<TextBlock Grid.Column="0" Text="{L 'Items and folders'}" VerticalAlignment="Center"
+										   Foreground="{DynamicResource [Text] Body}"/>
+								<TextBlock Grid.Column="1" Classes="dim small" Text="{Binding ItemsCount}" VerticalAlignment="Center" Margin="8,0"/>
+								<ToggleButton Grid.Column="2" Classes="tick" VerticalAlignment="Center"
+											  AutomationProperties.AutomationId="Clear_Items"
+											  IsChecked="{Binding ClearItems, Mode=TwoWay}">
+									<Path Data="{StaticResource [Glyph] Tick}" IsVisible="{Binding ClearItems}"/>
+								</ToggleButton>
+							</Grid>
+							<Grid ColumnDefinitions="*,Auto,Auto" MinHeight="32">
+								<TextBlock Grid.Column="0" Text="{L 'Trade records'}" VerticalAlignment="Center"
+										   Foreground="{DynamicResource [Text] Body}"/>
+								<TextBlock Grid.Column="1" Classes="dim small" Text="{Binding TradesCount}" VerticalAlignment="Center" Margin="8,0"/>
+								<ToggleButton Grid.Column="2" Classes="tick" VerticalAlignment="Center"
+											  AutomationProperties.AutomationId="Clear_Trades"
+											  IsChecked="{Binding ClearTrades, Mode=TwoWay}">
+									<Path Data="{StaticResource [Glyph] Tick}" IsVisible="{Binding ClearTrades}"/>
+								</ToggleButton>
+							</Grid>
+							<Grid ColumnDefinitions="*,Auto,Auto" MinHeight="32">
+								<TextBlock Grid.Column="0" Text="{L 'Gold'}" VerticalAlignment="Center"
+										   Foreground="{DynamicResource [Text] Body}"/>
+								<TextBlock Grid.Column="1" Classes="dim small" Text="{Binding GoldCount}" VerticalAlignment="Center" Margin="8,0"/>
+								<ToggleButton Grid.Column="2" Classes="tick" VerticalAlignment="Center"
+											  AutomationProperties.AutomationId="Clear_Gold"
+											  IsChecked="{Binding ClearGold, Mode=TwoWay}">
+									<Path Data="{StaticResource [Glyph] Tick}" IsVisible="{Binding ClearGold}"/>
+								</ToggleButton>
+							</Grid>
+						</StackPanel>
+					</DockPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+
+	<!-- The season migration: a dry run of each older season's vaults waiting, each with its tick, then MIGRATE
+	     for the ones ticked (one left stays waiting). Opened from the vault card's row or the new-season notice. -->
+	<Border Classes="veil"
+			DataContext="{Binding Migration}" x:DataType="vm:SeasonMigrationViewModel"
+			IsVisible="{Binding IsPanelPresent, FallbackValue=False}"
+			Classes.shown="{Binding IsPanelOpen}"
+			IsHitTestVisible="{Binding IsPanelOpen}">
+		<Panel>
+			<Button Classes="backdrop" Command="{Binding ClosePanelCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<Border Classes="pickerpanel" VerticalAlignment="Center">
+					<DockPanel>
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+							<TextBlock Grid.Column="0" Classes="pickertitle" Text="{Binding PanelTitle}"/>
+							<Button Grid.Column="1" Classes="spend"
+									Command="{Binding ClosePanelCommand}"
+									ToolTip.Tip="{L 'Close'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</Grid>
+
+						<!-- The popup's answer: MIGRATE. The cross above closes it. -->
+						<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6"
+									HorizontalAlignment="Right" Margin="0,12,0,0">
+							<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch"
+									Theme="{DynamicResource [CtrlThm] Button_Primary}"
+									IsEnabled="{Binding CanMigrate}" ToolTip.Tip="{Binding MigrateHint}" ToolTip.ShowOnDisabled="True"
+									Command="{Binding MigrateCommand}">
+								<Grid ColumnDefinitions="Auto,*">
+									<Path Classes="pin label" Data="{StaticResource [Glyph] Tick}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+									<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'MIGRATE'}"/>
+								</Grid>
+							</Button>
+
+						</StackPanel>
+
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+							<StackPanel Spacing="10">
+								<TextBlock Classes="dim" Text="{Binding BusyText}" IsVisible="{Binding IsBusy}"/>
+
+								<!-- One card per vault, on the Settings page's beat. -->
+								<ItemsControl ItemsSource="{Binding Modes}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<StackPanel Spacing="10"/>
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+									<ItemsControl.ItemTemplate>
+										<DataTemplate x:DataType="vm:MigrationModeRow">
+											<Border Classes="section">
+												<StackPanel Margin="16,14" Spacing="4">
+													<Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+														<StackPanel Grid.Column="0" Margin="0,0,8,0">
+															<TextBlock base:TrimmedTip.Tip="{Binding Title}" Classes="heading" Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+															<TextBlock Classes="dim small" Text="{Binding From}"/>
+														</StackPanel>
+														<ToggleButton Grid.Column="1" Classes="tick" VerticalAlignment="Top"
+																	  AutomationProperties.AutomationId="Migrate_Tick"
+																	  AutomationProperties.Name="{Binding Title}"
+																	  IsVisible="{Binding CanChoose}"
+																	  IsChecked="{Binding IsChosen, Mode=TwoWay}">
+															<Path Data="{StaticResource [Glyph] Tick}" IsVisible="{Binding IsChosen}"/>
+														</ToggleButton>
+													</Grid>
+													<ItemsControl ItemsSource="{Binding Lines}">
+														<ItemsControl.ItemTemplate>
+															<DataTemplate x:DataType="x:String">
+																<TextBlock Classes="body" Text="{Binding}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+															</DataTemplate>
+														</ItemsControl.ItemTemplate>
+													</ItemsControl>
+													<StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsRefused}">
+														<Path Classes="pin" Data="{StaticResource [Glyph] Alert}" Stroke="{DynamicResource [Text] Warning}"/>
+														<TextBlock Text="{Binding Refused}" Foreground="{DynamicResource [Text] Warning}"
+																   VerticalAlignment="Center" TextWrapping="Wrap"/>
+													</StackPanel>
+													<!-- How its values come across: each season its own, by whether its tables were kept. -->
+													<TextBlock Classes="dim" Text="{Binding Note}" IsVisible="{Binding HasNote}" TextWrapping="Wrap"/>
+												</StackPanel>
+											</Border>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</StackPanel>
+						</ScrollViewer>
+					</DockPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+	</Panel>
+</UserControl>

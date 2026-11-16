@@ -1,0 +1,44 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The small marks after an item's name or a property: "(maps)", "(ethereal)". A property row's own -
+	  "(runeword)", "(set)" - are drawn by the row's head and colored there (StatRowHead, VP_View_Inv_R.axaml).
+	-->
+	<!-- "(maps)": a property only a map carries, beside it on the item panel and in the pickers. -->
+	<Style Selector="TextBlock.mapmark">
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Normal items}"/>
+	</Style>
+
+	<!-- A grail card whose row is ethereal always: green, the colour of the brackets beside it. -->
+	<Style Selector="TextBlock.etherealmark">
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+	</Style>
+
+	<!-- A grail card whose item lies in the game's Compendium: the unique gold, as the tab draws a deposited card in
+	     colour. -->
+	<Style Selector="TextBlock.ownedmark">
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+
+	<!--
+	  The vault's moves, waiting for a save: "move up" on what goes out - into the vault from a
+	  grid, out of the vault on a card - and "move down" on what came in. Green, outlined in black,
+	  set at the top right by whoever places it.
+	-->
+	<Style Selector="Path.move">
+		<Setter Property="Fill" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+		<Setter Property="Stroke" Value="Black"/>
+		<Setter Property="StrokeThickness" Value="1"/>
+		<Setter Property="IsHitTestVisible" Value="False"/>
+	</Style>
+	<Style Selector="Path.move.up">
+		<Setter Property="Data" Value="M5.5,0.5 L10.5,6 L7.3,6 L7.3,12 L3.7,12 L3.7,6 L0.5,6 Z"/>
+	</Style>
+	<Style Selector="Path.move.down">
+		<Setter Property="Data" Value="M5.5,12 L10.5,6.5 L7.3,6.5 L7.3,0.5 L3.7,0.5 L3.7,6.5 L0.5,6.5 Z"/>
+	</Style>
+</Styles>

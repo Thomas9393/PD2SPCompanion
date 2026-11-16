@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+    <PackageReference Include="War3Net.IO.Compression" Version="6.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PD2SPCompanion.D2S\PD2SPCompanion.D2S.csproj" />
+  </ItemGroup>
+
+  <!-- The release notes, built in: Settings' "What's new" and the notice after an update (Changelog). -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\CHANGELOG.md" LogicalName="CHANGELOG.md" Link="CHANGELOG.md" />
+  </ItemGroup>
+
+  <!-- What a new character is built on: one made in game, nothing done (CharacterTemplate). -->
+  <ItemGroup>
+    <EmbeddedResource Include="Characters\Templates\new-character.d2s" LogicalName="new-character.d2s" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)../../build/OneWayGuard.targets" />
+
+</Project>

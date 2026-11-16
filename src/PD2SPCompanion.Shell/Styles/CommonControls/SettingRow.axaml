@@ -1,0 +1,13 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  A setting's row (Settings, the Experimental page's cards) - its name on the left, what sets it on the right, a second line under the name where
+	  there is one. Every row at least as tall as one with that second line, so the rows fall on an even
+	  beat whether they have it or not (the gaps between rows came out uneven).
+
+	      <Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0"> ... </Grid>
+	-->
+	<Style Selector="Grid.settingrow">
+		<Setter Property="MinHeight" Value="36"/>
+	</Style>
+</Styles>

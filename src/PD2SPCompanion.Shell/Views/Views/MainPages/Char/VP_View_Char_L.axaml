@@ -1,0 +1,484 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:mvm="using:PD2SPCompanion.Shell.ViewModels"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Char_L"
+			 x:DataType="vm:VP_ViewModel_Char_L"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_L CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Char_L/>
+	</Design.DataContext>
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/ActionIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<!-- For the sort menu and the bin it hosts, which wear it (SortMenu, BinButton). -->
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Choice.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SettingRow.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Tick.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+
+		<!-- The three cards open to one height: the waypoints' act at its fullest,
+		     its foot included. What runs longer - the kept seeds - scrolls inside. -->
+		<Style Selector="DockPanel.cardbody">
+			<Setter Property="Height" Value="272"/>
+			<Setter Property="Margin" Value="0,12,0,0"/>
+		</Style>
+		<!-- A waypoint held for good - a main camp reached - keeps its tick, dimmed: fixed, not off. -->
+		<Style Selector="ToggleButton.tick:disabled">
+			<Setter Property="Opacity" Value="0.55"/>
+		</Style>
+
+
+		<!-- The two respec buttons. Small, square, and plainly dead when the move is not
+		     allowed, since that is most of what they have to communicate. -->
+		<!-- Chrome in Styles/CommonControls/SpendButton.axaml; only the glyph is local. -->
+
+		<!-- The quests' rows: a lamp, the name, where it stands. -->
+		<Style Selector="TextBlock.questname">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+		</Style>
+		<Style Selector="TextBlock.queststate">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Margin" Value="8,0,0,0"/>
+		</Style>
+		<Style Selector="Border.questlamp">
+			<Setter Property="Width" Value="11"/>
+			<Setter Property="Height" Value="11"/>
+			<Setter Property="CornerRadius" Value="6"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Margin" Value="0,0,8,0"/>
+			<Setter Property="Opacity" Value="0.6"/>
+		</Style>
+		<Style Selector="Border.questlamp.progress">
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			<Setter Property="Opacity" Value="1"/>
+		</Style>
+		<Style Selector="Border.questlamp.waiting">
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+			<Setter Property="Opacity" Value="1"/>
+		</Style>
+		<Style Selector="Border.questlamp.done">
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			<Setter Property="Opacity" Value="1"/>
+		</Style>
+	</UserControl.Styles>
+
+	<Panel>
+		<DockPanel Margin="16" IsVisible="{Binding Session.IsLoaded}">
+		<TextBlock DockPanel.Dock="Top" Classes="title" Text="{L 'Character'}" Margin="0,0,0,12"/>
+
+		<!-- Who is open: the character card, shared with the Experimental page's Armory Import. Its row is this page's:
+		     level and experience. Free mode moves them, and a level
+		     brings what a level-up brings; elsewhere they are read. A box applies on Enter or on leaving it. -->
+		<views:CharacterCardPanel DockPanel.Dock="Top"
+								  Card="{Binding Session.OpenCard}"
+								  Description="{Binding CardDescription}"
+								  Life="{Binding BaseLife}" Mana="{Binding BaseMana}" Stamina="{Binding BaseStamina}">
+			<views:CharacterCardPanel.Footer>
+				<Grid ColumnDefinitions="Auto,Auto,64,Auto,*,Auto,Auto" RowDefinitions="Auto,Auto,Auto">
+					<TextBlock Grid.Column="0" Classes="dim" Text="{L 'Level'}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+
+					<Button Grid.Column="1" Classes="spend" VerticalAlignment="Center"
+							IsVisible="{Binding EditsLevel}" IsEnabled="{Binding CanLowerLevel}"
+							Tag="level down" Command="{Binding LowerLevelCommand}"
+							ToolTip.Tip="{Binding LowerLevelTip}" ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+					</Button>
+					<base:NumericTextBox Grid.Column="2" Classes="value" Height="28" FontSize="{StaticResource [Type] Body}" Margin="6,0"
+											 MinWidth="0" Width="{StaticResource [UI] Box Small}" Minimum="1" Maximum="99"
+											 IsVisible="{Binding EditsLevel}"
+											 Text="{Binding LevelText}"
+											 KeyDown="LevelBox_KeyDown" LostFocus="LevelBox_LostFocus"/>
+					<TextBlock Grid.Column="2" Text="{Binding Level}" HorizontalAlignment="Center" VerticalAlignment="Center"
+							   FontFamily="{StaticResource DiabloFont}" FontSize="{StaticResource [Type] Title}" FontWeight="Bold"
+							   Foreground="{DynamicResource [Text] Heading}"
+							   IsVisible="{Binding !EditsLevel}"/>
+					<Button Grid.Column="3" Classes="spend" VerticalAlignment="Center"
+							IsVisible="{Binding EditsLevel}" IsEnabled="{Binding CanRaiseLevel}"
+							Tag="level up" Command="{Binding RaiseLevelCommand}"
+							ToolTip.Tip="{Binding RaiseLevelTip}" ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+					</Button>
+
+					<TextBlock Grid.Column="5" Classes="dim" Text="{L 'Total experience'}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+					<base:NumericTextBox Grid.Column="6" Classes="value" Height="28" FontSize="{StaticResource [Type] Body}" Width="{StaticResource [UI] Box Wide}"
+											 IsVisible="{Binding EditsLevel}"
+											 Text="{Binding ExperienceText}"
+											 KeyDown="ExperienceBox_KeyDown" LostFocus="ExperienceBox_LostFocus"/>
+					<!-- As wide as Free's box, so the progress bar below ends in the same place in every mode. -->
+					<TextBlock Grid.Column="6" Text="{Binding ExperienceShown}" VerticalAlignment="Center"
+							   MinWidth="130" TextAlignment="Right"
+							   Foreground="{DynamicResource [Text] Body}"
+							   IsVisible="{Binding !EditsLevel}"/>
+
+					<!-- The way to the next level, 0 to 99: a slider in Free mode, steps of 1,
+					     the level kept; a gauge elsewhere and at the last level. Under
+					     "Level" so the stepper and the bar start together; its ends are the two levels' totals,
+					     so the experience above reads as a point between them. -->
+					<TextBlock Grid.Row="1" Grid.Column="0" Classes="dim" Margin="0,8,10,0" VerticalAlignment="Center"
+							   Text="{Binding ProgressLabel}"/>
+					<Slider Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="5" Margin="0,8,12,0" Maximum="99"
+							Theme="{DynamicResource [CtrlThm] Slider_Flat}"
+							IsEnabled="{Binding CanSlideProgress}"
+							Value="{Binding LevelProgress}"/>
+					<TextBlock Grid.Row="1" Grid.Column="6" Margin="0,8,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"
+							   Foreground="{DynamicResource [Text] Body}"
+							   Text="{Binding ProgressText}"/>
+					<Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5" Margin="0,0,12,0" ColumnDefinitions="*,*"
+						  IsVisible="{Binding !AtMaxLevel}">
+						<TextBlock Grid.Column="0" Classes="dim" FontSize="{StaticResource [Type] Small}"
+								   Text="{Binding LevelStartText}"/>
+						<TextBlock Grid.Column="1" Classes="dim" FontSize="{StaticResource [Type] Small}" HorizontalAlignment="Right"
+								   Text="{Binding NextLevelStartText}"/>
+					</Grid>
+				</Grid>
+			</views:CharacterCardPanel.Footer>
+		</views:CharacterCardPanel>
+
+		<!-- Under the character card, three folding cards in one column that scrolls:
+		     the quests, the waypoints, the map seed - each whole in its card, no panel over the right page.
+		     At their own height, so a small window scrolls the page rather than squeezing a card. -->
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False" Margin="0,12,0,0">
+			<StackPanel Spacing="12">
+
+			<!-- The quests: each difficulty's, as they
+			     stand. Where the play mode edits the character, a quest not done is completed with one click,
+			     and one completed this session can be reverted (no marks, no confirm). A
+			     quest with a reward is left waiting for it, so the game gives it. -->
+			<Border Classes="section" DataContext="{Binding Quests}" x:DataType="vm:QuestsViewModel">
+				<DockPanel Margin="16,12">
+					<Grid DockPanel.Dock="Top">
+						<Button Classes="fold"
+								Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).ToggleQuestsCommand}">
+							<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+								<Path Grid.Column="0" Classes="chevron"
+									  Classes.open="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).QuestsOpen}"
+									  Data="{StaticResource [Glyph] Chevron}"/>
+								<TextBlock Grid.Column="1" Classes="heading" Text="{L 'Quests'}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+								<TextBlock Grid.Row="1" Grid.Column="1" Classes="dim" FontSize="{StaticResource [Type] Small}"
+										   Margin="8,2,0,0" Text="{Binding Summary}"/>
+							</Grid>
+						</Button>
+					</Grid>
+
+					<DockPanel Classes="cardbody"
+							   IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).QuestsOpen}">
+						<UniformGrid DockPanel.Dock="Top" Columns="3" Margin="-3,0,-3,6">
+							<Button Classes="choice" Classes.current="{Binding IsNormal}" Margin="3,0"
+									Command="{Binding ShowDifficultyCommand}" CommandParameter="Normal" Content="{L 'NORMAL'}"/>
+							<Button Classes="choice" Classes.current="{Binding IsNightmare}" Margin="3,0"
+									Command="{Binding ShowDifficultyCommand}" CommandParameter="Nightmare" Content="{L 'NIGHTMARE'}"/>
+							<Button Classes="choice" Classes.current="{Binding IsHell}" Margin="3,0"
+									Command="{Binding ShowDifficultyCommand}" CommandParameter="Hell" Content="{L 'HELL'}"/>
+						</UniformGrid>
+
+						<!-- The acts, as the waypoints': one shown at a time. As many columns as
+						     there are acts - the classic game has no Act V. -->
+						<ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Acts}" Margin="-3,0,-3,10">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate><UniformGrid Columns="{Binding $parent[ItemsControl].ItemCount}"/></ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="vm:QuestAct">
+									<Button Classes="choice" Classes.current="{Binding IsCurrent}" Margin="3,0"
+											Command="{Binding $parent[ItemsControl].((vm:QuestsViewModel)DataContext).ShowActCommand}"
+											CommandParameter="{Binding}" Content="{Binding Label}"/>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+
+							<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+							<ItemsControl ItemsSource="{Binding Rows}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate x:DataType="vm:QuestRow">
+											<Grid ColumnDefinitions="Auto,*,Auto,Auto" MinHeight="30">
+												<!-- Filled gold when done, green while its reward waits, a ring
+												     while in progress, dim when not started. -->
+												<Border Grid.Column="0" Classes="questlamp"
+														Classes.done="{Binding IsDone}"
+														Classes.waiting="{Binding IsWaiting}"
+														Classes.progress="{Binding IsInProgress}"/>
+												<!-- The reward waiting, on hover - the three NPC services' quests only. -->
+												<TextBlock Grid.Column="1" Classes="questname" Text="{Binding Name}"
+														   Background="Transparent" ToolTip.Tip="{Binding Gives}"/>
+												<TextBlock Grid.Column="2" Classes="queststate"
+														   Text="{Binding StateText}"/>
+												<Panel Grid.Column="3" Width="26" Margin="8,0,0,0">
+													<!-- Completes at once, with what it gives and does not on hover; one completed this
+													     session can be taken back, while nothing since has changed it. -->
+													<Button Classes="spend" IsVisible="{Binding CanComplete}"
+															Command="{Binding CompleteCommand}" ToolTip.Tip="{Binding Hint}">
+														<Path Classes="pin" Data="{StaticResource [Glyph] Task done}"/>
+													</Button>
+													<Button Classes="spend" IsVisible="{Binding CanRevert}"
+															Command="{Binding RevertCommand}" ToolTip.Tip="{L 'Revert'}">
+														<!-- The undo arrow, as every way back to before; the clock is the history list's. -->
+														<Path Classes="pin" Data="{StaticResource [Glyph] Undo}"/>
+													</Button>
+												</Panel>
+											</Grid>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+						</ScrollViewer>
+					</DockPanel>
+				</DockPanel>
+			</Border>
+
+			<!-- The waypoints: a difficulty, an act,
+			     and each waypoint of it a tick, two to a row. Grant and Remove for the act at the foot - Ctrl
+			     for the difficulty, Shift for all three. In Legit it is read (hidden there at first): the ticks take no
+			     click, and Grant and Remove are not there. -->
+			<Border Classes="section" DataContext="{Binding Waypoints}" x:DataType="vm:WaypointsViewModel">
+				<DockPanel Margin="16,12">
+					<Button DockPanel.Dock="Top" Classes="fold"
+							Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).ToggleWaypointsCommand}">
+						<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+							<Path Grid.Column="0" Classes="chevron"
+								  Classes.open="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).WaypointsOpen}"
+								  Data="{StaticResource [Glyph] Chevron}"/>
+							<TextBlock Grid.Column="1" Classes="heading" Text="{L 'Waypoints'}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+							<TextBlock Grid.Row="1" Grid.Column="1" Classes="dim" FontSize="{StaticResource [Type] Small}"
+									   Margin="8,2,0,0" Text="{Binding Summary}"/>
+						</Grid>
+					</Button>
+
+					<DockPanel Classes="cardbody"
+							   IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).WaypointsOpen}">
+						<ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Difficulties}" Margin="-3,0,-3,6">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate><UniformGrid Columns="3"/></ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="vm:DifficultyTabViewModel">
+									<Button Classes="choice" Classes.current="{Binding IsCurrent}" Margin="3,0"
+											Command="{Binding $parent[ItemsControl].((vm:WaypointsViewModel)DataContext).ShowDifficultyCommand}"
+											CommandParameter="{Binding}" Content="{Binding Label}"/>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+
+						<ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Acts}" Margin="-3,0,-3,10">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate><UniformGrid Columns="{Binding $parent[ItemsControl].ItemCount}"/></ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="vm:ActTabViewModel">
+									<Button Classes="choice" Classes.current="{Binding IsCurrent}" Margin="3,0"
+											Command="{Binding $parent[ItemsControl].((vm:WaypointsViewModel)DataContext).ShowActTabCommand}"
+											CommandParameter="{Binding}" Content="{Binding Label}"/>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+
+						<!-- The act's waypoints at once, compact on the right as the other cards' actions; what of the
+						     act is held on the left. -->
+						<Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+						<TextBlock Grid.Column="0" Classes="dim" VerticalAlignment="Center" Text="{Binding ActSummary}"/>
+						<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6"
+									IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).Rules.EditsWaypoints}">
+							<Button Classes="enable" Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch"
+									Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+									Command="{Binding EnableActCommand}">
+								<Grid ColumnDefinitions="Auto,*">
+									<Path Classes="pin label" Data="{StaticResource [Glyph] Plus}" Grid.Column="0"/>
+									<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'GRANT'}"/>
+								</Grid>
+								<ToolTip.Tip>
+									<base:KeyedTip LeadText="{Binding GrantLabel}"
+												   Text="{L 'Ctrl + LMB: every act of this difficulty&#x0a;Shift + LMB: every difficulty'}"/>
+								</ToolTip.Tip>
+							</Button>
+							<Button Classes="disable" Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch"
+									Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+									Command="{Binding RemoveActCommand}">
+								<Grid ColumnDefinitions="Auto,*">
+									<Path Classes="pin label" Data="{StaticResource [Glyph] Minus}" Grid.Column="0"/>
+									<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'REMOVE'}"/>
+								</Grid>
+								<ToolTip.Tip>
+									<base:KeyedTip LeadText="{Binding RemoveLabel}"
+												   Text="{L 'Ctrl + LMB: every act of this difficulty&#x0a;Shift + LMB: every difficulty&#x0a;Main camps reached stay.'}"/>
+								</ToolTip.Tip>
+							</Button>
+						</StackPanel>
+						</Grid>
+
+						<!-- Two columns, read down then across as the game lists them. -->
+						<Grid ColumnDefinitions="*,*">
+							<ItemsControl Grid.Column="0" ItemsSource="{Binding FirstColumn}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:WaypointRowViewModel">
+										<Grid ColumnDefinitions="Auto,*" MinHeight="32" Margin="0,0,12,0"
+											  Background="Transparent"
+											  ToolTip.Tip="{Binding Hint}">
+											<ToggleButton Grid.Column="0" Classes="tick" IsHitTestVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).Rules.EditsWaypoints}" Focusable="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).Rules.EditsWaypoints}"
+														  IsChecked="{Binding IsFound, Mode=TwoWay}"
+														  IsEnabled="{Binding CanToggle}">
+												<Path Data="{StaticResource [Glyph] Tick}" IsVisible="{Binding IsFound}"/>
+											</ToggleButton>
+											<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="10,0,0,0"
+														VerticalAlignment="Center">
+												<TextBlock Classes="body" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+												<!-- Why the tick will not come off. A camp of an act never reached is not
+												     fixed, so it says nothing. -->
+												<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{L 'main camp'}"
+														   VerticalAlignment="Center" IsVisible="{Binding IsFixed}"/>
+											</StackPanel>
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+							<ItemsControl Grid.Column="1" ItemsSource="{Binding SecondColumn}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:WaypointRowViewModel">
+										<Grid ColumnDefinitions="Auto,*" MinHeight="32" Margin="0,0,12,0"
+											  Background="Transparent"
+											  ToolTip.Tip="{Binding Hint}">
+											<ToggleButton Grid.Column="0" Classes="tick" IsHitTestVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).Rules.EditsWaypoints}" Focusable="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).Rules.EditsWaypoints}"
+														  IsChecked="{Binding IsFound, Mode=TwoWay}"
+														  IsEnabled="{Binding CanToggle}">
+												<Path Data="{StaticResource [Glyph] Tick}" IsVisible="{Binding IsFound}"/>
+											</ToggleButton>
+											<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="10,0,0,0"
+														VerticalAlignment="Center">
+												<TextBlock Classes="body" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+												<!-- Why the tick will not come off. A camp of an act never reached is not
+												     fixed, so it says nothing. -->
+												<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{L 'main camp'}"
+														   VerticalAlignment="Center" IsVisible="{Binding IsFixed}"/>
+											</StackPanel>
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</Grid>
+					</DockPanel>
+				</DockPanel>
+			</Border>
+
+			<!-- The map seed: the seed and its name, typed or rolled, applied at once;
+			     and the seeds kept, a click to go onto one. In Legit it is read (hidden there at first): the seed is
+			     shown and can be kept under a name - the list is the player's notes - but
+			     is neither typed, rolled nor gone onto. -->
+			<Border Classes="section" DataContext="{Binding MapSeed}" x:DataType="vm:MapSeedViewModel">
+				<DockPanel Margin="16,12">
+					<Button DockPanel.Dock="Top" Classes="fold"
+							Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).ToggleMapSeedCommand}">
+						<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+							<Path Grid.Column="0" Classes="chevron"
+								  Classes.open="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).MapSeedOpen}"
+								  Data="{StaticResource [Glyph] Chevron}"/>
+							<TextBlock Grid.Column="1" Classes="heading" Text="{L 'Map seed'}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+							<TextBlock Grid.Row="1" Grid.Column="1" Classes="dim" FontSize="{StaticResource [Type] Small}"
+									   Margin="8,2,0,0" Text="{Binding Summary}"/>
+						</Grid>
+					</Button>
+
+					<DockPanel Classes="cardbody"
+							   IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_L)DataContext).MapSeedOpen}">
+						<!-- The seed, applied on Enter or on leaving the box; the dice puts a new one on; the name and
+						     Keep write it to the list. -->
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,130,Auto,Auto,*,Auto">
+							<TextBlock Grid.Column="0" Classes="dim" Text="{L 'Seed'}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+							<base:NumericTextBox Grid.Column="1" Classes="value" Height="28" MinWidth="0" Minimum="0"
+												 FontSize="{StaticResource [Type] Body}"
+												 Text="{Binding SeedText}"
+												 IsReadOnly="{Binding !Rules.EditsMapSeed}" Focusable="{Binding Rules.EditsMapSeed}"
+												 KeyDown="SeedBox_KeyDown" LostFocus="SeedBox_LostFocus"/>
+							<base:RollButton Kind="Dice" Grid.Column="2" Margin="6,0,0,0" VerticalAlignment="Center"
+									IsVisible="{Binding Rules.EditsMapSeed}"
+									Command="{Binding RollSeedCommand}"
+									ToolTip.Tip="{L 'Random seed'}"/>
+							<TextBlock Grid.Column="3" Classes="dim" Text="{L 'Name'}" VerticalAlignment="Center" Margin="16,0,10,0"/>
+							<TextBox Grid.Column="4" Classes="value" Height="28" MinWidth="0"
+									 TextAlignment="Left" HorizontalContentAlignment="Left" Padding="6,0"
+									 FontSize="{StaticResource [Type] Body}"
+									 Text="{Binding NameText}" PlaceholderText="{L 'Name seed'}">
+								<TextBox.KeyBindings>
+									<KeyBinding Gesture="Enter" Command="{Binding KeepCommand}"/>
+								</TextBox.KeyBindings>
+							</TextBox>
+							<Button Grid.Column="5" Classes="spend" Margin="6,0,0,0" VerticalAlignment="Center"
+									Command="{Binding KeepCommand}"
+									ToolTip.Tip="{L 'Keep seed'}" ToolTip.ShowOnDisabled="True">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Bookmark}"/>
+							</Button>
+						</Grid>
+
+						<!-- The kept seeds: a click goes onto one; the current one marked. They scroll in the card, which is
+						     the others' height. -->
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,14,0,6" IsVisible="{Binding HasSaved}">
+							<TextBlock Grid.Column="0" Classes="dim" Text="{L 'Kept seeds'}" VerticalAlignment="Center"/>
+							<base:SortMenu Grid.Column="1" DataContext="{Binding Order}"/>
+						</Grid>
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+							<ItemsControl ItemsSource="{Binding Saved}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:MapSeedRow">
+										<Grid ColumnDefinitions="*,Auto" Margin="0,0,0,2">
+											<Button Grid.Column="0" Classes="pickone" Classes.held="{Binding IsCurrent}"
+													IsHitTestVisible="{Binding $parent[ItemsControl].((vm:MapSeedViewModel)DataContext).Rules.EditsMapSeed}"
+													Focusable="{Binding $parent[ItemsControl].((vm:MapSeedViewModel)DataContext).Rules.EditsMapSeed}"
+													Command="{Binding $parent[ItemsControl].((vm:MapSeedViewModel)DataContext).ChooseCommand}"
+													CommandParameter="{Binding}">
+												<Grid ColumnDefinitions="130,*">
+													<TextBlock Grid.Column="0" Text="{Binding Seed}" VerticalAlignment="Center"
+															   FontFamily="{StaticResource DiabloFont}"
+															   Foreground="{DynamicResource [Text] Heading}"/>
+													<TextBlock Grid.Column="1" Classes="body" Text="{Binding Remark}"
+															   VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+												</Grid>
+											</Button>
+											<!-- Asks twice: a kept seed and its name are gone. -->
+											<base:BinButton Grid.Column="1" Compact="True" VerticalAlignment="Center" Margin="6,0,0,0"
+															Command="{Binding $parent[ItemsControl].((vm:MapSeedViewModel)DataContext).ForgetCommand}"
+															CommandParameter="{Binding}"
+															IsArmed="{Binding IsArmed}"
+															Tip="{L 'Delete seed'}"/>
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</DockPanel>
+				</DockPanel>
+			</Border>
+			</StackPanel>
+		</ScrollViewer>
+		</DockPanel>
+
+		<!-- In place of the page while nothing is open. The line is the way back. -->
+		<base:LoadCharacterNotice
+			IsVisible="{Binding !Session.IsLoaded}"
+			Command="{Binding $parent[views:MainView].((mvm:MainViewModel)DataContext).GoHomeCommand}"/>
+	</Panel>
+</UserControl>

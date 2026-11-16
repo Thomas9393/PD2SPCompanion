@@ -1,0 +1,70 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base">
+
+	<!--
+	  How a line of an item reads, in the game's own colours.
+
+	  These dress the `ItemFact` rows that `ItemTileViewModel.Tooltip` builds, so every page
+	  showing an item - the inventory tooltip, the vault card - says the same thing the same
+	  way. Kept here rather than per page because they are one vocabulary: a second opinion
+	  about what blue means is a bug nobody would think to look for.
+	-->
+
+	<!-- An ordinary line: what the item is, what it weighs, what it asks of the character. -->
+	<Style Selector="TextBlock.fact">
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Normal items}"/>
+	</Style>
+
+	<!-- A property. Blue, as the game prints anything an item grants. -->
+	<Style Selector="TextBlock.magic">
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Magic items}"/>
+	</Style>
+
+	<Style Selector="TextBlock.corrupt">
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Corrupted}"/>
+	</Style>
+	<Style Selector="TextBlock.desecrate">
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+	<!-- The runes in the sockets, named under the base: the game's gold. -->
+	<Style Selector="TextBlock.runes">
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+	<Style Selector="TextBlock.skin">
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Crafted items}"/>
+	</Style>
+
+	<!-- A requirement the character does not meet: red, as the game prints it. -->
+	<!-- A set piece's green bonus, in the set green. -->
+	<Style Selector="TextBlock.setbonus">
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+	</Style>
+	<Style Selector="TextBlock.unmet">
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+	</Style>
+	<Style Selector="TextBlock.warn">
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+	</Style>
+
+	<!-- The green bracket after a line that rolled, and left off one that could not have. -->
+	<Style Selector="TextBlock.bracket">
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+	</Style>
+
+	<!-- The same colors for the control that draws an item's lines itself (ItemFactLines - a tooltip's): it has
+	     no text block a line to wear a class, so it is handed each tone's color here, beside the classes'. One
+	     vocabulary still: a color changed above is changed here. The rule is the tooltip's text color, faded. -->
+	<Style Selector="base|ItemFactLines">
+		<Setter Property="FactBrush" Value="{DynamicResource [Brush] Rarity - Normal items}"/>
+		<Setter Property="MagicBrush" Value="{DynamicResource [Brush] Rarity - Magic items}"/>
+		<Setter Property="CorruptBrush" Value="{DynamicResource [Text] Corrupted}"/>
+		<Setter Property="DesecrateBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		<Setter Property="RunesBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		<Setter Property="SkinBrush" Value="{DynamicResource [Brush] Rarity - Crafted items}"/>
+		<Setter Property="SetBrush" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+		<Setter Property="WarningBrush" Value="{DynamicResource [Text] Warning}"/>
+		<Setter Property="BracketBrush" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+		<Setter Property="RuleBrush" Value="{DynamicResource [Brush] Wiki - Text color}"/>
+	</Style>
+</Styles>

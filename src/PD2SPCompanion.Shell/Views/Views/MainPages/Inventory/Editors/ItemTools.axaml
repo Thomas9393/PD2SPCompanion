@@ -1,0 +1,123 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             x:Class="PD2SPCompanion.Shell.Views.ItemTools"
+             x:DataType="vm:VP_ViewModel_Inv_R">
+	<!-- The item panel's tools: the Horadric Cube's upgrade, the Demonic Cube's reroll, the shard's corruption, a
+	     normal item made superior, a map's recipes, and Lucion's desecration. One row, wherever the panel puts it - under its name on the Edit page, in the item's
+	     holder on the Forge. One spacing for the row, and a hidden button takes no room. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+	</UserControl.Styles>
+
+	<StackPanel Orientation="Horizontal" Spacing="8">
+		<!-- A Horadric Cube, which takes the base a tier up. -->
+		<Button Classes="spend"
+				Command="{Binding UpgradeBaseCommand}"
+				ToolTip.Tip="{Binding UpgradeHint}">
+			<Button.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="Rules.Crafts"/>
+					<Binding Path="CanUpgradeBase"/>
+				</MultiBinding>
+			</Button.IsVisible>
+			<Image Source="{Binding HoradricCubeIcon}" Stretch="Uniform"
+				   Width="15" Height="15"/>
+		</Button>
+
+		<!-- A Demonic Cube, which rerolls the numbers of an item that is someone's, as the game's does - and,
+		     in its place on the Forge, a Horadrim Orb, which makes the item there as a new drop: what the
+		     game rolls when it makes one, and with Shift what makes it another of its kind (their goals are different;
+		     VP_ViewModel_Inv_R.Roll). One of the two a page. -->
+		<base:RollButton Kind="Cube"
+				AutomationProperties.AutomationId="Item_Cube"
+				Command="{Binding RerollItemCommand}"
+				IsEnabled="{Binding CanRollNow}"
+				ToolTip.Tip="{Binding RerollHint}" ToolTip.ShowOnDisabled="True">
+			<base:RollButton.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="Rules.EditsAffixes"/>
+					<Binding Path="ShowsCube"/>
+				</MultiBinding>
+			</base:RollButton.IsVisible>
+		</base:RollButton>
+		<!-- Its Shift + click is read on the press, by the page (VP_View_Inv_R.Jump, by the tag). -->
+		<base:RollButton Kind="Orb" Tag="item:roll"
+				AutomationProperties.AutomationId="Item_RollAsDrop"
+				Command="{Binding RerollItemCommand}"
+				ToolTip.Tip="{Binding RerollHint}">
+			<base:RollButton.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="Rules.EditsAffixes"/>
+					<Binding Path="ShowsOrb"/>
+				</MultiBinding>
+			</base:RollButton.IsVisible>
+		</base:RollButton>
+
+		<!-- A Worldstone Shard, which is what corrupts an item. Offered on a
+		     corrupted one as well, since the panel is where it says what
+		     happened to it. -->
+		<Button Classes="spend"
+				Command="{Binding Corruption.OpenPickerCommand}"
+				ToolTip.Tip="{L 'Corrupt'}">
+			<Button.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="Rules.Corrupts"/>
+					<Binding Path="Corruption.Shows"/>
+				</MultiBinding>
+			</Button.IsVisible>
+			<Image Source="{Binding Corruption.Icon}" Stretch="Uniform"
+				   Width="15" Height="15"/>
+		</Button>
+
+		<!-- A normal item made superior: the quality, then its bonus from the picker this
+		     opens. It wears a Giant Conch, as the others wear the game's own things. Not on the Forge,
+		     whose Rarity box says what the item is. -->
+		<Button Classes="spend"
+				AutomationProperties.AutomationId="Make_Superior"
+				Command="{Binding Superior.MakeCommand}"
+				ToolTip.Tip="{L 'Make superior'}">
+			<Button.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="Rules.EditsAffixes"/>
+					<Binding Path="Superior.CanMake"/>
+				</MultiBinding>
+			</Button.IsVisible>
+			<Image Source="{Binding MakeSuperiorIcon}" Stretch="Uniform"
+				   Width="17" Height="17"/>
+		</Button>
+
+		<!-- What the cube does to a map with one item: a Standard of Heroes, an Orb of
+		     Fortification, a Catalyst Shard, a Corrupted Ear. On a magic, rare or unique map; it wears the
+		     Standard. With corruption's own rule: they are the same kind of thing, done with the cube. -->
+		<Button Classes="spend"
+				AutomationProperties.AutomationId="Map_Recipes"
+				Command="{Binding MapRecipe.OpenPickerCommand}"
+				ToolTip.Tip="{L 'Map recipes'}">
+			<Button.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="Rules.Corrupts"/>
+					<Binding Path="MapRecipe.Shows"/>
+				</MultiBinding>
+			</Button.IsVisible>
+			<Image Source="{Binding MapRecipe.Icon}" Stretch="Uniform"
+				   Width="15" Height="15"/>
+		</Button>
+
+		<!-- Lucion's desecration, for a corrupted amulet - and on a desecrated
+		     one, which is how it is read and rerolled. -->
+		<Button Classes="spend"
+				Command="{Binding Desecration.OpenPickerCommand}"
+				ToolTip.Tip="{L 'Desecrate'}">
+			<Button.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="Rules.Corrupts"/>
+					<Binding Path="Desecration.Shows"/>
+				</MultiBinding>
+			</Button.IsVisible>
+			<Image Source="{Binding Desecration.Icon}" Stretch="Uniform"
+				   Width="15" Height="15"/>
+		</Button>
+	</StackPanel>
+</UserControl>

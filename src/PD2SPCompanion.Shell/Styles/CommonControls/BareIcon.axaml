@@ -1,0 +1,65 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!-- A bare icon: a glyph with no frame and no fill, which brightens under the pointer. For an act that
+	     belongs to a piece of text or a card rather than to a row of tools - where the tools' framed square
+	     (Button.spend, 26) would stand taller than the words beside it: a notice's close (the Experimental
+	     page's online notice), the opened character card's close, and the
+	     pencil after a mercenary's name (the button was big, the header text
+	     much smaller). It was "noticeclose", and NoticeClose.axaml, while a cross was all that wore it. -->
+	<Style Selector="Button.bareicon">
+		<Setter Property="Width" Value="20"/>
+		<Setter Property="Height" Value="20"/>
+		<Setter Property="MinHeight" Value="0"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+	</Style>
+	<Style Selector="Button.bareicon /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+	</Style>
+	<!-- Under the pointer and pressed too: said again for each state, since the button's own theme fills its
+	     square in those states and a state's setter outranks a plain one - the tree's chevron lit a square behind
+	     its glyph (the highlight belongs on the glyph alone). -->
+	<Style Selector="Button.bareicon:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.bareicon:pressed /template/ ContentPresenter#PART_ContentPresenter, Button.bareicon:focus-visible /template/ ContentPresenter#PART_ContentPresenter, Button.bareicon:disabled /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="Transparent"/>
+	</Style>
+	<!-- The glyph's colour; its size and stroke are every icon's (Glyph.axaml). -->
+	<Style Selector="Button.bareicon Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		<Setter Property="Opacity" Value="0.75"/>
+	</Style>
+	<!-- Lit: what it opens holds something - the search panel's button while a form is filled. -->
+	<Style Selector="Button.bareicon.on Path">
+		<Setter Property="Opacity" Value="1"/>
+		<Setter Property="Stroke" Value="{DynamicResource [Text] Heading}"/>
+		<Setter Property="StrokeThickness" Value="1.6"/>
+	</Style>
+	<Style Selector="Button.bareicon:disabled Path">
+		<Setter Property="Opacity" Value="{StaticResource [UI] Disabled Opacity}"/>
+	</Style>
+	<Style Selector="Button.bareicon:pointerover Path, Button.bareicon:focus-visible Path">
+		<Setter Property="Opacity" Value="1"/>
+		<Setter Property="Stroke" Value="White"/>
+	</Style>
+	<!-- A row's lock - a page's in the Items page's list, a folder's in the vault's tree:
+	     at the row's end, there to be clicked. Gold while it is on, faint while it is off, so what is locked is
+	     seen at a glance and anything can be locked from the list. -->
+	<Style Selector="Button.bareicon.rowlock">
+		<Setter Property="Width" Value="20"/>
+		<Setter Property="Height" Value="20"/>
+	</Style>
+	<Style Selector="Button.bareicon.rowlock Path">
+		<Setter Property="Opacity" Value="0.45"/>
+	</Style>
+	<Style Selector="Button.bareicon.rowlock.on Path">
+		<Setter Property="Opacity" Value="1"/>
+	</Style>
+	<Style Selector="Button.bareicon.rowlock:pointerover Path, Button.bareicon.rowlock:focus-visible Path">
+		<Setter Property="Opacity" Value="1"/>
+	</Style>
+</Styles>

@@ -1,0 +1,17 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The app's one warning mark (there were two, a red circle and an orange
+	  triangle): an orange triangle, a mark and not a button - its tooltip says what to know. Orange is
+	  warning; red stays for danger and for what cannot be used.
+
+	      <Path Classes="pin alert" Data="{StaticResource [Glyph] Alert}" ToolTip.Tip="{L 'Rerolls affected stats'}"/>
+	-->
+	<Style Selector="Path.alert">
+		<Setter Property="Stroke" Value="{DynamicResource [Text] Warning}"/>
+		<!-- Its size and stroke are every icon's (Glyph.axaml). -->
+		<Setter Property="Margin" Value="0,0,8,0"/>
+		<!-- Filled clear, so the whole triangle takes the pointer and shows the tooltip. -->
+		<Setter Property="Fill" Value="Transparent"/>
+	</Style>
+</Styles>

@@ -1,0 +1,383 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:mvm="using:PD2SPCompanion.Shell.ViewModels"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Extra_L"
+			 x:DataType="vm:VP_ViewModel_Extra_L"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_L CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Extra_L/>
+	</Design.DataContext>
+
+	<!-- The Extra page's left half: the mode, then its sections as the Settings page's cards - the rune
+	     wizard first, shown here whole rather than behind a button; more
+	     reference sections may follow it. The right page is the grail's. The view model is the right
+	     page's. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Choice.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<!-- For the sort menu and the bin it hosts, which wear it (SortMenu, BinButton). -->
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemWording.axaml"/>
+
+		<!-- The crafting wizard's chart: a cell is a row of a picker in small - lit under the pointer, framed while
+		     it is the one told of - its number plain where the recipe can be built and faint where it cannot. -->
+		<Style Selector="Button.pickone.craftcell">
+			<Setter Property="Padding" Value="0"/>
+			<Setter Property="Margin" Value="1"/>
+			<Setter Property="Height" Value="22"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+		</Style>
+		<Style Selector="Button.pickone.craftcell.can">
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+		</Style>
+		<Style Selector="TextBlock.crafthead">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+		</Style>
+		<Style Selector="TextBlock.short">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+		</Style>
+		<!-- A part of a recipe, in the strip under the chart: its picture in a box of one size, its count under it. -->
+		<Style Selector="TextBlock.joiner">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Margin" Value="7,0"/>
+		</Style>
+		<!-- The bracket round the three an infusion stands for: tall as the pictures it holds. -->
+		<Style Selector="TextBlock.grouping">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Display}"/>
+			<Setter Property="FontWeight" Value="Light"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Margin" Value="0,-6,0,0"/>
+		</Style>
+		<!-- The two cards. With the rune wizard open they are as tall as the page while that is enough for them -
+		     its list has what the crafting wizard leaves - and never less than they need, the page scrolling then.
+		     With it folded they are as tall as they are: a heading, and the crafting wizard under it. -->
+		<Style Selector="DockPanel.cards">
+			<Setter Property="VerticalAlignment" Value="Top"/>
+		</Style>
+		<Style Selector="DockPanel.cards.runes">
+			<Setter Property="Height" Value="{Binding $parent[ScrollViewer].Bounds.Height}"/>
+			<Setter Property="MinHeight" Value="400"/>
+		</Style>
+		<Style Selector="DockPanel.cards.runes.both">
+			<Setter Property="MinHeight" Value="1125"/>
+		</Style>
+	</UserControl.Styles>
+
+	<Panel>
+		<!-- Open with no character: nothing
+		     here is the character's - the rune wizard reads the shared stash's materials tab. -->
+		<DockPanel Margin="16" DataContext="{Binding Tools}" x:DataType="vm:VP_ViewModel_Extra_R">
+			<!-- The page's title, and which mode's grail and shared stash it shows - each mode has its own, the
+			     runes here and the grail on the right alike. With a character open the
+			     mode is the character's, and the switch is dimmed; with none it chooses. -->
+			<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+				<TextBlock Grid.Column="0" Classes="title" VerticalAlignment="Center" Text="{L 'Extra'}"/>
+
+				<!-- The pair always, dimmed with a character open, whose mode it follows - as Settings' (not a
+				     square with SC or HC). Each button says why: a dimmed button
+				     shows its own tooltip, not its panel's. -->
+				<UniformGrid Grid.Column="1" Columns="2" Width="{StaticResource [UI] Pair Width}" VerticalAlignment="Center" Margin="-3,0">
+					<Button Classes="choice" Classes.current="{Binding !IsHardcore}" Margin="3,0"
+							IsEnabled="{Binding ChoosesMode}" ToolTip.Tip="{Binding ModeHint}" ToolTip.ShowOnDisabled="True"
+							AutomationProperties.AutomationId="Extra_Softcore"
+							Command="{Binding ShowModeCommand}" CommandParameter="Softcore" Content="{L 'SOFTCORE'}"/>
+					<Button Classes="choice" Classes.current="{Binding IsHardcore}" Margin="3,0"
+							IsEnabled="{Binding ChoosesMode}" ToolTip.Tip="{Binding ModeHint}" ToolTip.ShowOnDisabled="True"
+							AutomationProperties.AutomationId="Extra_Hardcore"
+							Command="{Binding ShowModeCommand}" CommandParameter="Hardcore" Content="{L 'HARDCORE'}"/>
+				</UniformGrid>
+			</Grid>
+
+			<!-- The rune wizard: the runes the shared stash's materials tab holds, and every runeword - what
+			     they make shown plainly, the rest dimmed. Information only. The card fills the page; its
+			     list scrolls. -->
+			<!-- On a window too small for both cards the page scrolls: neither is squeezed out of sight (the rune
+			     wizard's runes were cut across, and its list gone, at the window's least). -->
+			<!-- Its bar stands in the page's own margin, beside the cards and not over their edge: the scroll reaches
+			     12 into the margin, and the cards stop where they did. -->
+			<ScrollViewer Name="Cards" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="0,0,-12,0"
+						  AutomationProperties.AutomationId="Extra_Cards">
+			<DockPanel Classes="cards" Classes.runes="{Binding Wizard.IsOpen}" Classes.both="{Binding Crafting.IsOpen}" Margin="0,0,12,0">
+			<!-- The crafting wizard, under the rune wizard: the wiki's chart of the craft
+			     recipes - a type of item a row, a family a column - each cell how many of that recipe the materials
+			     tab and the vault's Crafting Bases folder would build, and under it what the recipe picked takes and
+			     grants. It folds. -->
+			<Border DockPanel.Dock="Bottom" Classes="section" Margin="0,12,0,0"
+					DataContext="{Binding Crafting}" x:DataType="vm:CraftWizardViewModel">
+				<StackPanel Margin="16,12">
+					<Grid ColumnDefinitions="Auto,Auto,*" MinHeight="28">
+						<Button Grid.Column="0" Classes="fold" Command="{Binding ToggleOpenCommand}"
+								AutomationProperties.AutomationId="Craft_Fold">
+							<Grid ColumnDefinitions="Auto,*">
+								<Path Grid.Column="0" Classes="chevron" Classes.open="{Binding IsOpen}"
+									  Data="{StaticResource [Glyph] Chevron}"/>
+								<TextBlock Grid.Column="1" Classes="heading" Text="{L 'Crafting wizard'}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+							</Grid>
+						</Button>
+						<!-- Where the bases are counted from, and how they get there: a mark behind the heading, as the
+						     grail's. -->
+						<Path Grid.Column="1" Classes="pin" Data="{StaticResource [Glyph] Info}" Margin="10,0,0,0" VerticalAlignment="Center"
+							  Fill="Transparent" Stroke="{DynamicResource [Brush] Wiki - Text color}"
+							  AutomationProperties.AutomationId="Craft_Note"
+							  ToolTip.Tip="{Binding BasesTip}"/>
+						<TextBlock Grid.Column="2" Classes="dim" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="12,0,0,0"
+								   AutomationProperties.AutomationId="Craft_Summary"
+								   Text="{Binding Summary}"/>
+					</Grid>
+
+					<!-- Half the card's own margin at each side is the chart's and the strip's: seven families' names at
+					     the scale's smallest size want every unit of a page's half width. -->
+					<StackPanel IsVisible="{Binding IsOpen}" Margin="-8,8,-8,0">
+						<!-- The chart. Its first column is as wide as the longest type's name and no wider (on a page of
+						     ordinary width the families' names were cut short, with room to
+						     spare beside the types'): one width for the heads' row and every row under it. -->
+						<StackPanel Grid.IsSharedSizeScope="True">
+							<!-- The families, over their columns. -->
+							<Grid Margin="0,0,0,2">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto" SharedSizeGroup="CraftType"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<ItemsControl Grid.Column="1" ItemsSource="{Binding Families}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<UniformGrid Rows="1"/>
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+									<ItemsControl.ItemTemplate>
+										<DataTemplate x:DataType="vm:CraftFamilyHead">
+											<!-- The family's own infusion over its name. -->
+											<StackPanel Background="Transparent" ToolTip.Tip="{Binding OrbName}">
+												<Image Source="{Binding Orb}" Height="28" Stretch="Uniform" StretchDirection="DownOnly"
+													   HorizontalAlignment="Center"/>
+												<TextBlock Classes="crafthead" Text="{Binding Name}"/>
+											</StackPanel>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</Grid>
+
+							<ItemsControl ItemsSource="{Binding Rows}" AutomationProperties.AutomationId="Craft_Chart">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:CraftRowViewModel">
+										<Grid>
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="Auto" SharedSizeGroup="CraftType"/>
+												<ColumnDefinition Width="*"/>
+											</Grid.ColumnDefinitions>
+											<!-- A base of the type over its name, both in the column's middle. -->
+											<StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,2,4,2">
+												<Image Source="{Binding Picture}" Height="24" MaxWidth="40" Stretch="Uniform" StretchDirection="DownOnly"
+													   RenderOptions.BitmapInterpolationMode="HighQuality"
+													   HorizontalAlignment="Center"/>
+												<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}"
+														   HorizontalAlignment="Center" Text="{Binding Label}"/>
+											</StackPanel>
+											<ItemsControl Grid.Column="1" ItemsSource="{Binding Cells}" VerticalAlignment="Center">
+												<ItemsControl.ItemsPanel>
+													<ItemsPanelTemplate>
+														<UniformGrid Rows="1"/>
+													</ItemsPanelTemplate>
+												</ItemsControl.ItemsPanel>
+												<ItemsControl.ItemTemplate>
+													<DataTemplate x:DataType="vm:CraftCellViewModel">
+														<Button Classes="pickone craftcell"
+																Classes.can="{Binding CanMake}"
+																Classes.held="{Binding IsSelected}"
+																AutomationProperties.AutomationId="Craft_Cell"
+																Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Extra_L)DataContext).Tools.Crafting.PickCommand}"
+																CommandParameter="{Binding}"
+																Content="{Binding Text}"/>
+													</DataTemplate>
+												</ItemsControl.ItemTemplate>
+											</ItemsControl>
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</StackPanel>
+
+						<!-- The recipe picked: its name; what goes into the cube as pictures - the
+						     jewel, the rune and the gem, or the infusion that stands for the three, and the base - each
+						     with how many there are under it, the materials tab's or the vault's; then what the family
+						     puts on the item. As tall with a recipe as with none, and whichever recipe it is: a click
+						     anywhere else lets the recipe go (VP_View_Extra_L.OnPressed), and nothing under moves. -->
+						<Border Name="CraftStrip" Margin="0,8,0,0" Padding="0,8,0,0" BorderThickness="0,1,0,0" Height="158"
+								BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}">
+							<Panel>
+								<TextBlock Classes="dim" HorizontalAlignment="Center" VerticalAlignment="Center"
+										   IsVisible="{Binding !HasSelected}"
+										   Text="{L 'No recipe selected'}"/>
+								<StackPanel IsVisible="{Binding HasSelected}">
+									<Grid ColumnDefinitions="*,Auto">
+										<TextBlock Grid.Column="0" FontWeight="Bold" Foreground="{DynamicResource [Text] Heading}"
+												   AutomationProperties.AutomationId="Craft_Title"
+												   Text="{Binding Title}"/>
+										<TextBlock Grid.Column="1" Classes="dim" Classes.short="{Binding !VerdictIsGood}"
+												   AutomationProperties.AutomationId="Craft_Verdict"
+												   Text="{Binding Verdict}"/>
+									</Grid>
+
+									<ItemsControl ItemsSource="{Binding Parts}" Margin="0,6,0,0" HorizontalAlignment="Center"
+												  AutomationProperties.AutomationId="Craft_Parts">
+										<ItemsControl.ItemsPanel>
+											<ItemsPanelTemplate>
+												<StackPanel Orientation="Horizontal"/>
+											</ItemsPanelTemplate>
+										</ItemsControl.ItemsPanel>
+										<ItemsControl.ItemTemplate>
+											<DataTemplate x:DataType="vm:CraftPart">
+												<StackPanel Orientation="Horizontal">
+													<Panel Height="44" VerticalAlignment="Top" IsVisible="{Binding HasBefore}">
+														<TextBlock Classes="joiner" Text="{Binding Before}"/>
+													</Panel>
+													<Panel Height="44" VerticalAlignment="Top" IsVisible="{Binding Opens}">
+														<TextBlock Classes="grouping" Text="("/>
+													</Panel>
+													<StackPanel Width="38" Background="Transparent" ToolTip.Tip="{Binding Name}"
+																AutomationProperties.AutomationId="Craft_Part"
+																AutomationProperties.Name="{Binding Name}">
+														<Panel Height="44">
+															<Image Source="{Binding Sprite}" Stretch="Uniform" StretchDirection="DownOnly"
+																   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+														</Panel>
+														<TextBlock Classes="dim" Classes.short="{Binding IsShort}" HorizontalAlignment="Center"
+																   FontSize="{StaticResource [Type] Small}" Text="{Binding Count}"/>
+													</StackPanel>
+													<Panel Height="44" VerticalAlignment="Top" IsVisible="{Binding Closes}">
+														<TextBlock Classes="grouping" Text=")"/>
+													</Panel>
+												</StackPanel>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+
+									<TextBlock Classes="magic" Margin="0,6,0,0" TextWrapping="Wrap"
+											   HorizontalAlignment="Center" TextAlignment="Center"
+											   AutomationProperties.AutomationId="Craft_Grants"
+											   Text="{Binding Grants}"/>
+								</StackPanel>
+							</Panel>
+						</Border>
+					</StackPanel>
+				</StackPanel>
+			</Border>
+
+			<!-- The rune wizard: the runes the shared stash's materials tab holds, and every runeword - what
+			     they make shown plainly, the rest dimmed. Information only. The card has the page's height the
+			     crafting wizard leaves; its list scrolls. It folds as the crafting wizard does. -->
+			<Border Classes="section">
+				<DockPanel Margin="16,12">
+					<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" MinHeight="28">
+						<Button Grid.Column="0" Classes="fold" Command="{Binding Wizard.ToggleOpenCommand}"
+								AutomationProperties.AutomationId="Runes_Fold">
+							<Grid ColumnDefinitions="Auto,*">
+								<Path Grid.Column="0" Classes="chevron" Classes.open="{Binding Wizard.IsOpen}"
+									  Data="{StaticResource [Glyph] Chevron}"/>
+								<TextBlock Grid.Column="1" Classes="heading" Text="{L 'Rune wizard'}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+							</Grid>
+						</Button>
+						<!-- Whether a word's bases are counted with its runes: lit while they are. Its
+						     picture is battle gear. -->
+						<Button Grid.Column="1" Classes="spend" Classes.on="{Binding Wizard.CountsBases}" VerticalAlignment="Center" Margin="0,0,6,0"
+								IsVisible="{Binding Wizard.IsOpen}"
+								AutomationProperties.AutomationId="Runes_Bases"
+								Command="{Binding Wizard.ToggleBasesCommand}"
+								ToolTip.Tip="{Binding Wizard.BasesTip}">
+							<Path Classes="pin art" Data="{StaticResource [Glyph] Battle gear}"/>
+						</Button>
+						<base:SortMenu Grid.Column="2" VerticalAlignment="Center"
+									   IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Extra_L)DataContext).Tools.Wizard.IsOpen}"
+									   DataContext="{Binding Wizard.Filter}"
+									   Glyph="M 0.5,1 L 11.5,1 L 7,6.5 L 7,11 L 5,10 L 5,6.5 Z"/>
+					</Grid>
+
+					<DockPanel Margin="0,10,0,0" IsVisible="{Binding Wizard.IsOpen}">
+						<base:MaterialsTab DockPanel.Dock="Top" HorizontalAlignment="Center"
+										   DataContext="{Binding Wizard.Runes.First}"/>
+
+						<TextBlock DockPanel.Dock="Top" Classes="dim" Margin="0,8,0,10" HorizontalAlignment="Right"
+								   Text="{Binding Wizard.Summary}"/>
+
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+							<ItemsControl ItemsSource="{Binding Wizard.Rows}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:RunewordRow">
+										<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" Background="Transparent"
+											  Margin="0,0,0,8" Opacity="{Binding Opacity}"
+											  AutomationProperties.AutomationId="Runeword_Row"
+											  AutomationProperties.Name="{Binding Name}">
+											<!-- What the word grants, drawn as an item's tooltip draws its properties:
+											     the name in the runewords' gold, the lines in the properties' blue. -->
+											<ToolTip.Tip>
+												<StackPanel MaxWidth="{StaticResource [UI] Tip Wide}">
+													<TextBlock Text="{Binding Name}" FontWeight="Bold" HorizontalAlignment="Center"
+															   Foreground="{DynamicResource [Brush] Rarity - Unique items}"/>
+													<TextBlock Text="{Binding Runes}" Classes="runes" HorizontalAlignment="Center"/>
+													<ItemsControl ItemsSource="{Binding Bonus}">
+														<ItemsControl.ItemTemplate>
+															<DataTemplate x:DataType="vm:ItemFact">
+																<Panel>
+																	<Border IsVisible="{Binding IsRule}" Height="1" Margin="0,4"
+																			Background="{DynamicResource [Brush] Wiki - Text color}" Opacity="0.4"/>
+																	<TextBlock IsVisible="{Binding IsWords}" TextWrapping="Wrap"
+																			   HorizontalAlignment="Center" TextAlignment="Center"
+																			   Classes.fact="{Binding IsFact}" Classes.magic="{Binding IsMagic}"
+																			   Text="{Binding Text}"/>
+																</Panel>
+															</DataTemplate>
+														</ItemsControl.ItemTemplate>
+													</ItemsControl>
+												</StackPanel>
+											</ToolTip.Tip>
+											<TextBlock Grid.Column="0" FontWeight="Bold"
+													   Foreground="{DynamicResource [Brush] Rarity - Unique items}"
+													   Text="{Binding Title}"/>
+											<TextBlock Grid.Column="1" Classes="dim"
+													   Text="{Binding Runes}"/>
+											<TextBlock Grid.Row="1" Grid.Column="0" Classes="dim" FontSize="{StaticResource [Type] Small}"
+													   TextWrapping="Wrap" Text="{Binding Bases}"/>
+											<TextBlock Grid.Row="1" Grid.Column="1" Classes="dim" FontSize="{StaticResource [Type] Small}"
+													   HorizontalAlignment="Right"
+													   IsVisible="{Binding HasMissing}"
+													   Text="{Binding Missing}"/>
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</DockPanel>
+				</DockPanel>
+			</Border>
+			</DockPanel>
+			</ScrollViewer>
+		</DockPanel>
+
+	</Panel>
+</UserControl>

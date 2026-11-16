@@ -1,0 +1,60 @@
+<UserControl xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base" xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             xmlns:character="using:PD2SPCompanion.Shell.Services.Character"
+             x:Class="PD2SPCompanion.Shell.Views.HistoryList"
+             x:DataType="vm:VP_ViewModel_Default_L">
+	<!--
+	  The open character's history this session: what each
+	  save did, newest first, the last line the character as opened. A line goes back or forward to
+	  that state. The one the files are in is gold; undone ones are dim, until the next action
+	  drops them. Opened from the top bar.
+	-->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<Style Selector="Button.historyrow">
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="HorizontalContentAlignment" Value="Left"/>
+			<Setter Property="Padding" Value="8,4"/>
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="Cursor" Value="Hand"/>
+		</Style>
+		<Style Selector="Button.historyrow TextBlock">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		</Style>
+		<Style Selector="Button.historyrow.current TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		</Style>
+		<Style Selector="Button.historyrow.undone TextBlock">
+			<Setter Property="Opacity" Value="0.45"/>
+		</Style>
+		<Style Selector="Button.historyrow:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.historyrow:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		</Style>
+	</UserControl.Styles>
+
+	<!-- A menu's panel, as the order's and the card's figures (Picker.axaml; it had a frame of its own). -->
+	<Border Classes="menupanel">
+		<!-- The bar takes its own room when it shows, not the rows'. -->
+		<ScrollViewer MaxHeight="360" Width="340" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+			<ItemsControl ItemsSource="{Binding History.Rows}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="character:HistoryRow">
+						<Button Classes="historyrow"
+								Classes.current="{Binding IsCurrent}"
+								Classes.undone="{Binding IsUndone}"
+								Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Default_L)DataContext).GoToCommand}"
+								CommandParameter="{Binding}">
+							<Grid ColumnDefinitions="Auto,*">
+								<TextBlock Grid.Column="0" Text="{Binding When}" Margin="0,0,10,0" Opacity="0.7"/>
+								<TextBlock base:TrimmedTip.Tip="{Binding Label}" Grid.Column="1" Text="{Binding Label}" TextTrimming="CharacterEllipsis"/>
+							</Grid>
+						</Button>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
+	</Border>
+</UserControl>

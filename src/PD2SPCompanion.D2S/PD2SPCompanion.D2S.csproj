@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- Vendored code predates nullable reference types; annotating it would mean
+         rewriting it, which defeats the point of keeping the diff to upstream small. -->
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);CS0168;CS0219;CS8632</NoWarn>
+    <RootNamespace>D2SLib</RootNamespace>
+  </PropertyGroup>
+
+</Project>

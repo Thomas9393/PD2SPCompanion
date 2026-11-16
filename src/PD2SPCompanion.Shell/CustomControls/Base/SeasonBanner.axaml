@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PD2SPCompanion.Shell.CustomControls.Base.SeasonBanner"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base">
+	<!--
+	  The game's title, the season under it, and the golden rule with a jewel in its socket.
+	  Written out on the landing page first; the vault's page of doors wanted it too, and it is
+	  this control now. The jewel is picked once a run, so every page shows the same one.
+	-->
+	<Grid RowDefinitions="Auto,Auto">
+		<TextBlock FontFamily="{StaticResource DiabloFont}"
+				   TextAlignment="Center"
+				   HorizontalAlignment="Center"
+				   Grid.Row="0">
+			<!-- Title -->
+			<!-- type-guard-ok: branding: the season banner. -->
+			<Run Text="{DynamicResource [UI Text] Game Title}"
+				 FontWeight="Heavy"
+				 Foreground="{DynamicResource [Brush] Rarity - Unique items}"
+				 FontSize="32"/>
+			<LineBreak/>
+			<!-- Sub Title -->
+			<!-- type-guard-ok: branding: the season banner. -->
+			<!-- color-guard-ok: branding: the season banner. -->
+			<Run Text="{Binding $parent[base:SeasonBanner].SeasonTitle}"
+				 FontWeight="Light"
+				 Foreground="LightGray"
+				 FontSize="18"/>
+		</TextBlock>
+		<!-- Decoration Part: A random jewel displayed in the socket. -->
+		<Grid Margin="16 20"
+			  Effect="drop-shadow(0 0 16 black)"
+			  Grid.Row="1">
+			<Border Background="{DynamicResource [UI] GradBrush - Frame - Golden#02}"
+					Height="1.5" CornerRadius="4"/>
+			<Border BorderBrush="{DynamicResource [UI] GradBrush - Frame - Golden#02}"
+					Height="40" Width="40"
+					BorderThickness="1"
+					Background="Black"
+					CornerRadius="40">
+				<Image Source="{Binding $parent[base:SeasonBanner].Jewel}"
+					   HorizontalAlignment="Center"
+					   VerticalAlignment="Center"
+					   Width="32" Height="32"/>
+			</Border>
+		</Grid>
+	</Grid>
+</UserControl>

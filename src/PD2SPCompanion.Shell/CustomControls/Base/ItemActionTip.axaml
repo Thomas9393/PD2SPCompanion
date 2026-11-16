@@ -1,0 +1,105 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             x:Class="PD2SPCompanion.Shell.CustomControls.Base.ItemActionTip">
+	<!-- An item's tooltip where the item can be acted on (after Diablo 4's): the item as
+	     every tooltip has it, with a strip at its foot saying what the keys do with it here - and, with the
+	     comparison open (Tab), a box beside it of what is worn where the click would put it.
+	     The comparison is a popup of its own, set against the item's box: the item's tooltip stays where it is
+	     and as it is, strip and all, whether the comparison is open or not: the
+	     comparison adjusts its own position without affecting the item's. In one popup with it, the pair grew wider as it opened
+	     and was moved as one at a screen's edge. -->
+	<UserControl.Styles>
+		<Style Selector="Border.tipbox">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Popup}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="Padding" Value="9,5"/>
+			<Setter Property="VerticalAlignment" Value="Top"/>
+		</Style>
+		<Style Selector="TextBlock.empty">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+		</Style>
+		<Style Selector="TextBlock.caption">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+		</Style>
+	</UserControl.Styles>
+
+	<Panel>
+		<!-- Cut to the screen's height where the item is a wall of lines (MaxHeight, set as it opens): the item
+		     then scrolls over the strip, which stays - by the [ and ] keys, the pointer passing through a
+		     tooltip (taking over the wheel would make many edge cases). -->
+		<Border Name="OwnBox" Classes="tipbox">
+			<DockPanel>
+				<!-- The strip, here whether the comparison is open or shut: a rule, then a line a key. -->
+				<StackPanel Name="Strip" DockPanel.Dock="Bottom" IsVisible="False" Margin="0,6,0,1">
+					<Border Height="1" Margin="0,0,0,5"
+							Background="{DynamicResource [Brush] Wiki - Text color}" Opacity="0.4"/>
+					<base:KeyHints Name="Hints" AutomationProperties.AutomationId="Tip_Hints"/>
+				</StackPanel>
+				<ScrollViewer Name="Scroller" AutomationProperties.AutomationId="Tip_Scroll"
+							  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+							  AllowAutoHide="False">
+					<StackPanel>
+						<ContentControl Name="Own" ContentTemplate="{StaticResource ItemTip}"/>
+						<!-- A vault item's own last section, under what the item says of itself and over the keys:
+						     when it was stored - when its stay in the vault began. -->
+						<StackPanel Name="StoredBlock" IsVisible="False" Margin="0,6,0,0">
+							<Border Height="1" Margin="0,0,0,5"
+									Background="{DynamicResource [Brush] Wiki - Text color}" Opacity="0.4"/>
+							<TextBlock Name="StoredLine" AutomationProperties.AutomationId="Tip_Stored"
+									   TextAlignment="Center"
+									   Foreground="{DynamicResource [Text] Body}"/>
+						</StackPanel>
+					</StackPanel>
+				</ScrollViewer>
+			</DockPanel>
+		</Border>
+
+		<!-- The comparison (Tab): what is worn where the click would put the item, named over its box as Diablo 4's
+		     "Equipped" - one piece, two where a weapon held in both hands takes two off, or "Empty". To the right
+		     of the item's box, its name level with the item's name and its lines with the item's lines - so the
+		     caption stands out over the top and the equip strip pops out, which looks better than the lines out of step; to the
+		     item's left where the screen ends; moved up where it would run off the foot. Never under the pointer's reach: it takes no pointer and no focus. -->
+		<Popup Name="ComparedPopup"
+			   PlacementTarget="{Binding #OwnBox}"
+			   Placement="RightEdgeAlignedTop"
+			   PlacementConstraintAdjustment="FlipX,SlideY"
+			   HorizontalOffset="6"
+			   IsLightDismissEnabled="False"
+			   Focusable="False">
+			<DockPanel Name="Compared" IsHitTestVisible="False" Focusable="False">
+				<Border Name="CaptionBox" DockPanel.Dock="Top" Classes="tipbox" Padding="9,2" CornerRadius="4,4,0,0" BorderThickness="1,1,1,0"
+						HorizontalAlignment="Stretch">
+					<TextBlock Name="Caption" Classes="caption" AutomationProperties.AutomationId="Tip_Compared"/>
+				</Border>
+				<!-- The foot of the frame the boxes above leave open. -->
+				<Border DockPanel.Dock="Bottom" Height="1" Background="{DynamicResource [Brush] Frame - Golden Dim}"/>
+				<ScrollViewer Name="Scroller2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+							  AllowAutoHide="False">
+					<StackPanel>
+						<ItemsControl Name="Others">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="vm:ItemTileViewModel">
+									<Border Classes="tipbox" CornerRadius="0" BorderThickness="1,1,1,0" HorizontalAlignment="Stretch">
+										<ContentControl Content="{Binding}" ContentTemplate="{StaticResource ItemTip}"/>
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+						<Border Name="EmptyBox" Classes="tipbox" CornerRadius="0" BorderThickness="1,1,1,0"
+								HorizontalAlignment="Stretch" MinWidth="150" Padding="9,12">
+							<TextBlock Name="EmptyText" Classes="empty" HorizontalAlignment="Center"
+									   AutomationProperties.AutomationId="Tip_Empty"/>
+						</Border>
+					</StackPanel>
+				</ScrollViewer>
+			</DockPanel>
+		</Popup>
+	</Panel>
+</UserControl>

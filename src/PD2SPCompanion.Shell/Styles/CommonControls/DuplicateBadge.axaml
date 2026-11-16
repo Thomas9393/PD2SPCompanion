@@ -1,0 +1,42 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The duplicate badge: an item held more than once, marked in the corner of its tile or card
+	  while the play rule asks for it. Orange, the warning colour; a click shows every copy.
+
+	      <Button Classes="dupe" IsVisible="{Binding Item.IsDuplicate}"
+	              Command="{Binding Item.ShowCopiesCommand}" ToolTip.Tip="{Binding Item.DuplicateHint}"/>
+	-->
+	<Style Selector="Button.dupe">
+		<Setter Property="Width" Value="13"/>
+		<Setter Property="Height" Value="13"/>
+		<Setter Property="Margin" Value="1,1,0,0"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="MinWidth" Value="0"/>
+		<Setter Property="MinHeight" Value="0"/>
+		<Setter Property="HorizontalAlignment" Value="Left"/>
+		<Setter Property="VerticalAlignment" Value="Top"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Caution}"/>
+		<Setter Property="BorderBrush" Value="Black"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="2"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<!-- Two sheets, one over the other: a copy. -->
+		<Setter Property="Content">
+			<Template>
+				<Path Classes="pin small" Data="{StaticResource [Glyph] Duplicate}"/>
+			</Template>
+		</Setter>
+	</Style>
+	<!-- The two sheets in black on the orange (gold on it was hard to read): by a style, which outranks the
+	     icons' gold - a Stroke set on the Path in the template above ranks below every style, and was drawn gold. -->
+	<Style Selector="Button.dupe Path.pin">
+		<Setter Property="Stroke" Value="Black"/>
+	</Style>
+	<Style Selector="Button.dupe:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.dupe:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Caution}"/>
+		<Setter Property="BorderBrush" Value="White"/>
+	</Style>
+</Styles>

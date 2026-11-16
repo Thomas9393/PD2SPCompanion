@@ -1,0 +1,101 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             xmlns:data="using:PD2SPCompanion.Core.Items"
+             x:Class="PD2SPCompanion.Shell.Views.PropertyPicker"
+             x:DataType="vm:PropertyPickerViewModel">
+	<!--
+	  A property picker, over whatever the page places it on: the search panel's and the Edit page's
+	  (they were twins, two files). The list and what a pick does are the view model's
+	  (PropertyPickerViewModel). Picked and added in one press.
+	-->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemMarks.axaml"/>
+	</UserControl.Styles>
+
+	<Border Classes="veil"
+			IsVisible="{Binding IsPresent, FallbackValue=False}"
+			Classes.shown="{Binding IsOpen}"
+			IsHitTestVisible="{Binding IsOpen}">
+		<Panel>
+			<Button Classes="backdrop" Command="{Binding CloseCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<Border Classes="pickerpanel">
+					<DockPanel>
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+							<TextBlock Grid.Column="0" Classes="pickertitle" Text="{L 'Property'}"/>
+							<Button Grid.Column="1" Classes="spend"
+									Command="{Binding CloseCommand}"
+									ToolTip.Tip="{L 'Close'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</Grid>
+
+						<base:SearchBox x:Name="SearchBox" DockPanel.Dock="Top" Classes="value"
+								 Margin="0,0,0,8"
+								 Padding="2,0"
+								 Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"/>
+
+						<TextBlock DockPanel.Dock="Top" Classes="dim" FontSize="{StaticResource [Type] Small}" Margin="6,0,0,6"
+								   IsVisible="{Binding NoChoices}"
+								   Text="{L 'No match.'}"/>
+
+						<!-- Virtualised: a thousand lines, and only the ones on screen are made. The scroll
+						     viewer is the list's own, which is what lets the panel know how much of it shows -
+						     and the presenter must be handed the panel: without the TemplateBinding it falls back
+						     to a plain StackPanel and every row is built, 516 of them, 700 ms frozen on each open
+						     (measured). -->
+						<ItemsControl ItemsSource="{Binding Choices}">
+							<ItemsControl.Template>
+								<ControlTemplate>
+									<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+										<ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}"/>
+									</ScrollViewer>
+								</ControlTemplate>
+							</ItemsControl.Template>
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<VirtualizingStackPanel/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="data:IPropertyChoice">
+									<Button Classes="pickone"
+											Command="{Binding $parent[UserControl].((vm:PropertyPickerViewModel)DataContext).PickCommand}"
+											CommandParameter="{Binding}">
+										<!-- The id and the marks on the right, the text in what is left and trimmed there: in a
+										     horizontal stack the text had all the width it wanted and ran under the id. -->
+										<DockPanel>
+											<!-- The id the save stores it under, where the list has one. -->
+											<TextBlock DockPanel.Dock="Right" Classes="dim" VerticalAlignment="Center" Margin="12,0,0,0"
+													   FontSize="{StaticResource [Type] Small}"
+													   Text="{Binding IdText}"/>
+											<!-- What the list notes - obsolete, UI, engine - in the warning colour. -->
+											<TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Margin="6,0,0,0"
+													   FontSize="{StaticResource [Type] Small}"
+													   Foreground="{DynamicResource [Text] Warning}"
+													   IsVisible="{Binding HasNote}" Text="{Binding Note}"/>
+											<TextBlock DockPanel.Dock="Right" Classes="mapmark" Margin="6,0,0,0"
+													   IsVisible="{Binding IsMapOnly}" Text="{L '(maps)'}"/>
+											<TextBlock Text="{Binding Text}" TextTrimming="CharacterEllipsis"
+													   ToolTip.Tip="{Binding Text}"
+													   FontSize="{StaticResource [Type] Body}"
+													   Foreground="{DynamicResource [Text] Body}"/>
+										</DockPanel>
+									</Button>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</DockPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+</UserControl>

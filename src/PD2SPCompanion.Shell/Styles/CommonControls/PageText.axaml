@@ -1,0 +1,37 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  A page's words by tier (Resources/UI_Main/Typography.axaml): display,
+	  title, heading in the Diablo font and gold, body in cream and small in tan (the colour follows
+	  the tier: [Text] brushes in Theme_Standard.axaml); and dim, the small tier by another name. Written out identically on nine pages until the settings page's right panel
+	  wanted a tenth, and one file since.
+
+	  title is a page's own title ("Inventory", "Settings"). heading is every section, card, panel
+	  and picker title - it was the page title's class until the type scale, and pages bent it to
+	  17, 18 and 20 for their sections.
+	-->
+	<Style Selector="TextBlock.title">
+		<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Title}"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+	</Style>
+	<Style Selector="TextBlock.heading">
+		<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Heading}"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+	</Style>
+	<Style Selector="TextBlock.body">
+		<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+	</Style>
+	<Style Selector="TextBlock.small">
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+	</Style>
+	<Style Selector="TextBlock.dim">
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+	</Style>
+</Styles>

@@ -1,0 +1,39 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             xmlns:views="using:PD2SPCompanion.Shell.Views"
+             x:Class="PD2SPCompanion.Shell.Views.PaymentPanel"
+             x:DataType="vm:PaymentViewModel">
+	<!--
+	  A purchase's payment, framed: its title and a close, and PaymentBody - every priced currency
+	  the materials tab holds, counted out the way a cash machine counts notes, and the HR the
+	  player chooses underneath. A sale folds the same body into its own panel beside its search.
+	-->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+	</UserControl.Styles>
+
+	<Border Classes="pickerpanel"
+			VerticalAlignment="Center">
+		<DockPanel>
+			<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,2">
+				<TextBlock Grid.Column="0" Classes="pickertitle" Text="{Binding Title}"/>
+
+				<Button Grid.Column="1" Classes="spend"
+						Command="{Binding CloseCommand}"
+						ToolTip.Tip="{L 'Close'}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+				</Button>
+			</Grid>
+
+			<TextBlock DockPanel.Dock="Top" Classes="dim" Margin="0,0,0,8"
+					   Text="{Binding Subtitle}"/>
+
+			<views:PaymentBody/>
+		</DockPanel>
+	</Border>
+</UserControl>

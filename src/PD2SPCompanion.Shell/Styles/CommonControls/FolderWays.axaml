@@ -1,0 +1,140 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The ways about the vault: the path over a vault
+	  page, a folder's row in the tree and in a list of folders, its tile on the sheet, and the tree's edge.
+	  A file of its own because the lists of folders open in a popup, which takes the styles it is given.
+	-->
+	<!-- A step of the path, and the chevron after it: a word to click, lit under the pointer, in a bar framed
+	     as a box is (Explorer's address bar). -->
+	<Style Selector="Border.pathbar">
+		<Setter Property="Height" Value="26"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="CornerRadius" Value="4"/>
+		<Setter Property="Background" Value="{DynamicResource [ABrush] Black - A50%}"/>
+		<Setter Property="Padding" Value="2,0"/>
+	</Style>
+	<Style Selector="Button.step">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="Padding" Value="5,0"/>
+		<Setter Property="MinWidth" Value="0"/>
+		<Setter Property="Height" Value="22"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="CornerRadius" Value="3"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+	</Style>
+	<Style Selector="Button.step.list">
+		<Setter Property="Padding" Value="2,0"/>
+		<Setter Property="Width" Value="18"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+	</Style>
+	<Style Selector="Button.step /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+	</Style>
+	<Style Selector="Button.step:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.step:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+	</Style>
+	<Style Selector="Button.step:pressed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Pressed Wash}"/>
+	</Style>
+
+	<!-- A folder's row - in the tree, in a list of folders: a picker's row, close
+	     set. The folder shown is the row held; one that what is carried would go into is framed in gold. -->
+	<Style Selector="Button.folderrow">
+		<Setter Property="Padding" Value="2,0,6,0"/>
+		<Setter Property="Margin" Value="0,0,0,1"/>
+		<Setter Property="HorizontalContentAlignment" Value="Left"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+	</Style>
+	<Style Selector="Button.folderrow.drop /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+	</Style>
+	<!-- A folder as a tile of its folder's sheet (FolderTile): two cells by four, faced as
+	     an item's tile is (ItemTile.axaml: TileBrush, HoverBrush, FrameBrush) - a faint fill, lighter under the
+	     pointer, a thin edge. Cut, it is as faint as a cut item; no find of a search in it, as an item that is none. -->
+	<Style Selector="Button.sheetfolder">
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="VerticalAlignment" Value="Stretch"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="Margin" Value="0"/>
+		<Setter Property="MinWidth" Value="0"/>
+		<Setter Property="MinHeight" Value="0"/>
+		<Setter Property="Focusable" Value="False"/>
+		<Setter Property="Background" Value="#14FFFFFF"/>
+		<Setter Property="BorderBrush" Value="#4CA79066"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}"/>
+		<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+		<Setter Property="VerticalContentAlignment" Value="Stretch"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+	</Style>
+	<Style Selector="Button.sheetfolder /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="#14FFFFFF"/>
+		<Setter Property="BorderBrush" Value="#4CA79066"/>
+		<Setter Property="BorderThickness" Value="1"/>
+	</Style>
+	<Style Selector="Button.sheetfolder:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.sheetfolder:pressed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="#28FFFFFF"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}"/>
+	</Style>
+	<Style Selector="Button.sheetfolder:pressed">
+		<Setter Property="RenderTransform" Value="none"/>
+	</Style>
+	<!-- Its name is not drawn while it is typed over it: laid out still, so nothing under it moves. -->
+	<Style Selector="Button.sheetfolder TextBlock.renamed">
+		<Setter Property="Opacity" Value="0"/>
+	</Style>
+	<!-- With something selected on the sheet, what is not steps back - the items' own number (TileLayer.OpacityOf),
+	     and in its order: a search's miss further back still, what is selected never, what is cut faint whatever. -->
+	<Style Selector="Button.sheetfolder.stepped">
+		<Setter Property="Opacity" Value="0.45"/>
+	</Style>
+	<Style Selector="Button.sheetfolder.miss">
+		<Setter Property="Opacity" Value="0.25"/>
+	</Style>
+	<Style Selector="Button.sheetfolder.marked">
+		<Setter Property="Opacity" Value="1"/>
+	</Style>
+	<Style Selector="Button.sheetfolder.cut">
+		<Setter Property="Opacity" Value="0.35"/>
+	</Style>
+	<!-- What is carried would go into it: framed as a card a gem would go into is (TileLayer.TargetBrush). -->
+	<Style Selector="Border.dropring">
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+		<Setter Property="IsHitTestVisible" Value="False"/>
+	</Style>
+
+	<!-- A folder that is cut (ItemClipboard): faint where it stands, until it is pasted or let go. -->
+	<Style Selector="Button.folderrow.cut">
+		<Setter Property="Opacity" Value="0.4"/>
+	</Style>
+	<!-- A chevron that does nothing - over the folder shown - is faint. -->
+	<Style Selector="Button.folderrow Button.pickone:disabled Path">
+		<Setter Property="Opacity" Value="0.3"/>
+	</Style>
+
+	<!-- A row of the list of tools a narrow page's line had no room for (OverflowRow): a picker's row, its
+	     words the page's; faint where the tool is dead. And the rule between two groups of them. -->
+	<Style Selector="Button.toolrow">
+		<Setter Property="Padding" Value="8,5"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+	</Style>
+	<Style Selector="Button.toolrow:disabled">
+		<Setter Property="Opacity" Value="0.35"/>
+	</Style>
+	<Style Selector="Border.menurule">
+		<Setter Property="Height" Value="1"/>
+		<Setter Property="Margin" Value="6,4"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+	</Style>
+</Styles>

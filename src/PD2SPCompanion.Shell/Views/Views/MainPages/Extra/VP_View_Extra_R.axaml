@@ -1,0 +1,38 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Extra_R"
+			 x:DataType="vm:VP_ViewModel_Extra_R"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_R CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Extra_R/>
+	</Design.DataContext>
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+
+	</UserControl.Styles>
+
+	<!-- The grail, browsed: every unique, set piece, runeword and recipe, found or not - a card chosen
+	     searches nothing here; that is the Items page's Grail. The whole right page, always: the rune
+	     wizard is the left page's own now, not a panel over this one. -->
+	<DockPanel Margin="16">
+		<!-- The title, and the page's fact at its right: how many cards are shown. -->
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+			<TextBlock Grid.Column="0" Classes="title" Text="{L 'Compendium'}" VerticalAlignment="Center"/>
+			<TextBlock Grid.Column="1" Classes="dim" VerticalAlignment="Center" Text="{Binding Grail.CountText}"/>
+		</Grid>
+		<views:GrailPanel DataContext="{Binding Grail}"/>
+	</DockPanel>
+</UserControl>

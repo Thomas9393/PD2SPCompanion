@@ -1,0 +1,7 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:sys="using:System">
+	<!-- Halved from 0.3 s: measured, a page swap freezes nothing (bookmark-lag.ps1, under 50 ms)
+	     and the fade was the whole of the wait - a side bar page showed ~150 ms after a bookmark, every round. -->
+	<sys:TimeSpan x:Key="[Anim] ViewPage Transition">0:0:0.15</sys:TimeSpan>
+</ResourceDictionary>

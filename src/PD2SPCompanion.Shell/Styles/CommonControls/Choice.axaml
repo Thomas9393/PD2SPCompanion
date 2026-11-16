@@ -1,0 +1,20 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  A flat choice group - one of a few, the chosen one filled (ornament vs flat): every option the secondary button, the chosen
+	  one the primary. The same logic as a popup's answers, so a group reads as a group and its choice
+	  by fill, not by a lit red face. For panels and popups; the chrome keeps its ornament.
+
+	      <Button Classes="choice" Classes.current="{Binding IsCasual}" Content="{L 'Casual'}" .../>
+
+	  First on the first-run question's play mode; the other choice groups move to it page by page.
+	-->
+	<Style Selector="Button.choice">
+		<Setter Property="Theme" Value="{DynamicResource [CtrlThm] Button_Secondary}"/>
+		<Setter Property="Height" Value="28"/>
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+	</Style>
+	<Style Selector="Button.choice.current">
+		<Setter Property="Theme" Value="{DynamicResource [CtrlThm] Button_Primary}"/>
+	</Style>
+</Styles>

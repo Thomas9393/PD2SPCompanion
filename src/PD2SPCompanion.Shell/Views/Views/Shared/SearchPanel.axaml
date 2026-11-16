@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:controls="using:PD2SPCompanion.Shell.CustomControls.Base"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="760"
+             x:Class="PD2SPCompanion.Shell.Views.SearchPanel"
+             x:DataType="vm:SearchPanelViewModel">
+	<Design.DataContext>
+		<vm:SearchPanelViewModel/>
+	</Design.DataContext>
+
+	<!-- The search's conditions: the standing search's form, under the Conditions heading of its panel
+	     (SearchWindow) - the heading, and the brush that empties them, are the panel's.
+	     Every piece is the Search page's as it was on Utilities, moved whole. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ComboBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SettingRow.axaml"/>
+	</UserControl.Styles>
+
+	<Panel>
+		<DockPanel>
+			<!-- The name on top, then the pickers, as the trade site lays them out. -->
+			<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+				<StackPanel Spacing="12">
+					<!-- The presets, in the panel (no second panel opening up; the drop panel's
+					     section, shared), then the form. -->
+					<views:PresetSection ListHeight="96"/>
+					<views:ItemSearchForm DataContext="{Binding Form}"/>
+				</StackPanel>
+			</ScrollViewer>
+		</DockPanel>
+
+		<!-- The property picker, over the search's list. -->
+		<views:PropertyPicker DataContext="{Binding Form.Properties}"/>
+	</Panel>
+</UserControl>

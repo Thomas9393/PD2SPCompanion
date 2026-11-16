@@ -1,0 +1,141 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:generic="using:PD2SPCompanion.Shell.Services.Generic"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             x:Class="PD2SPCompanion.Shell.CustomControls.Base.ActMenuHost"
+             x:DataType="generic:ActMenuService"
+             IsHitTestVisible="False">
+	<!--
+	  The right-click menu, in Windows 11's layout and the app's art style: a row of icons at its head - cut, copy, paste,
+	  rename, delete, as each applies to what was
+	  clicked - and under it the worded rows: a glyph, the words, and at the row's end the keys that do the same
+	  without the menu, as caps. The main act first, in bold; a rule between groups; a state that is on, ticked.
+	  One for the window (MainView holds it), filled by whichever page was clicked (ActMenuService).
+
+	  The frame is a picker's panel, a row the tools' list's (pickone toolrow), a key the tooltips' cap
+	  (KeyCap.axaml); the icons at the head and the rules are the menu's own, after Windows 11's (below). The
+	  styles are included on the menu itself: it opens in a popup, which takes the styles it is given.
+
+	  It is not closed by the popup's own light dismiss, whose layer swallows the press that closes it: a right
+	  click on something else then only shut the menu, where Windows opens that thing's menu, and a click on a
+	  folder did nothing. The host closes it on any press outside it and lets the press go on (the code).
+	-->
+	<!-- For the row's template below, which is made here and shown in the popups - whose own frames take the
+	     same file, a popup being a tree of its own. -->
+	<UserControl.Styles>
+		<!-- Named one by one beside the file that includes them all: the build's guard (PD2UI005) reads this
+		     view's own includes, not an included file's. -->
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/FolderWays.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/KeyCap.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActMenu.axaml"/>
+	</UserControl.Styles>
+
+	<UserControl.Resources>
+		<!-- A worded row: the menu's, and the same in the list a row opens beside it. -->
+		<DataTemplate x:Key="MenuRow" x:DataType="vm:MenuAct">
+			<StackPanel>
+				<Border Classes="menurule" IsVisible="{Binding RuleAbove}"/>
+				<Button Classes="pickone toolrow"
+						IsEnabled="{Binding IsEnabled}"
+						AutomationProperties.AutomationId="ActMenu_Row"
+						AutomationProperties.Name="{Binding Label}"
+						ToolTip.Tip="{Binding RowTip}" ToolTip.ShowOnDisabled="True"
+						PointerEntered="Row_Entered"
+						Click="Act_Click">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="24"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="Auto" SharedSizeGroup="Keys"/>
+							<ColumnDefinition Width="Auto" SharedSizeGroup="Tick"/>
+						</Grid.ColumnDefinitions>
+						<Path Grid.Column="0" Classes="pin" Classes.art="{Binding IsArt}" HorizontalAlignment="Left" VerticalAlignment="Center"
+							  Data="{Binding Shape}"/>
+						<TextBlock Grid.Column="1" Text="{Binding Label}" FontWeight="{Binding Weight}" VerticalAlignment="Center"/>
+						<Border Grid.Column="2" Classes="keycap" HorizontalAlignment="Right" IsVisible="{Binding HasKeys}">
+							<TextBlock Classes="key" Text="{Binding Keys}"/>
+						</Border>
+						<Path Grid.Column="3" Classes="pin small" Margin="12,0,0,0" VerticalAlignment="Center"
+							  Data="{StaticResource [Glyph] Tick}"
+							  IsVisible="{Binding IsOn}"/>
+						<!-- A row that opens a list beside the menu (Sort by): a chevron at its end, as Windows' has. -->
+						<Path Grid.Column="3" Classes="pin small" Margin="12,0,0,0" VerticalAlignment="Center"
+							  Data="{StaticResource [Glyph] Chevron right}"
+							  IsVisible="{Binding HasMore}"/>
+					</Grid>
+				</Button>
+			</StackPanel>
+		</DataTemplate>
+	</UserControl.Resources>
+
+	<Panel>
+	<Popup Name="Menu" Placement="Pointer" IsLightDismissEnabled="False">
+		<Border Name="Frame" Classes="pickerpanel" Padding="0,6" MinWidth="230"
+				AutomationProperties.AutomationId="ActMenu" AutomationProperties.AccessibilityView="Control"
+				Effect="drop-shadow(0 2 12 Black)" Margin="12">
+			<Border.Styles>
+				<StyleInclude Source="/Styles/CommonControls/ActMenu.axaml"/>
+			</Border.Styles>
+
+			<StackPanel>
+				<!-- The icons: what every such menu has, where Windows 11 has them - each a share of the menu's width.
+				     A faint line stands at the left of each but the first. -->
+				<Border Margin="6,0" IsVisible="{Binding HasIcons}">
+					<ItemsControl Name="IconRow" ItemsSource="{Binding Icons}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<UniformGrid Rows="1"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate x:DataType="vm:MenuAct">
+								<Panel>
+									<Border Classes="iconrule" IsVisible="{Binding FollowsAnother}"/>
+									<Button Classes="menuicon" Classes.bin="{Binding IsBin}" Classes.asking="{Binding IsAsking}"
+											IsEnabled="{Binding IsEnabled}"
+											AutomationProperties.AutomationId="ActMenu_Icon"
+											AutomationProperties.Name="{Binding Shown}"
+											ToolTip.Tip="{Binding IconTip}" ToolTip.ShowOnDisabled="True"
+											Click="Act_Click">
+										<StackPanel>
+											<Path Classes="pin" Classes.art="{Binding IsArt}" Data="{Binding Shape}"/>
+											<!-- Both of its words are laid out from the start, the one not said undrawn: the icon
+											     is as wide as the wider of them, so the menu does not grow as a bin turns to
+											     its question (it pushed the layout about, the menu growing - measured,
+											     288 to 310 across, each icon 62 to 67
+											     and every icon after the first pushed along). -->
+											<Panel>
+												<TextBlock Text="{Binding Label}" Classes.unsaid="{Binding IsAsking}"/>
+												<TextBlock Text="{Binding Confirm}" Classes.unsaid="{Binding !IsAsking}"/>
+											</Panel>
+										</StackPanel>
+									</Button>
+								</Panel>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</Border>
+				<Border Classes="menurule" IsVisible="{Binding HasIcons}"/>
+
+				<ItemsControl Name="RowList" ItemsSource="{Binding Rows}" Grid.IsSharedSizeScope="True"
+							  ItemTemplate="{StaticResource MenuRow}"/>
+			</StackPanel>
+		</Border>
+	</Popup>
+
+	<!-- The list a row opens ("Sort by", which Explorer, Finder and Dolphin all have in the menu
+	     of empty room - the one list inside a list the guidelines allow): beside the row, opened as the pointer
+	     comes over it, by a click, or by Right; shut by Left, Esc, or the pointer on another row. -->
+	<Popup Name="Sub" Placement="RightEdgeAlignedTop" IsLightDismissEnabled="False" HorizontalOffset="-8" VerticalOffset="-18">
+		<Border Name="SubFrame" Classes="pickerpanel" Padding="0,6" MinWidth="170"
+				AutomationProperties.AutomationId="ActMenu_More" AutomationProperties.AccessibilityView="Control"
+				Effect="drop-shadow(0 2 12 Black)" Margin="12">
+			<Border.Styles>
+				<StyleInclude Source="/Styles/CommonControls/ActMenu.axaml"/>
+			</Border.Styles>
+			<ItemsControl Name="SubRows" Grid.IsSharedSizeScope="True" ItemTemplate="{StaticResource MenuRow}"/>
+		</Border>
+	</Popup>
+	</Panel>
+</UserControl>

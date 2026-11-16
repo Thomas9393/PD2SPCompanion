@@ -1,0 +1,80 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             x:Class="PD2SPCompanion.Shell.CustomControls.Base.SocketRow"
+			 x:DataType="vm:ItemTileViewModel">
+	<!--
+	  An item's sockets: a dark hole for an empty one, the gem or rune's own art for a filled one.
+	  DataContext is the item's tile.
+
+	      <base:SocketRow/>                                   over the art in a grid cell or a worn
+	                                                          slot, each hole where the game puts
+	                                                          it (SocketLayout)
+	      <base:SocketRow DataContext="{Binding Tile}"
+	                      IsOneRow="True" Scale="0.8"/>       under the art on a vault card, one
+	                                                          row, smaller
+
+	  Lifted out of ContainerGrid when the vault card wanted the same sockets. The item's shape is
+	  right over the art and wrong under it: a staff is one cell wide, so its sockets came out as a
+	  column down the card.
+	-->
+	<UserControl.Styles>
+		<Style Selector="Ellipse.hole">
+			<Setter Property="StrokeThickness" Value="1"/>
+			<Setter Property="Stroke" Value="#B4000000"/>
+			<Setter Property="Fill" Value="#7F000000"/>
+		</Style>
+	</UserControl.Styles>
+
+	<UserControl.Resources>
+		<DataTemplate x:Key="Socket" x:DataType="vm:SocketViewModel">
+			<Panel Width="{Binding Size}" Height="{Binding Size}">
+				<Ellipse Classes="hole"
+						 Width="{Binding HoleSize}"
+						 Height="{Binding HoleSize}"
+						 IsVisible="{Binding IsEmpty}"/>
+				<Image Source="{Binding Sprite}"
+					   Stretch="Uniform"
+					   IsVisible="{Binding IsFilled}"/>
+			</Panel>
+		</DataTemplate>
+	</UserControl.Resources>
+
+	<!-- Scaled for layout, not only for drawing, so a smaller row takes less room too. -->
+	<LayoutTransformControl Name="Scaler" IsVisible="{Binding HasSockets}">
+		<Panel>
+			<!-- Where the game puts them: on a box the item's own size, each hole at its place, all
+			     in one cell of a Panel and pushed there by a margin. A Canvas set from a container
+			     style drew every hole at the corner. -->
+			<ItemsControl ItemsSource="{Binding Sockets}"
+						  Width="{Binding Width}" Height="{Binding Height}"
+						  IsVisible="{Binding !$parent[base:SocketRow].IsOneRow}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Panel/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="vm:SocketViewModel">
+						<ContentControl Content="{Binding}"
+										ContentTemplate="{StaticResource Socket}"
+										Margin="{Binding Place}"
+										HorizontalAlignment="Left" VerticalAlignment="Top"/>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+
+			<!-- In one row, however the item is shaped. -->
+			<ItemsControl ItemsSource="{Binding Sockets}"
+						  IsVisible="{Binding $parent[base:SocketRow].IsOneRow}"
+						  ItemTemplate="{StaticResource Socket}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel Orientation="Horizontal"/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+			</ItemsControl>
+		</Panel>
+	</LayoutTransformControl>
+</UserControl>

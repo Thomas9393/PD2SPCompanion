@@ -1,0 +1,61 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The small framed box a value is typed into: the item panel's property rows, the left
+	  page's gold line, and the map seed. One file because it is one component; it was written
+	  out twice before this.
+
+	  :is, because some of those boxes are a TextBox subclass and a type selector matches that
+	  type exactly.
+	-->
+	<!--
+	  Fluent paints a watermark from TextControlPlaceholderForeground, never from the box's own
+	  Foreground, and its theme carries no PART_Watermark to reach with a /template/ selector.
+	  Without these three the placeholder comes out black on a dark panel.
+	-->
+	<Styles.Resources>
+		<SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#808080"/>
+		<SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#808080"/>
+		<SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#808080"/>
+	</Styles.Resources>
+
+	<Style Selector=":is(TextBox).value">
+		<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+		<Setter Property="Height" Value="26"/>
+		<Setter Property="MinHeight" Value="0"/>
+		<Setter Property="Padding" Value="2,0"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="TextAlignment" Value="Center"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Field}"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		<Setter Property="CaretBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="2"/>
+	</Style>
+	<!-- A box of numbers has the slim inside (ControlThemes/TextBox/NumberBox.axaml): the frame and the text,
+	     4 controls where the framework's text box is 21 - and a property row has one. Found by the class the
+	     box gives itself (NumericTextBox.NumberClass): it styles itself as a TextBox, so no selector can ask
+	     for its type. -->
+	<Style Selector=":is(TextBox).number">
+		<Setter Property="Theme" Value="{DynamicResource [CtrlThm] NumberBox}"/>
+	</Style>
+	<Style Selector=":is(TextBox).value /template/ Border#PART_BorderElement">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Field}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+	</Style>
+	<!-- What is typed cannot be read - a date that is not one. Framed in the bin's red, and the
+	     value is left out of whatever it was for rather than guessed at. -->
+	<Style Selector=":is(TextBox).value.invalid /template/ Border#PART_BorderElement">
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Broken items}"/>
+	</Style>
+	<!-- And its words in the caution colour: a worth or a bound that is not a number is kept as
+	     typed, and said so. Here rather than per page since the trading pages and the payment
+	     panel all wanted it. -->
+	<Style Selector=":is(TextBox).value.invalid">
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+	</Style>
+</Styles>

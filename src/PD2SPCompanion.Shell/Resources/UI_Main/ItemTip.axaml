@@ -1,0 +1,47 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+                    xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base">
+	<!-- The item as the game's own tooltip puts it: the name in its quality's colour, then what
+	     it is worth and what it does. One copy for the app: the grids, the worn slots and the
+	     trade panel. The worn slots had kept an older copy of their own, without the rules.
+	     Its lines take their colours from ItemWording.axaml, which the page must include. -->
+	<DataTemplate x:Key="ItemTip" x:DataType="vm:ItemTileViewModel">
+		<StackPanel MaxWidth="{StaticResource [UI] Tip Wide}" HorizontalAlignment="Stretch">
+			<!-- The name with its socket count after it, as the game heads a tooltip: Stone Barb [4]. -->
+			<TextBlock Text="{Binding Title}"
+					   Foreground="{Binding RarityBrush}"
+					   FontWeight="Bold" TextWrapping="Wrap"
+					   HorizontalAlignment="Center" TextAlignment="Center"/>
+
+			<!-- The lines, drawn by one control (ItemFactLines): a line was six controls,
+			     and a tooltip of twenty lines was built of some hundred and fifty at every hover. It draws a
+			     line as those drew it - the words wrapped, the game's asterisks after them, the green bracket
+			     beside or under, a rule as wide as the lines - in the middle, as a tooltip has them. -->
+			<base:ItemFactLines Items="{Binding Tooltip}" IsCentered="True"/>
+		</StackPanel>
+	</DataTemplate>
+
+	<!-- One line of an item on a card rather than in a tooltip: left-aligned, with its green
+	     bracket. The vault card and the grail card each wrote this out; the trade frame wanted a
+	     third, and it is one here. A wrap panel, not a stack: a horizontal stack measures against
+	     infinite width, so a long line never wrapped and its bracket was cut off by the edge. -->
+	<DataTemplate x:Key="ItemLine" x:DataType="vm:ItemFact">
+		<WrapPanel>
+			<!-- The asterisks as in the tooltip above. -->
+			<TextBlock TextWrapping="Wrap"
+					   Classes.fact="{Binding IsFact}"
+					   Classes.magic="{Binding IsMagic}"
+					   Classes.corrupt="{Binding IsCorrupt}"
+					   Classes.desecrate="{Binding IsDesecrate}"
+					   Classes.skin="{Binding IsSkin}"
+					   Classes.runes="{Binding IsRunes}"
+					   Classes.warn="{Binding IsWarning}"
+					   Classes.unmet="{Binding IsUnmet}"
+					   Classes.setbonus="{Binding IsSetBonus}"><Run Text="{Binding Text}"/><Run Text="{Binding CorruptStar}" Foreground="{DynamicResource [Text] Corrupted}"/><Run Text="{Binding DesecrateStar}" Foreground="{DynamicResource [Brush] Rarity - Unique items}"/></TextBlock>
+<TextBlock Text="{Binding Range}" Classes="bracket" Margin="5,0,0,0"
+					   IsVisible="{Binding HasRange}"/>
+		</WrapPanel>
+	</DataTemplate>
+
+</ResourceDictionary>

@@ -1,0 +1,57 @@
+﻿<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:PD2SPCompanion.Shell"
+			 xmlns:viewlocator="using:PD2SPCompanion.Shell.Helper.ViewLocator"
+			 
+             x:Class="PD2SPCompanion.Shell.App"
+             RequestedThemeVariant="Dark">
+	<!-- Always dark: the pages are drawn dark, and text left to the theme followed Windows' light or
+	     dark setting (no light mode is planned). -->
+
+	<Application.Resources>
+		<ResourceDictionary>
+			<!-- Custom Fonts -->
+			<!-- The titles' face: Cinzel (SIL Open Font License), Regular and Bold cut from its variable font and
+			     fitted to the measure the pages were laid out for (tools/fonts/build-cinzel.py). A font the player
+			     puts in the Fonts folder beside the editor takes its place at the next start (Services/Settings/
+			     TitleFont) - the game's Exocet and its lookalike AvQest may not be shipped. Credited in
+			     THIRD-PARTY-NOTICES.md. -->
+			<FontFamily x:Key="DiabloFont">avares://PD2SPCompanion.Shell/Assets/Fonts/#Cinzel</FontFamily>
+
+			<!-- The whole color schemes and palettes are decalred here. -->
+			<ResourceDictionary.MergedDictionaries>
+				<!-- Theme and Color/Brush Resources -->
+				<ResourceInclude Source="/Resources/ColorPalette/Theme_Standard.axaml"/>
+				<ResourceInclude Source="/Resources/UI_Main/BasicSettings.axaml"/>
+				<ResourceInclude Source="/Resources/UI_Main/Text.axaml"/>
+				<ResourceInclude Source="/Resources/UI_Main/Typography.axaml"/>
+				<ResourceInclude Source="/Resources/UI_Main/Glyphs.axaml"/>
+				<ResourceInclude Source="/Resources/UI_Main/Animation.axaml"/>
+				<ResourceInclude Source="/Resources/UI_Main/ItemTip.axaml"/>
+				<ResourceInclude Source="/Resources/UI_Main/FoundRows.axaml"/>
+				
+				<!-- Control Themes -->
+				<ResourceInclude Source="/ControlThemes/Button/Button_Action.axaml"/>
+				<ResourceInclude Source="/ControlThemes/Button/Button_Flat.axaml"/>
+				<ResourceInclude Source="/ControlThemes/ScrollBar/ScrollBar_D2.axaml"/>
+				<ResourceInclude Source="/ControlThemes/Slider/Slider_Flat.axaml"/>
+				<ResourceInclude Source="/ControlThemes/TextBox/NumberBox.axaml"/>
+				<ResourceInclude Source="/ControlThemes/ToggleButton/TButton_SideBar.axaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Application.Resources>
+
+	<Application.Styles>
+		<FluentTheme />
+
+		<!-- Common Controls-->
+		<StyleInclude Source="/Styles/CommonControls/Image.axaml"/>
+		<!-- Every frame's fill inside its line (Border.axaml). -->
+		<StyleInclude Source="/Styles/CommonControls/Border.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ToolTip.axaml"/>
+		<!-- Every icon in a page or a popup: one size, one stroke (Glyphs.axaml). -->
+		<StyleInclude Source="/Styles/CommonControls/Glyph.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Flyout.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/TextSelection.axaml"/>
+	</Application.Styles>
+</Application>

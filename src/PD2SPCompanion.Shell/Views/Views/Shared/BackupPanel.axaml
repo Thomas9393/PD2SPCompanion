@@ -1,0 +1,118 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="760"
+             x:Class="PD2SPCompanion.Shell.Views.BackupPanel"
+             x:DataType="vm:VP_ViewModel_Default_L">
+
+	<!-- The open character's backups, as a picker over the landing page's left half, where the card is, opened
+	     from the card's Backups button (it was the "Earlier copies" fold in the card). Dressed
+	     as the map seed's picker. Opening one shows it on the card; the card's Restore and Close backup act
+	     on it. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<!-- For the sort menu and the bin it hosts, which wear it (SortMenu, BinButton). -->
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/RowIcon.axaml"/>
+
+		<Style Selector="ListBox.backups">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="Padding" Value="0"/>
+		</Style>
+		<Style Selector="ListBox.backups ListBoxItem">
+			<Setter Property="Padding" Value="6,3"/>
+			<Setter Property="CornerRadius" Value="2"/>
+		</Style>
+		<Style Selector="ListBox.backups ListBoxItem /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="ListBox.backups ListBoxItem:pointerover /template/ ContentPresenter, ListBox.backups ListBoxItem:focus-visible /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		</Style>
+		<!-- The chosen backup: gold, as every "current" (it was the red wash). -->
+		<Style Selector="ListBox.backups ListBoxItem:selected /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Selection - Current}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary Hover Edge}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+		</Style>
+	</UserControl.Styles>
+
+	<Border Classes="veil"
+			IsVisible="{Binding IsBackupPickerPresent}"
+			Classes.shown="{Binding ShowBackups}"
+			IsHitTestVisible="{Binding ShowBackups}">
+		<Panel>
+			<Button Classes="backdrop" Command="{Binding CloseBackupPickerCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<Border Classes="pickerpanel">
+					<DockPanel>
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+							<TextBlock Grid.Column="0" Classes="pickertitle" Text="{L 'Backups'}"/>
+							<Button Grid.Column="1" Classes="spend"
+									Command="{Binding CloseBackupPickerCommand}"
+									ToolTip.Tip="{L 'Close'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</Grid>
+
+						<TextBlock DockPanel.Dock="Top" Classes="dim" Margin="0,0,0,8" TextWrapping="Wrap"
+								   Text="{L 'Restore replaces current character.'}"/>
+
+						<TextBlock DockPanel.Dock="Top" Classes="dim" IsVisible="{Binding !HasBackups}"
+								   Text="{L 'No backups.'}"/>
+
+						<!-- Newest first; the one on screen is marked. -->
+						<ListBox Classes="backups"
+								 ItemsSource="{Binding Backups}"
+								 SelectedIndex="{Binding OpenBackupIndex}"
+								 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+								 ScrollViewer.AllowAutoHide="False">
+							<ListBox.ItemTemplate>
+								<DataTemplate x:DataType="vm:BackupOption">
+									<Grid ColumnDefinitions="*,Auto,Auto,Auto">
+										<!-- When, and what it was taken before - literally the state just
+										     before that action. -->
+										<StackPanel Grid.Column="0" VerticalAlignment="Center">
+											<TextBlock Text="{Binding When}" Foreground="{DynamicResource [Text] Body}" FontSize="{StaticResource [Type] Body}"/>
+											<TextBlock Text="{Binding Caption}" Classes="dim"
+													   IsVisible="{Binding HasCaption}"
+													   TextTrimming="CharacterEllipsis"
+													   ToolTip.Tip="{Binding Caption}"/>
+										</StackPanel>
+										<TextBlock Grid.Column="1" Text="{Binding Size}"
+												   Classes="dim" VerticalAlignment="Center"
+												   Margin="0,0,10,0"/>
+
+										<!-- An open folder and a bin. The row is narrow, and
+										     both read faster as pictures than as words. -->
+										<Button Grid.Column="2" Classes="rowicon"
+												Command="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).OpenBackupCommand}"
+												CommandParameter="{Binding}"
+												ToolTip.Tip="{L 'Open backup'}">
+											<Path Classes="pin" Data="{StaticResource [Glyph] Open folder}"/>
+										</Button>
+
+										<!-- Asks twice: a backup is the last way back. -->
+										<base:BinButton Grid.Column="3" Compact="True" VerticalAlignment="Center" Margin="3,0,0,0"
+														Command="{Binding $parent[ListBox].((vm:VP_ViewModel_Default_L)DataContext).DeleteBackupCommand}"
+														CommandParameter="{Binding}"
+														IsArmed="{Binding IsArmed}"
+														Tip="{L 'Delete backup'}"/>
+									</Grid>
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+						</ListBox>
+					</DockPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+</UserControl>

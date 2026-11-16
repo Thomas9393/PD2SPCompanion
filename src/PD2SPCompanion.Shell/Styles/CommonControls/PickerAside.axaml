@@ -1,0 +1,21 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  A picker row's dim aside. The item panel's rule for a row's text (Button.pickone TextBlock, VP_View_Inv_R)
+	  paints every text in it bright and body size - over a value set on the text itself, too (measured: #F2E9D2,
+	  the body's). Included by a list of its own, nearer the text than the panel's and so applied after it, it keeps
+	  the aside dim. Only where included: other pickers' rows wear the class and are left as they read.
+
+	      <ItemsControl.Styles>
+	          <StyleInclude Source="/Styles/CommonControls/PickerAside.axaml"/>
+	      </ItemsControl.Styles>
+	      ... <TextBlock Classes="dim" Text="{Binding Aside}"/>
+
+	  The Forge's finds (a variant, a base's tier) and the affix picker's twin rows (what tells them apart; it was noisy
+	  and hard to read).
+	-->
+	<Style Selector="Button.pickone TextBlock.dim">
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+	</Style>
+</Styles>

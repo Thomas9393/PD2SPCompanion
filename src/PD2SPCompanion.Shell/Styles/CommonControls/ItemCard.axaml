@@ -1,0 +1,41 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  A list of item cards: each entry framed in dim gold, lit under the pointer, brighter and
+	  filled when selected. Class "itemcards" on the ListBox; the card's height and anything
+	  particular to one list stay with that list.
+
+	  Lifted out of the vault page when the grail wanted the same cards.
+	-->
+	<Style Selector="ListBox.itemcards">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="Padding" Value="6,6,0,6"/>
+	</Style>
+	<Style Selector="ListBox.itemcards ListBoxItem">
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="Padding" Value="8"/>
+		<Setter Property="Margin" Value="3"/>
+		<Setter Property="Cursor" Value="Hand"/>
+	</Style>
+	<!-- Framed always, the way a character card is: a shelf of things, and a card with no edge
+	     reads as a paragraph rather than an object. Selection brightens the frame rather than
+	     being the only thing that draws one. 1 thick, as every gold frame (it
+	     was 1.5). -->
+	<Style Selector="ListBox.itemcards ListBoxItem /template/ ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Card}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="CornerRadius" Value="2"/>
+	</Style>
+	<Style Selector="ListBox.itemcards ListBoxItem:pointerover /template/ ContentPresenter, ListBox.itemcards ListBoxItem:focus-visible /template/ ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+	</Style>
+	<!-- Selected: the tiles' light-gold ring, 2 thick, no fill (it was a red wash). -->
+	<Style Selector="ListBox.itemcards ListBoxItem:selected /template/ ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Card}"/>
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary Hover Edge}"/>
+	</Style>
+</Styles>

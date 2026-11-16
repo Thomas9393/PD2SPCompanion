@@ -1,0 +1,30 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  A stack's count, drawn on the item's art at the bottom left, where the game puts it. A
+	  TextBlock with class "qty" laid over the sprite, in a Panel the sprite's own size:
+
+	      <TextBlock Classes="qty" Classes.capped="{Binding IsQuantityCapped}"
+	                 IsVisible="{Binding HasQuantity}" Text="{Binding QuantityText}"/>
+
+	  Written out identically in the container grid and the inventory page (the page's copy
+	  without the capped colour) until the vault wanted it a third time.
+	-->
+	<!-- type-guard-ok: drawn on an item tile, as the game draws it. -->
+	<!-- color-guard-ok: drawn on an item tile, as the game draws it. -->
+	<Style Selector="TextBlock.qty">
+		<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+		<Setter Property="FontSize" Value="13"/>
+		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="HorizontalAlignment" Value="Left"/>
+		<Setter Property="VerticalAlignment" Value="Bottom"/>
+		<Setter Property="Margin" Value="2,0,0,1"/>
+		<Setter Property="IsHitTestVisible" Value="False"/>
+	</Style>
+
+	<!-- More than a cell can write: drawn as 999 in green, the true count in the tooltip. Green
+	     rather than gold, which vanished against the grey of the rune art. -->
+	<Style Selector="TextBlock.qty.capped">
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+	</Style>
+</Styles>

@@ -1,0 +1,301 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             xmlns:core="using:PD2SPCompanion.Core.Collection"
+             xmlns:views="using:PD2SPCompanion.Shell.Views"
+             x:Class="PD2SPCompanion.Shell.Views.ForgePanel"
+             x:DataType="vm:ForgeViewModel">
+	<!-- The Forge: the item panel itself (VP_View_Inv_R), as a
+	     page that makes its item. The panel's holder shows the item being made, with FORGE in its corner, where
+	     Edit had KEEP and UNDO; what it is leads the sections - the search panel's own boxes (type, base,
+	     rarity, and the item where the rarity names one) - and the Edit page's sections follow, so what is made
+	     is changed here. Nothing waits on KEEP: the item is in no file, so every change is written as it is
+	     made (the host keeps at once). Nothing here is new dress. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ComboBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+
+		<!-- A box with nothing to offer yet - a base before its type, an item where the rarity names none - and
+		     its label: greyed, the box's own disabled dress being only a dimmer text, which an empty box has none of. -->
+		<Style Selector="TextBlock.off, ComboBox.off">
+			<Setter Property="Opacity" Value="0.45"/>
+		</Style>
+	</UserControl.Styles>
+
+	<views:VP_View_Inv_R DataContext="{Binding Editor}" IsBare="True" EmptyText="{L 'Choose what to forge below.'}">
+		<!-- The corner of the item's holder: the page's action first, FORGE, where Edit had KEEP and UNDO - and
+		     after it the secondary one, RESET: the item made afresh from the boxes below, every change to it
+		     gone. The primary action at the left and the secondary to its right, as the
+		     Experimental page's APPLY, REMOVE, SHORTCUT stand. RESET is dim while the
+		     item is as made. Not a button that empties the page. -->
+		<views:VP_View_Inv_R.Actions>
+			<StackPanel DataContext="{Binding $parent[views:ForgePanel].DataContext}" x:DataType="vm:ForgeViewModel"
+						Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+				<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" VerticalAlignment="Center"
+						HorizontalContentAlignment="Stretch"
+						Theme="{DynamicResource [CtrlThm] Button_Primary}"
+						AutomationProperties.AutomationId="Forge_Make"
+						Command="{Binding ForgeCommand}"
+						ToolTip.Tip="{Binding ForgeTip}">
+					<Grid ColumnDefinitions="Auto,*">
+						<Path Classes="pin label" Data="{StaticResource [Glyph] Anvil}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+						<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'FORGE'}"/>
+					</Grid>
+				</Button>
+				<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" VerticalAlignment="Center"
+						HorizontalContentAlignment="Stretch"
+						Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+						AutomationProperties.AutomationId="Forge_Reset"
+						Command="{Binding ResetCommand}">
+					<Grid ColumnDefinitions="Auto,*">
+						<!-- Filled, as the game-icons art is, and in the label's own color so it dims with it. -->
+						<Path Classes="pin art" Data="{StaticResource [Glyph] Reset settings}" Grid.Column="0"
+							  Fill="{Binding $parent[Button].Foreground}"
+							  HorizontalAlignment="Left" VerticalAlignment="Center"/>
+						<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'RESET'}"/>
+					</Grid>
+				</Button>
+			</StackPanel>
+		</views:VP_View_Inv_R.Actions>
+
+		<views:VP_View_Inv_R.Lead>
+			<!-- What to make. The search panel's boxes, two to a row, each a label over its picker: the type, then
+			     the base within it, then what it is - and where that is a unique, a set piece or a runeword, which
+			     item: a base can carry several. Typing a name or a base over them lists what there is, and one
+			     chosen fills all four. -->
+			<Border DataContext="{Binding $parent[views:ForgePanel].DataContext}" x:DataType="vm:ForgeViewModel"
+					Classes="section" Margin="0,0,0,10" Padding="10,8">
+				<StackPanel>
+					<!-- The heading, and at its right the game's own copy of an item (Ctrl+C over one in game) made
+					     again (ForgeViewModel.Paste) - on the heading's line, where the other
+					     sections keep their buttons, and never the search box: that is for a name. The button is lit
+					     while the clipboard holds such an item, and names it; greyed, it says what it waits for.
+					     The clipboard is looked at when the window comes to the front and when this page is shown -
+					     never on a timer (ForgeViewModel.Peek). -->
+					<Grid ColumnDefinitions="*,Auto">
+						<!-- The paste button with nothing to paste: its glyph as bright as when it
+						     can be clicked, no frame, and nothing to click - it only says, in its tooltip, what it waits
+						     for. With an item copied it is the whole button again, frame and all. So the page always
+						     shows that an item can be pasted, and the frame alone says when. (Greyed at the small
+						     buttons' own 0.25 it left the page; with its frame kept and the glyph dimmed it read as a
+						     button that should work.) Here and not among the page's styles: the item panel under the
+						     page brings the small buttons' rules itself, nearer the button than the page's and so
+						     applied after them. -->
+						<Grid.Styles>
+							<Style Selector="Button.spend.waits:disabled">
+								<Setter Property="Opacity" Value="1"/>
+							</Style>
+							<!-- The item panel greys a disabled small button's glyph itself; not this one's. -->
+							<Style Selector="Button.spend.waits:disabled Path">
+								<Setter Property="Opacity" Value="1"/>
+								<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+							</Style>
+							<!-- The frame is the template's. -->
+							<Style Selector="Button.spend.waits:disabled /template/ ContentPresenter#PART_ContentPresenter">
+								<Setter Property="Background" Value="Transparent"/>
+								<Setter Property="BorderBrush" Value="Transparent"/>
+							</Style>
+						</Grid.Styles>
+						<Button Grid.Column="0" Classes="fold" Command="{Binding ToggleSearchCommand}">
+							<Grid ColumnDefinitions="Auto,*">
+								<Path Grid.Column="0" Classes="chevron"
+									  Classes.open="{Binding SearchOpen}"
+									  Data="{StaticResource [Glyph] Chevron}"/>
+								<TextBlock Grid.Column="1" Classes="section" Text="{L 'Search'}"/>
+							</Grid>
+						</Button>
+						<Button Grid.Column="1" Classes="spend waits" Margin="6,0,0,0"
+								AutomationProperties.AutomationId="Forge_Paste"
+								AutomationProperties.HelpText="{Binding PasteTip}"
+								Command="{Binding PasteCopiedCommand}"
+								ToolTip.ShowOnDisabled="True">
+							<ToolTip.Tip>
+								<StackPanel>
+									<TextBlock Text="{Binding PasteTip}"/>
+									<TextBlock IsVisible="{Binding !CanPaste}"
+											   Text="{L 'Require an item copied with Ctrl + C, in game or here.'}"/>
+								</StackPanel>
+							</ToolTip.Tip>
+							<Path Classes="pin" Data="{StaticResource [Glyph] Paste}"/>
+						</Button>
+					</Grid>
+
+				<StackPanel Spacing="8" Margin="0,10,0,0" IsVisible="{Binding SearchOpen}">
+					<Grid ColumnDefinitions="*,Auto">
+						<base:SearchBox Grid.Column="0" Classes="value" Height="28" FontSize="{StaticResource [Type] Body}"
+								 HorizontalAlignment="Stretch"
+								 AutomationProperties.AutomationId="Forge_Search"
+								 Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"/>
+						<TextBlock Grid.Column="1" Classes="dim" Margin="10,0,2,0" VerticalAlignment="Center"
+								   IsVisible="{Binding HasMatches}"
+								   Text="{Binding CountText}"/>
+					</Grid>
+
+					<!-- What the search finds: the name as the item wears it, the base it is on dim at the right - a base's
+					     tier for a base - as the Base box says a tier. A runeword's kinds are a list that runs long:
+					     on a line of their own, wrapped. -->
+					<!-- Forty at a time: scrolled to the end, the next forty join the list (ForgeViewModel.LoadMore). -->
+					<ScrollViewer MaxHeight="168" IsVisible="{Binding HasMatches}"
+								  HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False"
+								  ScrollChanged="OnMatchesScrolled">
+						<!-- In here a find is a picker's row, and the item panel's rule for a row's text paints its
+						     aside as bright as the name: kept dim by the list's own (PickerAside.axaml). -->
+						<ScrollViewer.Styles>
+							<StyleInclude Source="/Styles/CommonControls/PickerAside.axaml"/>
+						</ScrollViewer.Styles>
+						<!-- Down or Enter from the search box steps into the finds, Up and Down walk them (ListKeys). -->
+						<ItemsControl ItemsSource="{Binding Matches}" base:ListKeys.IsList="True">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="vm:ForgeChoice">
+									<Button Classes="pickone" Margin="0,0,0,2"
+											Command="{Binding $parent[ItemsControl].((vm:ForgeViewModel)DataContext).PickCommand}"
+											CommandParameter="{Binding}">
+										<StackPanel>
+											<Grid ColumnDefinitions="Auto,*,Auto">
+												<TextBlock Grid.Column="0" Text="{Binding Name}" Foreground="{Binding Brush}"
+														   TextTrimming="CharacterEllipsis"/>
+												<!-- One of several rows of its name: which, after the name. -->
+												<TextBlock Grid.Column="1" Classes="dim" Margin="6,0,0,0"
+														   IsVisible="{Binding HasVariant}"
+														   VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+														   Text="{Binding VariantShown}"/>
+												<TextBlock Grid.Column="2" Classes="dim" Margin="12,0,0,0"
+														   IsVisible="{Binding HasAside}"
+														   VerticalAlignment="Center"
+														   Text="{Binding Detail}"/>
+											</Grid>
+											<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" TextWrapping="Wrap"
+													   IsVisible="{Binding IsWord}"
+													   Text="{Binding Detail}"/>
+										</StackPanel>
+									</Button>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</ScrollViewer>
+
+					<Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,Auto,8,Auto,Auto">
+						<TextBlock Grid.Row="0" Grid.Column="0" Classes="fieldname" Text="{L 'Type'}" Margin="0,0,0,4"/>
+						<ComboBox Grid.Row="1" Grid.Column="0" Classes="slots" HorizontalAlignment="Stretch"
+								  AutomationProperties.Name="Type"
+								  ItemsSource="{Binding TypeChoices}"
+								  SelectedItem="{Binding Type, Mode=TwoWay}">
+							<ComboBox.ItemTemplate>
+								<DataTemplate x:DataType="core:ForgeSearch+Choice">
+									<TextBlock Text="{Binding Shown}" TextTrimming="CharacterEllipsis" base:TrimmedTip.Tip="{Binding Shown}"/>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+
+						<TextBlock Grid.Row="0" Grid.Column="2" Classes="fieldname" Classes.off="{Binding !CanPickBase}"
+								   Text="{L 'Base'}" Margin="0,0,0,4"/>
+						<!-- The holder's item taken a tier up (the Horadric Cube's button there, or a paste): said
+						     at the label's right, where nothing stands - the box keeps the base the item is made
+						     as, and any box changed makes the item afresh. -->
+						<TextBlock Grid.Row="0" Grid.Column="2" Classes="dim" FontSize="{StaticResource [Type] Small}"
+								   HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,0,4"
+								   AutomationProperties.AutomationId="Forge_Upgraded"
+								   IsVisible="{Binding HasUpgradeNote}"
+								   Text="{Binding UpgradeNote}"/>
+						<!-- A base is picked within a type, so it waits for one - or for a runeword, which lists the bases that take it. -->
+						<ComboBox Grid.Row="1" Grid.Column="2" Classes="slots" Classes.off="{Binding !CanPickBase}"
+								  HorizontalAlignment="Stretch"
+								  AutomationProperties.Name="Base"
+								  IsEnabled="{Binding CanPickBase}"
+								  HorizontalContentAlignment="Stretch"
+								  ItemsSource="{Binding BaseChoices}"
+								  SelectedItem="{Binding Base, Mode=TwoWay}">
+							<!-- Its tier at the right - normal, exceptional, elite - as a find says its base; the list
+							     goes by tier, then by name. -->
+							<ComboBox.ItemTemplate>
+								<DataTemplate x:DataType="core:ForgeSearch+Choice">
+									<Grid ColumnDefinitions="*,Auto">
+										<TextBlock Grid.Column="0" Text="{Binding Shown}" TextTrimming="CharacterEllipsis"/>
+										<TextBlock Grid.Column="1" Classes="dim" Margin="12,0,0,0"
+												   IsVisible="{Binding HasTier}"
+												   Text="{Binding TierShown}"/>
+									</Grid>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+
+						<TextBlock Grid.Row="3" Grid.Column="0" Classes="fieldname" Text="{L 'Rarity'}" Margin="0,0,0,4"/>
+						<ComboBox Grid.Row="4" Grid.Column="0" Classes="slots" HorizontalAlignment="Stretch"
+								  AutomationProperties.Name="Rarity"
+								  ItemsSource="{Binding RarityChoices}"
+								  SelectedItem="{Binding Rarity, Mode=TwoWay}">
+							<ComboBox.ItemTemplate>
+								<DataTemplate x:DataType="core:ForgeSearch+Choice">
+									<TextBlock Text="{Binding Shown}" TextTrimming="CharacterEllipsis" base:TrimmedTip.Tip="{Binding Shown}"/>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+
+						<TextBlock Grid.Row="3" Grid.Column="2" Classes="fieldname" Classes.off="{Binding !CanPickName}"
+								   Text="{L 'Item'}" Margin="0,0,0,4"/>
+						<!-- Which unique, set piece or runeword: the other rarities name no item, and the box is greyed.
+						     With several to choose from and none chosen, it says what to choose. -->
+						<ComboBox Grid.Row="4" Grid.Column="2" Classes="slots" Classes.off="{Binding !CanPickName}"
+								  HorizontalAlignment="Stretch"
+								  AutomationProperties.Name="Item"
+								  HorizontalContentAlignment="Stretch"
+								  IsEnabled="{Binding CanPickName}"
+								  PlaceholderText="{Binding NameHint}"
+								  ItemsSource="{Binding NameChoices}"
+								  SelectedItem="{Binding Named, Mode=TwoWay}">
+							<!-- The list as the finds are: a unique's base at the right of its name, a runeword's kinds
+							     under it and wrapped - held to the box's own width, so a long list of kinds neither
+							     crowds its line nor widens the list. -->
+							<ComboBox.ItemTemplate>
+								<DataTemplate x:DataType="vm:ForgeChoice">
+									<StackPanel MaxWidth="{Binding $parent[ComboBox].Bounds.Width}">
+										<Grid ColumnDefinitions="Auto,*,Auto">
+											<TextBlock Grid.Column="0" Text="{Binding Name}" Foreground="{Binding Brush}"
+													   TextTrimming="CharacterEllipsis"/>
+											<TextBlock Grid.Column="1" Classes="dim" Margin="6,0,0,0"
+													   IsVisible="{Binding HasVariant}"
+													   VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+													   Text="{Binding VariantShown}"/>
+											<TextBlock Grid.Column="2" Classes="dim" Margin="12,0,0,0"
+													   IsVisible="{Binding HasAside}"
+													   VerticalAlignment="Center"
+													   Text="{Binding Detail}"/>
+										</Grid>
+										<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" TextWrapping="Wrap"
+												   IsVisible="{Binding IsWord}"
+												   Text="{Binding Detail}"/>
+									</StackPanel>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+							<!-- Closed, one line: the name, and at the right what it is on, as far as there is room. -->
+							<ComboBox.SelectionBoxItemTemplate>
+								<DataTemplate x:DataType="vm:ForgeChoice">
+									<!-- As the Base box shows its tier: the name, and what it is on dim at the right. -->
+									<Grid ColumnDefinitions="Auto,Auto,*">
+										<TextBlock Grid.Column="0" Text="{Binding Name}" Foreground="{Binding Brush}"/>
+										<TextBlock Grid.Column="1" Classes="dim" Margin="6,0,0,0"
+												   IsVisible="{Binding HasVariant}"
+												   VerticalAlignment="Center"
+												   Text="{Binding VariantShown}"/>
+										<TextBlock Grid.Column="2" Classes="dim" Margin="12,0,0,0"
+												   HorizontalAlignment="Right" VerticalAlignment="Center"
+												   TextTrimming="CharacterEllipsis"
+												   Text="{Binding Detail}"/>
+									</Grid>
+								</DataTemplate>
+							</ComboBox.SelectionBoxItemTemplate>
+						</ComboBox>
+					</Grid>
+				</StackPanel>
+				</StackPanel>
+			</Border>
+		</views:VP_View_Inv_R.Lead>
+	</views:VP_View_Inv_R>
+</UserControl>

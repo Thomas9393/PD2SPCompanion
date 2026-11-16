@@ -1,0 +1,16 @@
+# Style selectors already declared in more than one view when the reuse guard
+# went in. Each is a component that should be one shared file and is not yet.
+#
+# The guard fails the build on any duplicate NOT listed here, so the debt cannot
+# grow while it is paid down. Delete a line when its selector is extracted to
+# Styles/CommonControls and the pages include it - never add one.
+#
+# 33 entries when written. Four paid off by CustomControls/Base/ContainerGrid, which
+# both grids now use, and two more by CommonControls/SpendButton.axaml - the chrome of
+# the small square button, which three pages had each written out. Its glyph rules stay
+# local: the character page draws a 12px arrow, the inventory panels 11px, and that is a
+# real difference. Three more by CommonControls/Tab.axaml, when the grail wanted tabs.
+# Seven more: Button.action and Button.fold had moved to ActionIcon and
+# Fold, and Button.spend:disabled Path is left in one view only.
+
+

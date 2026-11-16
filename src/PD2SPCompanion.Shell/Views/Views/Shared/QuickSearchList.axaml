@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             x:Class="PD2SPCompanion.Shell.Views.QuickSearchList"
+             x:DataType="vm:QuickSearchViewModel">
+
+	<!-- What the window's search finds, listed under its box as it is typed: group by
+	     group, a few of each - a row clicked is gone to, the list put away and the box emptied; a group that
+	     found more ends in the line to them all. Its rows are the search's own (FoundRows.axaml), as the Search
+	     page's results have them. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+	</UserControl.Styles>
+
+	<!-- Its own ground, as a tooltip's box has: a picker's panel is made to stand on a veil, and over a bare page
+	     the page showed through it. One opacity over that, as the standing search's panel has (0.9). As wide as the box
+	     it opens under (QuickSearchBar). -->
+	<Border Classes="pickerpanel" Width="440" MaxHeight="560" Padding="10,6,6,8" BoxShadow="0 6 24 0 #C0000000"
+			Background="{DynamicResource [Brush] Template - Background}" Opacity="0.9">
+		<DockPanel>
+			<!-- The foot: nothing found, said. -->
+			<TextBlock DockPanel.Dock="Bottom" Classes="dim" Margin="0,6,4,0"
+					   AutomationProperties.AutomationId="Quick_Nothing"
+					   IsVisible="{Binding FoundNothing}" Text="{L 'Nothing found'}"/>
+
+			<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" AllowAutoHide="False">
+				<ItemsControl Name="List" ItemsSource="{Binding Rows}" Margin="0,0,4,0" Tag="{Binding ChooseCommand}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<VirtualizingStackPanel/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.DataTemplates>
+						<StaticResource ResourceKey="FoundGroupRow"/>
+						<StaticResource ResourceKey="FoundPlaceRow"/>
+						<StaticResource ResourceKey="FoundItemRow"/>
+						<StaticResource ResourceKey="FoundTargetRow"/>
+						<StaticResource ResourceKey="FoundMoreRow"/>
+						<StaticResource ResourceKey="FoundSeeAllRow"/>
+					</ItemsControl.DataTemplates>
+				</ItemsControl>
+			</ScrollViewer>
+		</DockPanel>
+	</Border>
+</UserControl>

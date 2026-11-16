@@ -1,0 +1,77 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+
+             mc:Ignorable="d"
+             x:Class="PD2SPCompanion.Shell.CustomControls.Base.LoadCharacterNotice">
+
+	<UserControl.Styles>
+		<!-- A line of text that happens to be clickable, not a button that happens to have
+		     words in it: no frame, no fill, and the gold the editor gives a unique item. -->
+		<Style Selector="Button.notice">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="Padding" Value="16,10"/>
+			<Setter Property="Cursor" Value="Hand"/>
+		</Style>
+		<Style Selector="Button.notice /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="Button.notice:pointerover /template/ ContentPresenter, Button.notice:focus-visible /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+
+		<Style Selector="Button.notice TextBlock">
+			<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Display}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+			<Setter Property="TextAlignment" Value="Center"/>
+			<Setter Property="TextWrapping" Value="Wrap"/>
+		</Style>
+		<Style Selector="Button.notice TextBlock.detail">
+			<Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+			<Setter Property="Margin" Value="0,6,0,0"/>
+		</Style>
+		<!-- Brightening on hover is the only sign it can be clicked, since it carries no
+		     frame to light up. -->
+		<Style Selector="Button.notice:pointerover TextBlock, Button.notice:focus-visible TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+		</Style>
+	</UserControl.Styles>
+
+	<Panel>
+		<!-- The same watermark the right-hand panel shows with nothing chosen, so an editor
+		     with no character open reads as one empty page rather than two unlike ones. -->
+		<Image Classes="D2LogoBG"
+			   IsVisible="{Binding $parent[base:LoadCharacterNotice].ShowWatermark}"/>
+
+		<!-- Without a command it is only words: not hit-testable, so it neither brightens nor
+		     takes the hand cursor as if a click would do something (the vault's "empty"). -->
+		<StackPanel HorizontalAlignment="{Binding $parent[base:LoadCharacterNotice].HorizontalContentAlignment}"
+					VerticalAlignment="{Binding $parent[base:LoadCharacterNotice].VerticalContentAlignment}">
+		<Button Classes="notice" HorizontalAlignment="Center"
+				IsHitTestVisible="{Binding $parent[base:LoadCharacterNotice].Command, Converter={x:Static ObjectConverters.IsNotNull}}"
+				Command="{Binding $parent[base:LoadCharacterNotice].Command}">
+			<StackPanel>
+				<TextBlock Text="{Binding $parent[base:LoadCharacterNotice].Message}"
+						   FontSize="{Binding $parent[base:LoadCharacterNotice].TextSize}"/>
+				<!-- The hint lines' face, not the title's: a detail under it. -->
+				<TextBlock Classes="detail"
+						   IsVisible="{Binding $parent[base:LoadCharacterNotice].Detail, Converter={x:Static ObjectConverters.IsNotNull}}"
+						   Text="{Binding $parent[base:LoadCharacterNotice].Detail}"/>
+			</StackPanel>
+		</Button>
+		<!-- What the keys do here, as key caps on one line - outside the button, whose words wear the title's
+		     face, and taking no room of the panel's: the words stand where they stood without it (the code-behind
+		     takes its height back out, so these hints do not push them up). -->
+		<base:KeyedTip Name="KeysTip" Across="True" HorizontalAlignment="Center" Margin="0,14,0,0"
+					   IsVisible="{Binding $parent[base:LoadCharacterNotice].Keys, Converter={x:Static ObjectConverters.IsNotNull}}"
+					   Text="{Binding $parent[base:LoadCharacterNotice].Keys}"/>
+		</StackPanel>
+	</Panel>
+</UserControl>

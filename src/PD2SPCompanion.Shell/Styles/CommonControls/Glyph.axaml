@@ -1,0 +1,58 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+		Every icon inside a page or a popup, one size (the small icon buttons and the
+		action buttons were the inconsistent ones). A Path with Classes="pin" draws a glyph from Glyphs.axaml:
+		its 12-unit grid drawn at 14px, its stroke [Glyph] Stroke (1.6px) - for every glyph alike, since the grid is
+		scaled whole rather than each shape fitted to its own bounds. Included by the application, so it
+		reaches every page; a button's own style chooses the colour and nothing else.
+
+		small - 10px, a 1.2px stroke: a badge on a tile, the cross inside a search box, a card's fold.
+		filled - a filled glyph (the die), gold as a stroke is unless the Path gives its own Fill.
+		art - a filled shape published on a grid of its own (game-icons.net's 512 units): fitted whole to the
+		      icon's 14px rather than drawn on the 12-unit grid, and gold as the rest.
+		label - beside a button's words, in the words' colour.
+	-->
+	<Style Selector="Path.pin">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		<Setter Property="StrokeThickness" Value="{DynamicResource [Glyph] Stroke}"/>
+		<Setter Property="StrokeLineCap" Value="Round"/>
+		<Setter Property="StrokeJoin" Value="Round"/>
+		<Setter Property="Stretch" Value="None"/>
+		<Setter Property="Width" Value="12"/>
+		<Setter Property="Height" Value="12"/>
+		<Setter Property="RenderTransform" Value="scale(1.1667)"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
+	<Style Selector="Path.pin.small">
+		<Setter Property="RenderTransform" Value="scale(0.8333)"/>
+		<Setter Property="StrokeThickness" Value="{DynamicResource [Glyph] Stroke Small}"/>
+	</Style>
+	<!-- large - 26px: a folder in the vault's tree. The shape as every size has it: a
+	     folder drawn taller to fill its row "looks badly transformed" (tried and taken back the same day). -->
+	<Style Selector="Path.pin.large">
+		<Setter Property="RenderTransform" Value="scale(2.1667)"/>
+	</Style>
+	<!-- tile - 36px: a folder as a tile of its folder's sheet, two cells wide. -->
+	<Style Selector="Path.pin.tile">
+		<Setter Property="RenderTransform" Value="scale(3)"/>
+	</Style>
+	<!-- The fill is the icons' gold by default, as a stroked glyph's stroke is: the Character page's die
+	     wore the class without a Fill and drew nothing. -->
+	<Style Selector="Path.pin.filled">
+		<Setter Property="StrokeThickness" Value="0"/>
+		<Setter Property="Fill" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+	<Style Selector="Path.pin.art">
+		<Setter Property="StrokeThickness" Value="0"/>
+		<Setter Property="Fill" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		<Setter Property="Stretch" Value="Uniform"/>
+		<Setter Property="Width" Value="14"/>
+		<Setter Property="Height" Value="14"/>
+		<Setter Property="RenderTransform" Value="none"/>
+	</Style>
+	<Style Selector="Path.pin.label">
+		<Setter Property="Stroke" Value="{Binding $parent[Button].Foreground}"/>
+	</Style>
+</Styles>

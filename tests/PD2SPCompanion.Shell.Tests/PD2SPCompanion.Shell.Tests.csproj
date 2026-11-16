@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Tests of the view models and services, the program run without its window (Avalonia.Headless): what the
+       pages decide - what is up, what a key does, what a list holds, what a command refuses - proven in
+       milliseconds and without the mouse, beside the UI scripts.
+       A project of its own: PD2SPCompanion.Tests stays
+       the Core's, with no Avalonia in it. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>PD2SPCompanion.Shell.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Headless" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Skia" Version="12.1.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="PD2SPCompanion.Testing" />
+    <Compile Include="..\TestPaths.cs" Link="TestPaths.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PD2SPCompanion.Shell\PD2SPCompanion.Shell.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,94 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Design.PreviewWith>
+		<Border Padding="20" Background="Black">
+			<StackPanel Orientation="Horizontal" Spacing="6">
+				<Button Theme="{DynamicResource [CtrlThm] Button_Primary}" Content="DELETE"/>
+				<Button Theme="{DynamicResource [CtrlThm] Button_Secondary}" Content="CANCEL"/>
+				<Button Theme="{DynamicResource [CtrlThm] Button_Primary}" Content="SAVE" IsEnabled="False"/>
+			</StackPanel>
+		</Border>
+	</Design.PreviewWith>
+
+	<!--
+		The flat buttons of panels and popups. Ornament stays on the chrome - the sidebar's textured buttons, the
+		bookmarks, the page
+		frames; inside a panel or a popup the textured Button_Action was the heaviest thing there. Fluent 2's
+		pair: the one main action filled, the rest outlined, so importance shows by fill rather than every
+		button alike. Starting with the popups; page by page after.
+
+		The label keeps the Diablo capitals for now; plain bold, as Fluent does, is still to be chosen.
+	-->
+
+	<!-- The main action: the heading gold, filled; its label and icon dark on it. -->
+	<ControlTheme x:Key="[CtrlThm] Button_Primary" TargetType="Button">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Button - Primary}"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] On Primary}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="CornerRadius" Value="4"/>
+		<Setter Property="Padding" Value="12,4"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="Template">
+			<ControlTemplate>
+				<ContentPresenter x:Name="PART_ContentPresenter"
+								  Background="{TemplateBinding Background}"
+								  BorderBrush="{TemplateBinding BorderBrush}"
+								  BorderThickness="{TemplateBinding BorderThickness}"
+								  CornerRadius="{TemplateBinding CornerRadius}"
+								  Content="{TemplateBinding Content}"
+								  ContentTemplate="{TemplateBinding ContentTemplate}"
+								  Foreground="{TemplateBinding Foreground}"
+								  Padding="{TemplateBinding Padding}"
+								  RecognizesAccessKey="True"
+								  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+								  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+			</ControlTemplate>
+		</Setter>
+
+		<!-- Hover: a clear step lighter and a thin light edge; the label stays dark, which reads better on the
+		     lighter fill, not worse (white on this gold is about 2.4 : 1). -->
+		<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Button - Primary Hover}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary Hover Edge}"/>
+		</Style>
+		<Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Button - Primary Pressed}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary Pressed}"/>
+		</Style>
+		<!-- Unavailable: Fluent's neutral grey - a grey fill and edge, a grey label - for the primary and the
+		     secondary alike, rather than the colour faded. The button's own
+		     Foreground too, which drawn glyphs take. -->
+		<Style Selector="^:disabled">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Disabled}"/>
+			<Setter Property="Cursor" Value="Arrow"/>
+		</Style>
+		<Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Button - Disabled}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Disabled Edge}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Disabled}"/>
+		</Style>
+	</ControlTheme>
+
+	<!-- Every other action beside it - cancel, quit, a second answer: dark, a thin dim gold outline. -->
+	<ControlTheme x:Key="[CtrlThm] Button_Secondary" TargetType="Button" BasedOn="{StaticResource [CtrlThm] Button_Primary}">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Button - Secondary}"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+
+		<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		</Style>
+		<Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Pressed Wash}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		</Style>
+	</ControlTheme>
+</ResourceDictionary>

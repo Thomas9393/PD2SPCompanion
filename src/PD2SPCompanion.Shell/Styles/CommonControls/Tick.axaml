@@ -1,0 +1,50 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The app's switch: a square that takes a tick. A ToggleButton with class "tick" and a Path
+	  for the mark, shown while it is checked:
+
+	      <ToggleButton Classes="tick" IsChecked="{Binding On}">
+	          <Path Data="{StaticResource [Glyph] Tick}" IsVisible="{Binding On}"/>
+	      </ToggleButton>
+
+	  The blue box the theme gives a CheckBox belongs to a different program. This was written out
+	  identically on the extras page and the settings page; the vault's picking wanted it a third
+	  time, and it is one file now.
+	-->
+	<Style Selector="ToggleButton.tick">
+		<Setter Property="Width" Value="26"/>
+		<Setter Property="Height" Value="26"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
+	<Style Selector="ToggleButton.tick /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Field}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<!-- The small icon buttons' corners. -->
+		<Setter Property="CornerRadius" Value="4"/>
+	</Style>
+	<Style Selector="ToggleButton.tick:pointerover /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tick:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+	</Style>
+	<Style Selector="ToggleButton.tick:checked /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+	<!-- The mark is drawn on a 12 by 12 grid (1.5 to 10.5 across, 2.25 to 9.75 down), so the box it
+	     is laid out in is that grid and the square centres it. It was 16 by 14, which left the mark
+	     two pixels left of centre and one high. -->
+	<Style Selector="ToggleButton.tick Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		<Setter Property="StrokeThickness" Value="2"/>
+		<Setter Property="StrokeLineCap" Value="Round"/>
+		<Setter Property="StrokeJoin" Value="Round"/>
+		<Setter Property="Stretch" Value="None"/>
+		<Setter Property="Width" Value="12"/>
+		<Setter Property="Height" Value="12"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
+</Styles>

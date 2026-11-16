@@ -1,0 +1,22 @@
+bin/
+obj/
+.vs/
+*.user
+
+# Game data is read from the install at runtime, never committed.
+/data/
+
+# Python test runners
+__pycache__/
+
+# This machine's locations of the game and the corpus (tests/paths.py)
+pd2spc.local.env
+tests/public-names.local.txt
+
+# Release zips (build/publish.ps1)
+dist/
+
+# The player's own title font goes in Fonts beside the editor; only its note is ours. A font file left in the
+# source folder (AvQest, say) is never committed: the editor ships none but Cinzel.
+src/PD2SPCompanion.Shell.Desktop/Fonts/*
+!src/PD2SPCompanion.Shell.Desktop/Fonts/README.txt

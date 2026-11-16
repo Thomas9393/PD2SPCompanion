@@ -1,0 +1,150 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+                    xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base">
+	<!-- A search's finds as rows, the same wherever they are listed, and in both sizes: under the window's search box
+	     (QuickSearchList) and in the movable list of the standing
+	     search (SearchResultsPanel). The list that shows them hands its "a row was chosen" command through its
+	     ItemsControl's Tag. Their looks are Picker.axaml's (Button.pickone, TextBlock.foundplace), which the
+	     view must include. -->
+
+	<!-- A group of the window's search - the character, the vault, the other characters, the grail: its
+	     heading folds what it found. The chevron and the button are Fold.axaml's and
+	     Chevron.axaml's. -->
+	<DataTemplate x:Key="FoundGroupRow" x:DataType="vm:FoundGroup">
+		<Button Classes="fold" Margin="0,6,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+				AutomationProperties.AutomationId="Found_Group"
+				AutomationProperties.Name="{Binding Name}"
+				Command="{Binding Toggle}" CommandParameter="{Binding}">
+			<Grid ColumnDefinitions="Auto,*,Auto">
+				<Path Grid.Column="0" Classes="chevron" Classes.open="{Binding IsOpen}"
+					  Data="{StaticResource [Glyph] Chevron}"/>
+				<TextBlock Grid.Column="1" Classes="fieldname" Margin="6,0,0,0" VerticalAlignment="Center" Text="{Binding Name}"
+						   TextTrimming="CharacterEllipsis"/>
+				<TextBlock Grid.Column="2" Classes="dim" Margin="12,0,8,0" VerticalAlignment="Center"
+						   FontSize="{StaticResource [Type] Small}" Text="{Binding CountText}"/>
+			</Grid>
+		</Button>
+	</DataTemplate>
+
+	<!-- A place: its name - wrapped where a folder lies deep - and how many finds it holds. -->
+	<DataTemplate x:Key="FoundPlaceRow" x:DataType="vm:FoundPlace">
+		<DockPanel Margin="4,6,8,3">
+			<TextBlock DockPanel.Dock="Right" Classes="dim" Margin="12,0,0,0" VerticalAlignment="Top"
+					   FontSize="{StaticResource [Type] Small}" Text="{Binding CountText}"/>
+			<TextBlock Classes="foundplace" Text="{Binding Name}" TextWrapping="Wrap"/>
+		</DockPanel>
+	</DataTemplate>
+
+	<!-- A find: its art, its name in its rarity's color, and under the name what tells it apart - its base -
+	     with where it lies at that line's right end. The name has its line to itself (the place stood beside the name
+	     and took up to 170 of the row from it, and both were cut): the place shares the second line, where
+	     a base leaves room, and is cut from its START where it must be - a deep folder's last steps say more
+	     than its first. Its tooltip is its name and its place, under the row, and only where the row cuts
+	     either short (TrimmedTip).
+	     One that lies on another character asks, over itself, before that character is loaded: the row greyed, the
+	     question in its place with its two answers, worded (not a tick and a
+	     cross: no ticks) - a layer the row's own size, so nothing in the list moves. -->
+	<DataTemplate x:Key="FoundItemRow" x:DataType="vm:FoundItem">
+		<Panel Margin="0,0,0,2">
+			<Button Classes="pickone" Classes.held="{Binding IsCurrent}" Classes.asking="{Binding IsAsking}" Padding="6,3"
+					AutomationProperties.AutomationId="Found_Row"
+					AutomationProperties.Name="{Binding Name}"
+					base:TrimmedTip.Tip="{Binding Tip}"
+					ToolTip.VerticalOffset="2"
+					Command="{ReflectionBinding $parent[ItemsControl].Tag}"
+					CommandParameter="{Binding}">
+				<Grid ColumnDefinitions="Auto,*">
+					<Border Grid.Column="0" Width="30" Height="30" Margin="0,0,8,0" Background="Black" CornerRadius="2"
+							VerticalAlignment="Center">
+						<Image Source="{Binding Tile.Sprite}" Stretch="Uniform" Margin="1"
+							   Opacity="{Binding Tile.SpriteOpacity}"/>
+					</Border>
+					<StackPanel Grid.Column="1" VerticalAlignment="Center">
+						<TextBlock Text="{Binding Name}" Foreground="{Binding Tile.RarityBrush}"
+								   TextTrimming="CharacterEllipsis"/>
+						<!-- What tells it apart, then where it lies: a place in its container, or - in the search
+						     box's short list, which has no headings over its finds - the container or the
+						     folder itself. The place has what it needs up to most of the line; the base the
+						     rest. -->
+						<Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasSecondLine}">
+							<TextBlock Grid.Column="0" Classes="dim" FontSize="{StaticResource [Type] Small}"
+									   Text="{Binding Detail}"
+									   TextTrimming="CharacterEllipsis"/>
+							<TextBlock Grid.Column="1" Classes="dim" Margin="10,0,0,0" MaxWidth="240"
+									   AutomationProperties.AutomationId="Found_Where"
+									   TextTrimming="LeadingCharacterEllipsis"
+									   FontSize="{StaticResource [Type] Small}" Text="{Binding Where}"/>
+						</Grid>
+					</StackPanel>
+				</Grid>
+			</Button>
+
+			<Grid ColumnDefinitions="*,Auto,Auto" Margin="8,0,4,0" IsVisible="{Binding IsAsking}">
+				<TextBlock Grid.Column="0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+						   AutomationProperties.AutomationId="Found_Ask"
+						   Foreground="{DynamicResource [Text] Heading}" Text="{Binding AskText}"/>
+				<Button Grid.Column="1" Margin="6,0,0,0" VerticalAlignment="Center"
+						Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch"
+						Theme="{DynamicResource [CtrlThm] Button_Primary}"
+						AutomationProperties.AutomationId="Found_AskYes"
+						Command="{Binding Accept}" CommandParameter="{Binding}">
+					<Grid ColumnDefinitions="Auto,*">
+						<Path Classes="pin label" Data="{StaticResource [Glyph] Tick}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+						<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'OPEN'}"/>
+					</Grid>
+				</Button>
+				<Button Grid.Column="2" Margin="6,0,0,0" VerticalAlignment="Center"
+						Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch"
+						Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+						AutomationProperties.AutomationId="Found_AskNo"
+						Command="{Binding Decline}" CommandParameter="{Binding}">
+					<Grid ColumnDefinitions="Auto,*">
+						<Path Classes="pin label" Data="{StaticResource [Glyph] Close}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+						<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'CANCEL'}"/>
+					</Grid>
+				</Button>
+			</Grid>
+		</Panel>
+	</DataTemplate>
+
+	<!-- A setting or a section found: its name, and the page it is on. No art - it is a place, not an item. -->
+	<DataTemplate x:Key="FoundTargetRow" x:DataType="vm:FoundTarget">
+		<Button Classes="pickone" Classes.held="{Binding IsCurrent}" Margin="0,0,0,2" Padding="6,5"
+				AutomationProperties.AutomationId="Found_Target"
+				AutomationProperties.Name="{Binding Name}"
+				Command="{ReflectionBinding $parent[ItemsControl].Tag}"
+				CommandParameter="{Binding}">
+			<Grid ColumnDefinitions="*,Auto">
+				<TextBlock Grid.Column="0" Text="{Binding Name}" TextTrimming="CharacterEllipsis"
+						   Foreground="{DynamicResource [Text] Body}"/>
+				<TextBlock Grid.Column="1" Classes="dim" Margin="10,0,0,0" VerticalAlignment="Center"
+						   FontSize="{StaticResource [Type] Small}" Text="{Binding Where}"/>
+			</Grid>
+		</Button>
+	</DataTemplate>
+
+	<!-- A place's last line, where it holds more than the list shows. -->
+	<DataTemplate x:Key="FoundMoreRow" x:DataType="vm:FoundMore">
+		<TextBlock Classes="dim" Margin="4,8,8,2" FontSize="{StaticResource [Type] Small}" Text="{Binding Text}"/>
+	</DataTemplate>
+
+	<!-- A group's last line in the window's search box, where it found more than it lists: the way to them all
+	     ("See all 36 results"). A row as a find is - marked by the arrows, gone to by Enter or a click - in
+	     the headings' color, with the chevron that says it leads on. -->
+	<DataTemplate x:Key="FoundSeeAllRow" x:DataType="vm:FoundSeeAll">
+		<Button Classes="pickone" Classes.held="{Binding IsCurrent}" Margin="0,0,0,2" Padding="6,5"
+				AutomationProperties.AutomationId="Found_SeeAll"
+				AutomationProperties.Name="{Binding Text}"
+				Command="{ReflectionBinding $parent[ItemsControl].Tag}"
+				CommandParameter="{Binding}">
+			<Grid ColumnDefinitions="*,Auto">
+				<TextBlock Grid.Column="0" Text="{Binding Text}" TextTrimming="CharacterEllipsis"
+						   FontSize="{StaticResource [Type] Small}"
+						   Foreground="{DynamicResource [Text] Heading}"/>
+				<Path Grid.Column="1" Classes="pin" Margin="10,0,2,0" VerticalAlignment="Center"
+					  Data="{StaticResource [Glyph] Chevron right}"/>
+			</Grid>
+		</Button>
+	</DataTemplate>
+</ResourceDictionary>

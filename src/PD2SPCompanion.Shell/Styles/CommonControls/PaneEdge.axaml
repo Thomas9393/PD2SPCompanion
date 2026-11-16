@@ -1,0 +1,38 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!-- A part's edge, dragged to make it larger or smaller - the tree's, at its right; the strip's (across),
+	     under it. A grip stands on it, so it is seen that it can be taken hold of (without one,
+	     nothing hinted that it can be dragged): the classic grip's three dots in the dim gold, the buttons' gold under
+	     the pointer - one over the other on an
+	     upright edge, side by side on one that lies across. The width is VaultLook.EdgeWidth.
+	     The one grip there is (the item holder's uses the vault's design
+	     too - it had a bar of its own): in a file of its own since, for the pages that have one. -->
+	<Style Selector="Border.paneedge">
+		<Setter Property="Width" Value="8"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="Cursor" Value="SizeWestEast"/>
+	</Style>
+	<Style Selector="Border.paneedge > StackPanel">
+		<Setter Property="Orientation" Value="Vertical"/>
+		<Setter Property="Spacing" Value="3"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
+	<Style Selector="Border.paneedge > StackPanel > Border">
+		<Setter Property="Width" Value="4"/>
+		<Setter Property="Height" Value="4"/>
+		<Setter Property="CornerRadius" Value="2"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+	</Style>
+	<Style Selector="Border.paneedge.across">
+		<Setter Property="Width" Value="NaN"/>
+		<Setter Property="Height" Value="8"/>
+		<Setter Property="Cursor" Value="SizeNorthSouth"/>
+	</Style>
+	<Style Selector="Border.paneedge.across > StackPanel">
+		<Setter Property="Orientation" Value="Horizontal"/>
+	</Style>
+	<Style Selector="Border.paneedge:pointerover > StackPanel > Border, Border.paneedge.held > StackPanel > Border">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Button - Primary}"/>
+	</Style>
+</Styles>

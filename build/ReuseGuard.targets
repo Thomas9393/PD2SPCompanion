@@ -1,0 +1,853 @@
+﻿<Project>
+
+  <!--
+    Fails the build when a UI component is described twice instead of reused.
+
+    This project has lost hours to it more than once, most recently on the shared stash's
+    drop box: the inventory panel already had a working one, its rules were copied into a
+    new file under a new selector, and four rounds went by debugging the copy while the
+    original sat untouched. Writing the rule down did not stop it - the note existed and was
+    even quoted before being ignored. A build error is what stops it.
+
+    The checks:
+
+      PD2UI002  A /template/ style in App.axaml. Application-level styles do not reach a
+                popup's own visual tree, so the rule silently does nothing. This is the
+                exact failure above. Include the style file from the page instead.
+
+      PD2UI003  A page declaring a selector that Styles/CommonControls already declares.
+                That is a copy of a shared component. Include the shared file.
+
+      PD2UI004  The same selector declared in two views and not in the baseline. The
+                baseline holds what was already duplicated when this went in, so the debt
+                cannot grow while it is paid down.
+
+      PD2UI006  ToolTip.IsEnabled in a view. ToolTip has no such attached property, so the
+                compiler resolves it to the control's own IsEnabled: the control is disabled
+                exactly when the tooltip was meant to be off. It shipped twice unnoticed (the
+                Extra page's mode switch, the Character page's points to spend). The property
+                that switches a tooltip off is ToolTip.ServiceEnabled.
+
+      PD2UI007  A font size or font family written as a value (FontSize="13", a setter's
+                Value="13", FontFamily="Arial"). The type scale has five tiers,
+                and 17 hand-typed sizes had
+                grown before it. Name a tier - {StaticResource [Type] Body} - or wear its class
+                (display, title, heading, body, small); the values live only in
+                Resources/UI_Main/Typography.axaml. The colour theme's design preview
+                (Resources/ColorPalette) is not scanned.
+
+      PD2UI008  A text colour written as a value (Foreground="White", a setter's Value="#A59263").
+                Text is coloured by role:
+                [Text] Heading, Body, Muted, Pending, Warning, Danger, Corrupted, or an item's own
+                colour - all brushes in Resources/ColorPalette/Theme_Standard.axaml, which is not
+                scanned. Before it, labels came in three colours and "D2.Danger" was named and never
+                defined.
+
+      PD2UI009  A picker built by hand. After a veil's backdrop comes Panel.pickerframe, with no
+                Margin of its own; the panel is Border.pickerpanel, not a section given the
+                picker's fill. Every picker wore its own inset and they had drifted to five;
+                the frame lives in
+                Styles/CommonControls/Picker.axaml.
+
+      PD2UI010  A Path that draws nothing: no class, and no StrokeThickness, Fill or Theme of its own.
+                An icon's size and stroke come from Path.pin alone (Glyph.axaml), and
+                a button's style gives only the colour - the inventory's six pane arrows were bare
+                paths and went blank unnoticed (gold arrows, empty). A path inside a
+                ToggleButton.tick is drawn by that style and allowed.
+
+      PD2UI011  Text written in a view instead of through the language framework:
+                a Text, Content, ToolTip.Tip, PlaceholderText, Watermark, Header, Title or Message - or a
+                setter's Value for one - holding words that are not {L 'English text'}. Every string a
+                player reads goes through the framework, built in place,
+                or a language pack cannot reach it. A URL or file name is not words; a design preview
+                (Design.PreviewWith) is not scanned. lang-guard-ok names an exception.
+
+      PD2UI012  A roll button drawn by hand: a Button bound to a Roll...Command or Reroll...Command, or the
+                [Glyph] Dice drawn in a view. Every roll is base:RollButton, whose Kind says what it rolls - Dice
+                a number, Cube every number, Flawless a choice, Perfect every choice (five
+                were dice that chose). The control draws the picture.
+
+      PD2UI013  A ContentPresenter whose Content is bound through its own DataContext ({Binding Part}). A presenter
+                makes its content its own DataContext, null included, so once the part is null the binding has
+                nothing to read and never hears it come back: a tile left in place lost its red at the next move
+                (seen on two blades), and a recycled property row kept another row's parts. Read it
+                off the parent - {Binding $parent.((vm:Model)DataContext).Part} - or a named element.
+
+      PD2UI014  A tool of a tools line (base:OverflowRow.Leaves) with no Command. Left off a narrow line, a tool is
+                listed under the "more" button, and a row of that list runs the tool's Command: one that acts by
+                a Click handler alone is listed there and does nothing.
+
+    To allow a case that is genuinely fine, put reuse-guard-ok in a comment just above the
+    style and say why; for PD2UI007, type-guard-ok, naming the exception (the season banner,
+    what is drawn on an item tile as the game draws it); for PD2UI008, color-guard-ok.
+  -->
+
+  <UsingTask TaskName="GuardStyleReuse"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Views ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <Shared ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="false" />
+      <AppXaml ParameterType="System.String" Required="false" />
+      <Baseline ParameterType="System.String" Required="false" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Linq" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        var selectorPattern = new Regex("<Style\\s+Selector=\"([^\"]+)\"");
+
+        Func<string, int, int> lineOf = (text, index) =>
+        {
+            int line = 1;
+            for (int n = 0; n < index && n < text.Length; n++)
+                if (text[n] == '\n') line++;
+            return line;
+        };
+
+        Func<string, int, bool> allowed = (text, index) =>
+        {
+            int look = Math.Max(0, index - 300);
+            return text.Substring(look, index - look).Contains("reuse-guard-ok");
+        };
+
+        // ---- what the shared files already define ------------------------------------
+        var shared = new Dictionary<string, string>();
+        foreach (var item in Shared ?? new Microsoft.Build.Framework.ITaskItem[0])
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            foreach (Match m in selectorPattern.Matches(File.ReadAllText(path)))
+                shared[m.Groups[1].Value.Trim()] = Path.GetFileName(path);
+        }
+
+        // ---- what was already duplicated when this went in ---------------------------
+        var baseline = new HashSet<string>();
+        if (!string.IsNullOrEmpty(Baseline) && File.Exists(Baseline))
+        {
+            foreach (string line in File.ReadAllLines(Baseline))
+            {
+                string trimmed = line.Trim();
+                if (trimmed.Length > 0 && !trimmed.StartsWith("#"))
+                    baseline.Add(trimmed);
+            }
+        }
+
+        // ---- PD2UI002: a /template/ rule where it cannot reach -----------------------
+        if (!string.IsNullOrEmpty(AppXaml) && File.Exists(AppXaml))
+        {
+            string text = File.ReadAllText(AppXaml);
+            foreach (Match m in selectorPattern.Matches(text))
+            {
+                if (!m.Groups[1].Value.Contains("/template/")) continue;
+                if (allowed(text, m.Index)) continue;
+
+                Log.LogError(null, "PD2UI002", null, AppXaml, lineOf(text, m.Index), 1, 0, 0,
+                    "'" + m.Groups[1].Value + "' is a /template/ style in Application.Styles, " +
+                    "which does not reach a popup's own visual tree - the rule will silently do " +
+                    "nothing. Put it in a file under Styles/CommonControls and include it from " +
+                    "the page that needs it.");
+            }
+        }
+
+        // ---- PD2UI003 and PD2UI004 ----------------------------------------------------
+        var seen = new Dictionary<string, string>();
+
+        foreach (var item in Views)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+
+            string text = File.ReadAllText(path);
+            string name = Path.GetFileName(path);
+
+            // ---- PD2UI006: a tooltip switch that disables its control -------------------
+            for (int at = text.IndexOf("ToolTip.IsEnabled=", StringComparison.Ordinal); at >= 0;
+                 at = text.IndexOf("ToolTip.IsEnabled=", at + 1, StringComparison.Ordinal))
+            {
+                Log.LogError(null, "PD2UI006", null, path, lineOf(text, at), 1, 0, 0,
+                    "ToolTip.IsEnabled is not a tooltip property - it resolves to the control's " +
+                    "own IsEnabled and disables the control. Use ToolTip.ServiceEnabled.");
+            }
+
+            foreach (Match m in selectorPattern.Matches(text))
+            {
+                string selector = m.Groups[1].Value.Trim();
+                if (allowed(text, m.Index)) continue;
+
+                int line = lineOf(text, m.Index);
+
+                string owner;
+                if (shared.TryGetValue(selector, out owner))
+                {
+                    Log.LogError(null, "PD2UI003", null, path, line, 1, 0, 0,
+                        "'" + selector + "' is already defined in " + owner + ". Include that " +
+                        "file from this page's UserControl.Styles instead of describing it again.");
+                    continue;
+                }
+
+                if (baseline.Contains(selector))
+                    continue;
+
+                string first;
+                if (seen.TryGetValue(selector, out first) && first != name)
+                {
+                    Log.LogError(null, "PD2UI004", null, path, line, 1, 0, 0,
+                        "'" + selector + "' is also declared in " + first + ". Move it to a file " +
+                        "under Styles/CommonControls and include it from both, rather than keeping " +
+                        "two copies that will drift.");
+                }
+                else if (!seen.ContainsKey(selector))
+                {
+                    seen[selector] = name;
+                }
+            }
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GuardStyleReuse" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <ReuseGuardedView Include="$(MSBuildProjectDirectory)\Views\**\*.axaml"
+                        Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**" />
+      <ReuseGuardedShared Include="$(MSBuildProjectDirectory)\Styles\CommonControls\*.axaml" />
+    </ItemGroup>
+    <GuardStyleReuse Views="@(ReuseGuardedView)"
+                     Shared="@(ReuseGuardedShared)"
+                     AppXaml="$(MSBuildProjectDirectory)\App.axaml"
+                     Baseline="$(MSBuildThisFileDirectory)duplicate-styles.baseline"
+                     Condition="'@(ReuseGuardedView)' != ''" />
+  </Target>
+
+  <UsingTask TaskName="GuardTypeScale"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        // A size or family as a value: an attribute, or a setter's Value. A {markup extension} is fine.
+        var literal = new Regex(
+            "\\bFontSize=\"[0-9]|\\bFontFamily=\"[^{\"]|Property=\"FontSize\"\\s+Value=\"[0-9]|Property=\"FontFamily\"\\s+Value=\"[^{\"]");
+
+        foreach (var item in Files)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            string text = File.ReadAllText(path);
+
+            foreach (Match m in literal.Matches(text))
+            {
+                // The comment naming an exception sits just above the element or style.
+                int look = Math.Max(0, m.Index - 400);
+                string before = text.Substring(look, m.Index - look);
+                // It counts for the one element or style right under it: one element start, not
+                // counting a style's setters, between the comment and the value.
+                int ok = before.LastIndexOf("type-guard-ok", StringComparison.Ordinal);
+                if (ok >= 0)
+                {
+                    int end = before.IndexOf("-->", ok, StringComparison.Ordinal);
+                    string between = end >= 0 ? before.Substring(end + 3) : "";
+                    if (Regex.Matches(between, "<(?!Setter\\b)[A-Za-z]").Count <= 1)
+                        continue;
+                }
+
+                int line = 1;
+                for (int n = 0; n < m.Index; n++) if (text[n] == '\n') line++;
+                Log.LogError(null, "PD2UI007", null, path, line, 1, 0, 0,
+                    "A font size or family written as a value. Name a tier of the type scale - " +
+                    "{StaticResource [Type] Display|Title|Heading|Body|Small}, {StaticResource DiabloFont} or " +
+                    "BodyFont - or wear its class (display, title, heading, body, small). The values live in " +
+                    "Resources/UI_Main/Typography.axaml.");
+            }
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GuardTypeScale" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <TypeGuarded Include="$(MSBuildProjectDirectory)\**\*.axaml"
+                   Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**;$(MSBuildProjectDirectory)\Resources\ColorPalette\**;$(MSBuildProjectDirectory)\Resources\UI_Main\Typography.axaml" />
+    </ItemGroup>
+    <GuardTypeScale Files="@(TypeGuarded)" Condition="'@(TypeGuarded)' != ''" />
+  </Target>
+
+  <UsingTask TaskName="GuardTextColour"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        // A text colour as a value: an attribute or a setter's Value that is not a {markup extension}.
+        var literal = new Regex(
+            "(?<![\\w.])Foreground=\"[^{\"]|TextElement\\.Foreground=\"[^{\"]|Property=\"(?:TextElement\\.)?Foreground\"\\s+Value=\"[^{\"]");
+
+        foreach (var item in Files)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            string text = File.ReadAllText(path);
+
+            foreach (Match m in literal.Matches(text))
+            {
+                // A color-guard-ok comment counts for the one element or style right under it.
+                int look = Math.Max(0, m.Index - 400);
+                string before = text.Substring(look, m.Index - look);
+                int ok = before.LastIndexOf("color-guard-ok", StringComparison.Ordinal);
+                if (ok >= 0)
+                {
+                    int end = before.IndexOf("-->", ok, StringComparison.Ordinal);
+                    string between = end >= 0 ? before.Substring(end + 3) : "";
+                    if (Regex.Matches(between, "<(?!Setter\\b)[A-Za-z]").Count <= 1)
+                        continue;
+                }
+
+                int line = 1;
+                for (int n = 0; n < m.Index; n++) if (text[n] == '\n') line++;
+                Log.LogError(null, "PD2UI008", null, path, line, 1, 0, 0,
+                    "A text colour written as a value. Use a role - {DynamicResource [Text] Heading|Body|Muted|" +
+                    "Pending|Warning|Danger|Corrupted} - or an item's colour brush; they live in " +
+                    "Resources/ColorPalette/Theme_Standard.axaml.");
+            }
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GuardTextColour" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <ColourGuarded Include="$(MSBuildProjectDirectory)\**\*.axaml"
+                     Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**;$(MSBuildProjectDirectory)\Resources\ColorPalette\**" />
+    </ItemGroup>
+    <GuardTextColour Files="@(ColourGuarded)" Condition="'@(ColourGuarded)' != ''" />
+  </Target>
+
+  <!--
+    PD2UI005  A view wearing a shared class that nothing up its chain includes. A class a file in
+              Styles/CommonControls defines does nothing unless that file is included - by the view,
+              by every view that hosts it, or by App.axaml - and a missing style is no error: the
+              vault page wore Classes="value" without ValueBox.axaml and drew a white box in a black
+              panel, which read as a control that needed writing. Views and
+              CustomControls are scanned; a view hosted by writing its element in another is
+              covered when every such host is. Include the file named in the message.
+  -->
+  <UsingTask TaskName="GuardSharedInclude"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Views ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <Shared ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <AppXaml ParameterType="System.String" Required="false" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Linq" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        var comment = new Regex(@"<!--.*?-->", RegexOptions.Singleline);
+        Func<string, string> bare = text => comment.Replace(text, m => Regex.Replace(m.Value, @"[^\n]", " "));
+        var selector = new Regex(@"Selector=""([^""]+)""");
+        var include = new Regex(@"StyleInclude\s+Source=""/([^""]+)""");
+        var wornList = new Regex(@"\bClasses=""([^""{]+)""");
+        var wornOne = new Regex(@"\bClasses\.([\w-]+)=""");
+        var xClass = new Regex(@"x:Class=""[\w.]*?\.(\w+)""");
+
+        Func<string, HashSet<string>> classesOf = text =>
+        {
+            var found = new HashSet<string>();
+            foreach (Match m in selector.Matches(text))
+            {
+                string s = m.Groups[1].Value.Replace("/template/", " ");
+                s = Regex.Replace(s, @"\[[^\]]*\]", " ");
+                foreach (Match c in Regex.Matches(s, @"\.([A-Za-z_][\w-]*)"))
+                    found.Add(c.Groups[1].Value);
+            }
+            return found;
+        };
+        Func<string, HashSet<string>> includesOf = text =>
+            new HashSet<string>(include.Matches(text).Cast<Match>().Select(m => m.Groups[1].Value.Replace('\\', '/')),
+                                StringComparer.OrdinalIgnoreCase);
+
+        // ---- which shared file defines which class -------------------------------------
+        var definedBy = new Dictionary<string, HashSet<string>>();
+        foreach (var item in Shared)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            string rel = "Styles/CommonControls/" + Path.GetFileName(path);
+            foreach (string c in classesOf(bare(File.ReadAllText(path))))
+            {
+                HashSet<string> set;
+                if (!definedBy.TryGetValue(c, out set)) definedBy[c] = set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                set.Add(rel);
+            }
+        }
+
+        var global = (!string.IsNullOrEmpty(AppXaml) && File.Exists(AppXaml))
+            ? includesOf(bare(File.ReadAllText(AppXaml)))
+            : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // ---- the views, their own includes and classes, and who hosts whom ----------------
+        var texts = new Dictionary<string, string>();
+        foreach (var item in Views)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (File.Exists(path)) texts[path] = bare(File.ReadAllText(path));
+        }
+        var hosts = new Dictionary<string, List<string>>();
+        foreach (var pair in texts)
+        {
+            Match m = xClass.Match(pair.Value);
+            if (!m.Success) continue;
+            var element = new Regex(@"<\w+:" + Regex.Escape(m.Groups[1].Value) + @"[\s/>]");
+            hosts[pair.Key] = texts.Where(other => other.Key != pair.Key && element.IsMatch(other.Value))
+                                   .Select(other => other.Key).ToList();
+        }
+
+        Func<string, string, HashSet<string>, bool> covers = null;
+        covers = (path, cls, seen) =>
+        {
+            string text = texts[path];
+            if (definedBy[cls].Overlaps(includesOf(text)) || definedBy[cls].Overlaps(global)) return true;
+            if (classesOf(text).Contains(cls)) return true;
+            List<string> by;
+            if (!hosts.TryGetValue(path, out by)) return false;
+            var next = by.Where(h => !seen.Contains(h)).ToList();
+            if (next.Count == 0) return false;
+            var deeper = new HashSet<string>(seen) { path };
+            return next.All(h => covers(h, cls, deeper));
+        };
+
+        Func<string, int, int> lineOf = (text, index) =>
+        {
+            int line = 1;
+            for (int n = 0; n < index && n < text.Length; n++) if (text[n] == '\n') line++;
+            return line;
+        };
+
+        // ---- PD2UI005 ---------------------------------------------------------------------
+        foreach (var pair in texts)
+        {
+            var first = new Dictionary<string, int>();
+            foreach (Match m in wornList.Matches(pair.Value))
+                foreach (string c in m.Groups[1].Value.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries))
+                    if (!first.ContainsKey(c)) first[c] = m.Index;
+            foreach (Match m in wornOne.Matches(pair.Value))
+                if (!first.ContainsKey(m.Groups[1].Value)) first[m.Groups[1].Value] = m.Index;
+
+            foreach (var worn in first)
+            {
+                if (!definedBy.ContainsKey(worn.Key)) continue;
+                if (covers(pair.Key, worn.Key, new HashSet<string>())) continue;
+
+                Log.LogError(null, "PD2UI005", null, pair.Key, lineOf(pair.Value, worn.Value), 1, 0, 0,
+                    "'" + worn.Key + "' is defined in " + string.Join(" or ", definedBy[worn.Key].Select(Path.GetFileName)) +
+                    ", which nothing up this view's chain includes - the class does nothing, silently. Add " +
+                    "<StyleInclude Source=\"/" + definedBy[worn.Key].First() + "\"/> to its Styles (or its host's).");
+            }
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GuardSharedInclude" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <IncludeGuardedView Include="$(MSBuildProjectDirectory)\Views\**\*.axaml;$(MSBuildProjectDirectory)\CustomControls\**\*.axaml"
+                          Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**" />
+      <IncludeGuardedShared Include="$(MSBuildProjectDirectory)\Styles\CommonControls\*.axaml" />
+    </ItemGroup>
+    <GuardSharedInclude Views="@(IncludeGuardedView)"
+                        Shared="@(IncludeGuardedShared)"
+                        AppXaml="$(MSBuildProjectDirectory)\App.axaml"
+                        Condition="'@(IncludeGuardedView)' != ''" />
+  </Target>
+
+  <UsingTask TaskName="GuardPickerFrame"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        // The backdrop, then (past comments and blank lines) the element that follows it.
+        var afterBackdrop = new Regex("<Button\\s+Classes=\"backdrop\"[^>]*/>(?:\\s|<!--(?:(?!-->).)*-->)*(<[A-Za-z][^>]*>)",
+                                      RegexOptions.Singleline);
+        // A section wearing the picker's fill: the panel written out again.
+        var handPanel = new Regex("<Border\\s+Classes=\"section\"[^>]*Background=\"#F0242424\"[^>]*Padding=\"12,10\"",
+                                  RegexOptions.Singleline);
+
+        foreach (var item in Files)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            string text = File.ReadAllText(path);
+
+            Func<int, int> lineOf = index =>
+            {
+                int line = 1;
+                for (int n = 0; n < index; n++) if (text[n] == '\n') line++;
+                return line;
+            };
+
+            foreach (Match m in afterBackdrop.Matches(text))
+            {
+                string next = m.Groups[1].Value;
+                bool framed = next.StartsWith("<Panel", StringComparison.Ordinal)
+                           && next.Contains("pickerframe")
+                           && !Regex.IsMatch(next, "\\sMargin=");
+                if (!framed)
+                    Log.LogError(null, "PD2UI009", null, path, lineOf(m.Groups[1].Index), 1, 0, 0,
+                        "A picker's backdrop is followed by something other than <Panel Classes=\"pickerframe\">, " +
+                        "or the frame sets its own Margin. Every picker sits at one inset; it lives in " +
+                        "Styles/CommonControls/Picker.axaml.");
+            }
+
+            foreach (Match m in handPanel.Matches(text))
+                Log.LogError(null, "PD2UI009", null, path, lineOf(m.Index), 1, 0, 0,
+                    "A section given the picker's fill and padding. Use <Border Classes=\"pickerpanel\">, " +
+                    "defined in Styles/CommonControls/Picker.axaml.");
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GuardPickerFrame" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <PickerGuarded Include="$(MSBuildProjectDirectory)\Views\**\*.axaml"
+                     Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**" />
+    </ItemGroup>
+    <GuardPickerFrame Files="@(PickerGuarded)" Condition="'@(PickerGuarded)' != ''" />
+  </Target>
+
+  <UsingTask TaskName="GuardBarePath"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        var pathTag = new Regex("<Path\\b([^>]*?)/?>", RegexOptions.Singleline);
+        var comment = new Regex("<!--.*?-->", RegexOptions.Singleline);
+
+        foreach (var item in Files)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            // Comments blanked to spaces, so an example in one is not read and the lines still count.
+            string text = comment.Replace(File.ReadAllText(path), m => Regex.Replace(m.Value, "[^\\n]", " "));
+
+            Func<int, int> lineOf = index =>
+            {
+                int line = 1;
+                for (int n = 0; n < index; n++) if (text[n] == '\n') line++;
+                return line;
+            };
+
+            foreach (Match m in pathTag.Matches(text))
+            {
+                string attrs = m.Groups[1].Value;
+                if (Regex.IsMatch(attrs, "\\bClasses=\"[^\"]*\\S") || Regex.IsMatch(attrs, "\\b(StrokeThickness|Fill|Theme)="))
+                    continue;
+
+                // Drawn by the switch's own style (Tick.axaml): inside a ToggleButton with the tick class.
+                string before = text.Substring(0, m.Index);
+                int open = before.LastIndexOf("<ToggleButton", StringComparison.Ordinal);
+                int close = before.LastIndexOf("</ToggleButton>", StringComparison.Ordinal);
+                if (open > close)
+                {
+                    int tagEnd = before.IndexOf('>', open);
+                    string toggle = tagEnd < 0 ? before.Substring(open) : before.Substring(open, tagEnd - open);
+                    if (Regex.IsMatch(toggle, "Classes=\"[^\"]*\\btick\\b"))
+                        continue;
+                }
+
+                Log.LogError(null, "PD2UI010", null, path, lineOf(m.Index), 1, 0, 0,
+                    "A Path with no class and no stroke or fill of its own draws nothing: an icon's size and " +
+                    "stroke come from Path.pin (Styles/CommonControls/Glyph.axaml). Give it Classes=\"pin\".");
+            }
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GuardBarePaths" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <BarePathGuarded Include="$(MSBuildProjectDirectory)\Views\**\*.axaml;$(MSBuildProjectDirectory)\CustomControls\**\*.axaml"
+                       Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**;$(MSBuildProjectDirectory)\CustomControls\Third-Party\**" />
+    </ItemGroup>
+    <GuardBarePath Files="@(BarePathGuarded)" Condition="'@(BarePathGuarded)' != ''" />
+  </Target>
+
+  <UsingTask TaskName="GuardRollButton"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        var buttonTag = new Regex("<(Button|ToggleButton)\\b([^>]*?)/?>", RegexOptions.Singleline);
+        var rollCommand = new Regex("Command=\"\\{Binding [^}]*?\\b(Re)?[Rr]oll[A-Za-z]*Command\\}\"");
+        var dice = new Regex("\\[Glyph\\] Dice\\b");
+        var comment = new Regex("<!--.*?-->", RegexOptions.Singleline);
+
+        foreach (var item in Files)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            string text = comment.Replace(File.ReadAllText(path), m => Regex.Replace(m.Value, "[^\\n]", " "));
+
+            Func<int, int> lineOf = index =>
+            {
+                int line = 1;
+                for (int n = 0; n < index; n++) if (text[n] == '\n') line++;
+                return line;
+            };
+
+            foreach (Match m in buttonTag.Matches(text))
+            {
+                if (!rollCommand.IsMatch(m.Groups[2].Value)) continue;
+                Log.LogError(null, "PD2UI012", null, path, lineOf(m.Index), 1, 0, 0,
+                    "A roll button drawn by hand. Use base:RollButton with the Kind of what it rolls: Dice a number, " +
+                    "Cube every number, Flawless a choice, Perfect every choice.");
+            }
+
+            foreach (Match m in dice.Matches(text))
+            {
+                Log.LogError(null, "PD2UI012", null, path, lineOf(m.Index), 1, 0, 0,
+                    "The die drawn in a view. Every roll is base:RollButton, which draws its own picture.");
+            }
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GuardRollButtons" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <RollGuarded Include="$(MSBuildProjectDirectory)\Views\**\*.axaml;$(MSBuildProjectDirectory)\CustomControls\**\*.axaml"
+                   Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**;$(MSBuildProjectDirectory)\CustomControls\Third-Party\**" />
+    </ItemGroup>
+    <GuardRollButton Files="@(RollGuarded)" Condition="'@(RollGuarded)' != ''" />
+  </Target>
+
+  <UsingTask TaskName="GuardWords"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        // The same rule as the wrapping script that brought the views in.
+        string props = @"(?:Text|Content|ToolTip\.Tip|PlaceholderText|Watermark|Header|Title|Message)";
+        var attribute = new Regex(@"(?<=\s)" + props + @"=""([^""]*)""");
+        var setter = new Regex(@"Property=""" + props + @"""\s+Value=""([^""]*)""");
+        var preview = new Regex(@"<Design\.PreviewWith>.*?</Design\.PreviewWith>", RegexOptions.Singleline);
+        var word = new Regex("[A-Za-z]{2}");
+        // A binding's StringFormat with words in it: 'Grant {0}' is text a pack cannot reach either.
+        var format = new Regex(@"(?<=\s)" + props + @"=""\{Binding[^""]*StringFormat='([^']*)'");
+        var pathLike = new Regex("[./]");
+
+        foreach (var item in Files)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            string text = File.ReadAllText(path);
+            var previews = preview.Matches(text);
+
+            foreach (Match f in format.Matches(text))
+            {
+                if (!word.IsMatch(Regex.Replace(f.Groups[1].Value, @"\{[^}]*\}", ""))) continue;
+                int at = 1;
+                for (int n = 0; n < f.Index; n++) if (text[n] == '\n') at++;
+                Log.LogError(null, "PD2UI011", null, path, at, 1, 0, 0,
+                    "StringFormat '" + f.Groups[1].Value + "' writes words in the view, out of reach of a language " +
+                    "pack. Make it a view model property built with L($\"...\").");
+            }
+
+            foreach (Regex pattern in new[] { attribute, setter })
+            {
+                foreach (Match m in pattern.Matches(text))
+                {
+                    string value = m.Groups[1].Value;
+                    if (value.Length == 0 || value.StartsWith("{") || !word.IsMatch(value)) continue;
+                    if (!value.Contains(" ") && pathLike.IsMatch(value) && !value.EndsWith(".")) continue;
+
+                    bool inPreview = false;
+                    foreach (Match p in previews)
+                        if (m.Index >= p.Index && m.Index < p.Index + p.Length) inPreview = true;
+                    if (inPreview) continue;
+
+                    // A lang-guard-ok comment counts for the one element right under it.
+                    int look = Math.Max(0, m.Index - 400);
+                    string before = text.Substring(look, m.Index - look);
+                    int ok = before.LastIndexOf("lang-guard-ok", StringComparison.Ordinal);
+                    if (ok >= 0)
+                    {
+                        int end = before.IndexOf("-->", ok, StringComparison.Ordinal);
+                        string between = end >= 0 ? before.Substring(end + 3) : "";
+                        if (Regex.Matches(between, @"<(?!Setter\b)[A-Za-z]").Count <= 1)
+                            continue;
+                    }
+
+                    int line = 1;
+                    for (int n = 0; n < m.Index; n++) if (text[n] == '\n') line++;
+                    Log.LogError(null, "PD2UI011", null, path, line, 1, 0, 0,
+                        "'" + value + "' is written in the view, out of reach of a language pack. Write it " +
+                        "{L '" + value.Replace("'", @"\'") + "'}.");
+                }
+            }
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GuardWords" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <WordsGuarded Include="$(MSBuildProjectDirectory)\**\*.axaml"
+                    Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**;$(MSBuildProjectDirectory)\Resources\ColorPalette\**" />
+    </ItemGroup>
+    <GuardWords Files="@(WordsGuarded)" Condition="'@(WordsGuarded)' != ''" />
+  </Target>
+
+  <UsingTask TaskName="GuardPresenterContent"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        // Content="{Binding Name}" or "{Binding Name.More}" on a ContentPresenter: a path from its own DataContext.
+        // $parent, #name, Source= and the rest start with something else and pass.
+        var presenter = new Regex("<ContentPresenter\\b[^>]*?\\bContent=\"\\{Binding\\s+(?:Path=)?[A-Za-z_][\\w.]*\\s*\\}\"", RegexOptions.Singleline);
+        var comment = new Regex("<!--.*?-->", RegexOptions.Singleline);
+
+        foreach (var item in Files)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            // Comments blanked to spaces, so an example in one is not read and the lines still count.
+            string text = comment.Replace(File.ReadAllText(path), m => Regex.Replace(m.Value, "[^\\n]", " "));
+
+            foreach (Match m in presenter.Matches(text))
+            {
+                int line = 1;
+                for (int n = 0; n < m.Index; n++) if (text[n] == '\n') line++;
+                Log.LogError(null, "PD2UI013", null, path, line, 1, 0, 0,
+                    "A ContentPresenter's Content bound through its own DataContext stops listening once the content is " +
+                    "null (the presenter makes its content its DataContext). Read it off the parent: " +
+                    "{Binding $parent.((vm:Model)DataContext).Part}.");
+            }
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="GuardToolCommand"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        // An element's start tag that carries base:OverflowRow.Leaves="n".
+        var tool = new Regex("<[\\w:.]+\\b[^<>]*?\\bbase:OverflowRow\\.Leaves=\"\\d+\"[^<>]*?>", RegexOptions.Singleline);
+        var command = new Regex("\\bCommand=\"");
+        var comment = new Regex("<!--.*?-->", RegexOptions.Singleline);
+
+        foreach (var item in Files)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            // Comments blanked to spaces, so an example in one is not read and the lines still count.
+            string text = comment.Replace(File.ReadAllText(path), m => Regex.Replace(m.Value, "[^\\n]", " "));
+
+            foreach (Match m in tool.Matches(text))
+            {
+                if (command.IsMatch(m.Value)) continue;
+                int line = 1;
+                for (int n = 0; n < m.Index; n++) if (text[n] == '\n') line++;
+                Log.LogError(null, "PD2UI014", null, path, line, 1, 0, 0,
+                    "A tool that can be left off its line (base:OverflowRow.Leaves) needs a Command: the \"more\" list " +
+                    "runs the tool's Command, and a Click handler alone is dead there.");
+            }
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GuardToolCommands" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <ToolsGuarded Include="$(MSBuildProjectDirectory)\Views\**\*.axaml;$(MSBuildProjectDirectory)\CustomControls\**\*.axaml"
+                    Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**;$(MSBuildProjectDirectory)\CustomControls\Third-Party\**" />
+    </ItemGroup>
+    <GuardToolCommand Files="@(ToolsGuarded)" Condition="'@(ToolsGuarded)' != ''" />
+  </Target>
+
+  <Target Name="GuardPresenterContents" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <PresenterGuarded Include="$(MSBuildProjectDirectory)\Views\**\*.axaml;$(MSBuildProjectDirectory)\CustomControls\**\*.axaml"
+                        Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**;$(MSBuildProjectDirectory)\CustomControls\Third-Party\**" />
+    </ItemGroup>
+    <GuardPresenterContent Files="@(PresenterGuarded)" Condition="'@(PresenterGuarded)' != ''" />
+  </Target>
+
+</Project>

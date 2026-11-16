@@ -1,0 +1,120 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             xmlns:controls="using:PD2SPCompanion.Shell.CustomControls.Base"
+             x:Class="PD2SPCompanion.Shell.Views.PaymentBody"
+             x:DataType="vm:PaymentViewModel">
+	<!--
+	  A payment's working part - every priced currency counted out, what it comes to, and the
+	  price with the button that settles it - without a frame: the purchase's panel frames it
+	  (PaymentPanel), the sale folds it into the same panel as its search.
+	-->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/GameLock.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+
+		<!-- What a row's count moves by: less in red, more in green. -->
+		<Style Selector="TextBlock.net">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Margin" Value="8,0,0,0"/>
+		</Style>
+		<Style Selector="TextBlock.net.taken">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+		</Style>
+		<Style Selector="TextBlock.net.given">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+		</Style>
+	</UserControl.Styles>
+
+	<!-- The price and the offer pinned under the rows, which scroll: as the purchase had it. -->
+	<DockPanel>
+		<!-- What the player offers, and the tick that pays it. -->
+		<Grid DockPanel.Dock="Bottom" ColumnDefinitions="Auto,Auto,Auto,*,Auto" Margin="0,8,0,0">
+			<TextBlock Grid.Column="0" Classes="dim" Margin="0,0,8,0"
+					   VerticalAlignment="Center" Text="{Binding PriceLabel}"/>
+			<controls:NumericTextBox Grid.Column="1" Classes="value" Width="{StaticResource [UI] Box Value}" FontSize="{StaticResource [Type] Body}"
+									 Decimals="3" Minimum="0"
+									 Classes.invalid="{Binding IsPriceInvalid}"
+									 PlaceholderText="-"
+									 IsReadOnly="{Binding !IsOfferTyped}"
+									 Text="{Binding Price}"/>
+			<TextBlock Grid.Column="2" Classes="dim" Margin="8,0,0,0"
+					   VerticalAlignment="Center" Text="{L 'HR'}"/>
+			<!-- Two ways to pay: an offer typed and counted out, or each currency picked
+			     by hand and the offer what they come to. Lit while picking; a purchase's only. -->
+			<Button Grid.Column="3" Classes="spend" HorizontalAlignment="Left" Margin="12,0,0,0"
+					Classes.on="{Binding PicksByHand}"
+					IsVisible="{Binding !IsReceiving}"
+					Command="{Binding TogglePickingCommand}"
+					ToolTip.Tip="{Binding PickTip}">
+				<Path Classes="pin" Data="{StaticResource [Glyph] Pencil}"/>
+			</Button>
+			<!-- Worded, PAY or SELL, where it was a tick (no ticks). -->
+			<Button Grid.Column="4"
+					Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch"
+					Theme="{DynamicResource [CtrlThm] Button_Primary}"
+					Command="{Binding PayCommand}"
+					Classes.blocked="{Binding PayBlocked}"
+					ToolTip.Tip="{Binding ActionTip}"
+					ToolTip.ShowOnDisabled="True">
+				<Grid ColumnDefinitions="Auto,*">
+					<Path Classes="pin label" Data="{StaticResource [Glyph] Tick}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+					<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{Binding ActionWord}"/>
+				</Grid>
+			</Button>
+		</Grid>
+
+		<!-- The seller's price, and after it what the offer comes to. -->
+		<WrapPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
+			<TextBlock Foreground="{DynamicResource [Text] Body}"
+					   Margin="0,0,12,0"
+					   Text="{Binding PriceText}"/>
+			<TextBlock Classes="dim" Classes.warn="{Binding IsShort}"
+					   Text="{Binding Summary}"/>
+		</WrapPanel>
+
+		<!-- What the materials tab holds in all, over its rows. -->
+		<TextBlock DockPanel.Dock="Top" Classes="dim" FontSize="{StaticResource [Type] Small}"
+				   HorizontalAlignment="Right" Margin="0,0,2,4"
+				   Text="{Binding HoldingText}"/>
+
+		<!-- The currencies, one card, left as the rest of the panel (the rows were
+		     centred, the stock a loose column): the name with its worth and stock beneath, the count right. -->
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+			<Border Classes="section" Padding="8,6" VerticalAlignment="Top">
+				<ItemsControl ItemsSource="{Binding Rows}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate x:DataType="vm:PaymentRow">
+							<Grid ColumnDefinitions="36,*,Auto,Auto,Auto,40" Margin="0,4">
+								<Image Grid.Column="0" Width="28" Height="28" Stretch="Uniform"
+									   Source="{Binding Tile.Sprite}"/>
+								<StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
+									<TextBlock Foreground="{DynamicResource [Text] Body}"
+											   Text="{Binding Name}"/>
+									<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{Binding Detail}"/>
+								</StackPanel>
+								<Button Grid.Column="2" Classes="spend" Command="{Binding LessCommand}" ToolTip.Tip="{L 'Less'}">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+								</Button>
+								<controls:NumericTextBox Grid.Column="3" Classes="value" Width="{StaticResource [UI] Box Small}" FontSize="{StaticResource [Type] Body}" Margin="4,0"
+														 Minimum="0" Maximum="{Binding Limit}"
+														 Text="{Binding Count}"/>
+								<Button Grid.Column="4" Classes="spend" Command="{Binding MoreCommand}" ToolTip.Tip="{L 'More'}">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+								</Button>
+								<TextBlock Grid.Column="5" Classes="net"
+										   Classes.taken="{Binding IsTaken}"
+										   Classes.given="{Binding IsGiven}"
+										   Text="{Binding NetText}"/>
+							</Grid>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</Border>
+		</ScrollViewer>
+	</DockPanel>
+</UserControl>

@@ -1,0 +1,81 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:chrome="using:Avalonia.Controls.Chrome"
+        xmlns:helper="using:PD2SPCompanion.Shell.Helper"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+
+		mc:Ignorable="d"
+		Width="320" Height="320"
+
+        x:Class="PD2SPCompanion.Shell.Views.SplashWindow"
+		x:DataType="vm:SplashWindowViewModel"
+
+        Icon="/Assets/pd2spc.ico"
+        Title="{DynamicResource [UI Text] App Title}"
+
+		Background="Black"
+
+		WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="-1">
+
+	<Window.WindowDecorationsTheme>
+		<ControlTheme TargetType="chrome:WindowDrawnDecorations">
+			<Setter Property="Template">
+				<helper:EmptyWindowDecorations/>
+			</Setter>
+		</ControlTheme>
+	</Window.WindowDecorationsTheme>
+	<!-- The editor's own splash, the same on every start: its badge, its name and version, and what it is
+	     loading (App.ApplicationStart_Complete says each step). Not the game's loading screen:
+	     a first run, with no folder yet, has none to show. One splash,
+	     that is the editor's and says what it waits on. -->
+	<!-- A gold frame drawn just inside the window's edge: the border Windows draws is one pixel, too thin to see.
+	     Rounded as Windows 11 rounds the window. -->
+	<Border BorderThickness="1" CornerRadius="8" BorderBrush="{DynamicResource [UI] GradBrush - Frame - Golden#02}">
+	<DockPanel Margin="23">
+		<!-- A thin gold track, a brighter run sweeping along it - moved by the compositor, so it keeps going
+		     while the UI thread is busy with a step (SplashWindow.Sweep). Hidden where animations are off. -->
+		<Border DockPanel.Dock="Bottom" x:Name="Track" Height="2" Width="200" ClipToBounds="True"
+				Background="{DynamicResource [Brush] Frame - Golden Dim}">
+			<Border x:Name="Run" Width="60" HorizontalAlignment="Left">
+				<Border.Background>
+					<LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+						<GradientStop Color="Transparent" Offset="0"/>
+						<GradientStop Color="#BFAC69" Offset="0.5"/>
+						<GradientStop Color="Transparent" Offset="1"/>
+					</LinearGradientBrush>
+				</Border.Background>
+			</Border>
+		</Border>
+		<TextBlock DockPanel.Dock="Bottom" x:Name="Status" Margin="0,0,0,8"
+				   HorizontalAlignment="Center"
+				   FontSize="{StaticResource [Type] Small}" Foreground="{DynamicResource [Text] Body}"/>
+
+		<!-- The badge, the name and the version, centred in what is left. -->
+		<StackPanel VerticalAlignment="Center">
+			<Image Source="/Assets/pd2spc-logo.png" Width="112" Height="112"
+				   RenderOptions.BitmapInterpolationMode="HighQuality"/>
+			<!-- Made smaller where it would not fit, never cut: in
+			     Cinzel, the face that ships, the name is wider than the window leaves it - it was drawn past both
+			     edges - and a face of the player's own (the Fonts folder) may be wider still. -->
+			<!-- On two lines of one size (it was three lines for a few minutes). -->
+			<Viewbox Stretch="Uniform" StretchDirection="DownOnly" Margin="0,14,0,0" HorizontalAlignment="Center">
+				<StackPanel>
+					<TextBlock Text="{DynamicResource [UI Text] App Title Main}" HorizontalAlignment="Center"
+							   FontFamily="{StaticResource DiabloFont}" FontSize="{StaticResource [Type] Heading}" FontWeight="Bold"
+							   Foreground="{DynamicResource [Text] Heading}"/>
+					<TextBlock Text="{DynamicResource [UI Text] App Title Rest}" HorizontalAlignment="Center" Margin="0,3,0,0"
+							   FontFamily="{StaticResource DiabloFont}" FontSize="{StaticResource [Type] Heading}" FontWeight="Bold"
+							   Foreground="{DynamicResource [Text] Heading}"/>
+				</StackPanel>
+			</Viewbox>
+			<TextBlock x:Name="Version" Margin="0,4,0,0"
+					   HorizontalAlignment="Center"
+					   FontSize="{StaticResource [Type] Small}" Foreground="{DynamicResource [Text] Muted}"/>
+		</StackPanel>
+	</DockPanel>
+	</Border>
+</Window>

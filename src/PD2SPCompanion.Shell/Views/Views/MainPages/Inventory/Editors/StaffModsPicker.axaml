@@ -1,0 +1,113 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="760"
+             x:Class="PD2SPCompanion.Shell.Views.StaffModsPicker"
+             x:DataType="vm:StaffModsEditor">
+
+	<UserControl.Styles>
+		<!-- The brush beside each staff mod held. -->
+		<StyleInclude Source="/Styles/CommonControls/BareIcon.axaml"/>
+	</UserControl.Styles>
+
+	<!-- Staff mods, just like superior. The top says what the item carries, up to three;
+	     the list below is its class's skills - a click puts one on at +3 or takes it off, the picker staying open for
+	     the next. The die rolls a set as the game does; the bin empties it. -->
+	<Border Classes="veil"
+			IsVisible="{Binding IsPickerPresent}"
+			Classes.shown="{Binding IsPickerOpen}"
+			IsHitTestVisible="{Binding IsPickerOpen}">
+		<Panel>
+			<Button Classes="backdrop"
+				    Command="{Binding ClosePickerCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<Border Classes="pickerpanel">
+					<DockPanel>
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,8">
+							<!-- The title and, beside it, the most an item carries: a ceiling, not a count to fill. -->
+							<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+								<TextBlock Classes="pickertitle" Text="{L 'Staffmods'}"/>
+								<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" VerticalAlignment="Center"
+										   Text="{Binding Limits}"/>
+							</StackPanel>
+
+							<base:RollButton Kind="Perfect" Grid.Column="1" Margin="0,0,6,0"
+									Command="{Binding RollCommand}"
+									ToolTip.Tip="{L 'Random staffmods'}"/>
+
+							<!-- The brush, as the corruption's clean: the cross beside it is Close alone. -->
+							<Button Grid.Column="2" Classes="spend bin" Margin="0,0,6,0"
+									Command="{Binding ClearCommand}"
+									ToolTip.Tip="{L 'Remove staffmods'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Clean}"/>
+							</Button>
+
+							<Button Grid.Column="3" Classes="spend"
+									Command="{Binding ClosePickerCommand}"
+									ToolTip.Tip="{L 'Close'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</Grid>
+
+						<!-- 1. What it carries now. -->
+						<Border DockPanel.Dock="Top" Classes="section" Padding="10,8"
+								Margin="0,0,0,8">
+							<StackPanel>
+								<TextBlock Classes="fieldname" Margin="0,0,0,4" Text="{L 'Bonus'}"/>
+
+								<TextBlock Classes="dim" IsVisible="{Binding HasNone}" Text="{L 'None'}"/>
+
+								<!-- Each with its own brush: one taken off, the others kept. -->
+								<ItemsControl ItemsSource="{Binding HeldRows}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate x:DataType="vm:StaffModHeldRow">
+											<Grid ColumnDefinitions="*,Auto" Margin="0,1">
+												<TextBlock Grid.Column="0" Text="{Binding Line}" Classes="affix" VerticalAlignment="Center"/>
+												<Button Grid.Column="1" Classes="bareicon"
+														Command="{Binding $parent[UserControl].((vm:StaffModsEditor)DataContext).TakeOffCommand}"
+														CommandParameter="{Binding}"
+														ToolTip.Tip="{L 'Remove staffmod'}">
+													<Path Classes="pin" Data="{StaticResource [Glyph] Clean}"/>
+												</Button>
+											</Grid>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</StackPanel>
+						</Border>
+
+						<!-- 2. The class's skills, the item level each needs at the right. -->
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled"
+								      AllowAutoHide="False">
+							<ItemsControl ItemsSource="{Binding Choices}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:StaffModChoiceRow">
+										<!-- Greyed, and said at the right, where the item carries its most already. -->
+										<Button Classes="pickone"
+												Classes.held="{Binding IsHeld}"
+												IsEnabled="{Binding CanPick}"
+												Command="{Binding $parent[UserControl].((vm:StaffModsEditor)DataContext).ToggleCommand}"
+												CommandParameter="{Binding}">
+											<Grid ColumnDefinitions="*,Auto">
+												<TextBlock Grid.Column="0" Classes="affix" Text="{Binding Name}"
+														   Classes.needslevel="{Binding IsAboveLevel}"/>
+												<TextBlock Grid.Column="1" Classes="dim" Margin="8,0,0,0"
+														   Classes.needslevel="{Binding IsAboveLevel}"
+														   FontSize="{StaticResource [Type] Small}" VerticalAlignment="Center"
+														   Text="{Binding Said}"/>
+											</Grid>
+										</Button>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</DockPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+</UserControl>

@@ -1,0 +1,68 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:sys="using:System">
+	<!-- General Sizes -->
+	<!-- How far a button that cannot act is dimmed, frame and glyph together: seen, and plainly off. It was
+	     0.25 (0.35 on a row's icon), which on the dark page left a gap where the button stood.
+	     Then 0.5, and soon 0.4: with the idle dice dimmed too, a list of rows had many of
+	     them, and 0.5 was "a bit strong". -->
+	<sys:Double x:Key="[UI] Disabled Opacity">0.4</sys:Double>
+
+	<!-- What repeats, said once: the action button - KEEP's size once,
+	     now every worded button's, written out 29 times - and the three widths a drop-down beside a setting or
+	     in a row of boxes takes (they were 113, 150, 160 and 200). -->
+	<sys:Double x:Key="[UI] Button Height">28</sys:Double>
+	<sys:Double x:Key="[UI] Button Width">112</sys:Double>
+	<sys:Double x:Key="[UI] Drop Small">113</sys:Double>
+	<sys:Double x:Key="[UI] Drop Medium">160</sys:Double>
+	<!-- Wide enough for the longest choice it holds, so a row of them is one width whatever is chosen (the Experimental
+	     page's "Level 85 + Cows + Maps" stretched its box past the others at 200). -->
+	<sys:Double x:Key="[UI] Drop Wide">240</sys:Double>
+	<!-- A pair of choices, side by side (two choices are a pair, three or more a
+	     drop-down; one width for a pair - they were 160 and 236): the wider, which is what SOFTCORE and
+	     HARDCORE need in the buttons' spaced capitals - at 200 both were cut short. -->
+	<sys:Double x:Key="[UI] Pair Width">236</sys:Double>
+
+	<sys:Double x:Key="[UI] Windows MinWidth">1280</sys:Double>
+	<sys:Double x:Key="[UI] Windows MinHeight">720</sys:Double>
+
+	<sys:Double x:Key="[UI] Page PreviewWidth">504</sys:Double>
+	<sys:Double x:Key="[UI] Page PreviewHeight">581</sys:Double>
+	<!-- Header Bar Sizes -->
+	<sys:Double x:Key="[UI] Windows HeaderBar_Height">30</sys:Double>
+	<sys:Double x:Key="[UI] Windows HeaderBar_ButtonWidth">46</sys:Double>
+	<sys:Double x:Key="[UI] Windows HeaderBar_ToolTipOffset">4</sys:Double>
+	<!-- UI Frame Sizes -->
+	<sys:Double x:Key="[UI] Sidebar Width">72</sys:Double>
+
+	<!-- A number box's width, three sizes (there were nine): a count or points,
+	     a property's value, and gold or experience. -->
+	<sys:Double x:Key="[UI] Box Small">56</sys:Double>
+	<sys:Double x:Key="[UI] Box Value">72</sys:Double>
+	<sys:Double x:Key="[UI] Box Wide">120</sys:Double>
+	<!-- The widest a tooltip grows before it wraps: an item's longest line with its bracket. -->
+	<sys:Double x:Key="[UI] Tip Wide">600</sys:Double>
+	<sys:Double x:Key="[UI] Sidebar IconWidth">48</sys:Double>
+	<sys:Double x:Key="[UI] Sidebar ToolTipOffset">15.5</sys:Double>
+	
+	<sys:Double x:Key="[UI] Frame CornerSize">48</sys:Double>
+	<sys:Double x:Key="[UI] Frame BorderSize">32</sys:Double>
+	<!-- The gutter between the two pages, the old pillar kept and the pages over it:
+	     what of the pillar shows between the pages' gold inner edges. The pages stood beside the pillar's whole 48. -->
+	<sys:Double x:Key="[UI] Frame BarSize">12</sys:Double>
+	<!-- The pillar's width: a fifth narrower than its first 48 (it was thick) - the gutter's column and 13 under each
+	     page. Its art is not made smaller with it but cut, the
+	     middle shown (scaled, the texture was denser than the frames'): BarArt is the art's
+	     width as it is drawn (FrontEndArt.BarWidth). -->
+	<sys:Double x:Key="[UI] Frame BarWidth">38</sys:Double>
+	<sys:Double x:Key="[UI] Frame BarArt">48</sys:Double>
+	<sys:Double x:Key="[UI] Frame MidDecorSize">72</sys:Double>
+
+	<CornerRadius x:Key="[UI] MainViewPage_L CornerSize">4 0 0 4</CornerRadius>
+	<CornerRadius x:Key="[UI] MainViewPage_R CornerSize">0 4 4 0</CornerRadius>
+	<CornerRadius x:Key="[UI] MainViewPage_R CornerSize_RT">0 4 0 0</CornerRadius>
+	
+	<!-- Text Size -->
+	<sys:Double x:Key="[UI] TextSize CommonText_Title">20</sys:Double>
+	<sys:Double x:Key="[UI] TextSize CommonText">16</sys:Double>
+</ResourceDictionary>

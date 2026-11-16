@@ -1,0 +1,13 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  Text selected in any box is drawn in the app's own gold, its letters in the dark the primary buttons
+	  write on it - readable, and of the theme. The framework's was its accent blue. Every text box, words or numbers: the
+	  slim number box
+	  (ControlThemes/TextBox/NumberBox.axaml) takes both brushes through to its text.
+	-->
+	<Style Selector=":is(TextBox)">
+		<Setter Property="SelectionBrush" Value="{DynamicResource [Brush] Button - Primary}"/>
+		<Setter Property="SelectionForegroundBrush" Value="{DynamicResource [Text] On Primary}"/>
+	</Style>
+</Styles>

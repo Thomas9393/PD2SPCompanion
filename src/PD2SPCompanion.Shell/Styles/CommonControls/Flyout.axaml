@@ -1,0 +1,22 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<!--
+	  A flyout's content is hosted in a FlyoutPresenter, which brings its own pale chrome:
+	  a light background, a border and padding, drawn around whatever it is given. That is
+	  the white frame around the skill picker.
+
+	  It has to be styled here rather than beside the flyout that uses it. The presenter
+	  lives in a popup with a visual tree of its own, so a style in the page never reaches
+	  it; application styles do.
+
+	  Cleared rather than recoloured: every flyout in this app brings its own framed panel,
+	  so the presenter only needs to get out of the way.
+	-->
+	<Style Selector="FlyoutPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="CornerRadius" Value="0"/>
+	</Style>
+</Styles>

@@ -1,0 +1,49 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PD2SPCompanion.Shell.CustomControls.Base.BinButton"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base">
+	<!--
+	  The bin that asks twice: a first click turns it into a red tick, a second click on the tick
+	  means it, and a press anywhere else takes the question back. The command decides what each
+	  click does - it arms on the first and acts on the second - and this control draws the two
+	  states and does the taking back, through IsArmed, bound two-way:
+
+	      <base:BinButton Command="{Binding DeleteCommand}" IsArmed="{Binding DeleteArmed}"
+	                      Tip="{Binding DeleteHint}" IsEnabled="{Binding CanDelete}"/>
+
+	  Written once on the inventory page and copied to the vault page, each with its own handler
+	  for the press elsewhere; the settings page wanted a third, and it is this control now.
+
+	  Glyph, when given, is drawn in place of the bin - Store all's, a preset's import. Positive turns its red green: the
+	  inventory's Store all asks twice as delete does, and is not a loss.
+	-->
+	<UserControl.Styles>
+		<!-- ActionButton and SpendButton, the two it wears, are its hosts' to include (PD2UI005): here they
+		     were read again for every bin made (as SortMenu's were). -->
+		<!-- The first half of a split button (Leads): square at the right, where its arrow joins it. -->
+		<Style Selector="Button.bin.leads">
+			<Setter Property="CornerRadius" Value="4,0,0,4"/>
+		</Style>
+	</UserControl.Styles>
+
+	<!-- The tool buttons' (lock) by default; Compact, the row's small square (spend). The paths are
+	     "pin" so the small square fits them to its box; the tool buttons draw them as they are. -->
+	<Button Classes="bin"
+			Classes.lock="{Binding !$parent[base:BinButton].Compact}"
+			Classes.spend="{Binding $parent[base:BinButton].Compact}"
+			Classes.armed="{Binding $parent[base:BinButton].IsArmed}"
+			Classes.go="{Binding $parent[base:BinButton].Positive}"
+			Classes.leads="{Binding $parent[base:BinButton].Leads}"
+			Command="{Binding $parent[base:BinButton].Command}"
+			CommandParameter="{Binding $parent[base:BinButton].CommandParameter}"
+			ToolTip.Tip="{Binding $parent[base:BinButton].Tip}"
+			ToolTip.ShowOnDisabled="True">
+		<Panel>
+			<Path Classes="pin" Data="{StaticResource [Glyph] Bin}" IsVisible="{Binding $parent[base:BinButton].ShowsBin}"/>
+			<ContentPresenter Content="{Binding $parent[base:BinButton].Glyph}"
+							  IsVisible="{Binding $parent[base:BinButton].ShowsGlyph}"
+							  Width="18" Height="18"/>
+			<Path Classes="pin" Data="{StaticResource [Glyph] Tick}" IsVisible="{Binding $parent[base:BinButton].IsArmed}"/>
+		</Panel>
+	</Button>
+</UserControl>

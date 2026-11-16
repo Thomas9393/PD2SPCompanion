@@ -1,0 +1,77 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             xmlns:views="using:PD2SPCompanion.Shell.Views"
+             xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             x:Class="PD2SPCompanion.Shell.Views.ItemSummary"
+             x:DataType="vm:ItemTileViewModel">
+	<!-- An item summed up as the page beside it has it: one part art with its sockets
+	     under it, two parts words - its name in the heading's face, under it its code and rarity (and its id,
+	     where it is in a file), and the lines the game would print, laid out as a vault card in its
+	     details view. Drawn off a tile: the item panel hands it the selected item's own, or one over the item
+	     as staged (VP_ViewModel_Inv_R.Summary), so it follows an item being edited. The head stays; the lines
+	     scroll under it. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/ItemWording.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+	</UserControl.Styles>
+
+	<Grid ColumnDefinitions="1*,2*">
+		<!-- The art's room: the summary's whole height, or - where its host gives the words more height than the
+		     art, for something of its own under the art (ArtHeight) - that much of it, from the top. -->
+		<Panel Grid.Column="0" Name="ArtRoom">
+			<StackPanel Margin="2,0,10,0"
+						HorizontalAlignment="Center" VerticalAlignment="Center">
+				<Image Stretch="None" MaxHeight="132"
+					   Source="{Binding Sprite}"
+					   Opacity="{Binding SpriteOpacity}"/>
+				<!-- The sockets' room, kept whether or not the item has any (the pair was centred, so a first socket
+				     pushed the art up by half the row's height). The art's place is the same with them and without. -->
+				<Panel Height="23">
+					<base:SocketRow IsOneRow="True" Scale="0.65"
+									HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+				</Panel>
+			</StackPanel>
+		</Panel>
+
+		<DockPanel Grid.Column="1">
+			<!-- The name in the heading's face, as the Edit page named its item: here it is the page's subject,
+			     not one row among many - a vault card's name stays in the body's. -->
+			<TextBlock DockPanel.Dock="Top" Classes="heading"
+					   AutomationProperties.AutomationId="Item_Name"
+					   Text="{Binding View.Name}"
+					   Foreground="{Binding RarityBrush}"
+					   TextWrapping="Wrap"/>
+
+			<!-- No rule under them: a little air, then the item's own lines. -->
+			<TextBlock DockPanel.Dock="Top" Classes="dim" FontSize="{StaticResource [Type] Small}"
+					   Margin="0,2,0,6" TextWrapping="Wrap"
+					   IsVisible="{Binding !$parent[views:ItemSummary].ShowsId}"
+					   Text="{Binding SummaryFacts}"/>
+			<TextBlock DockPanel.Dock="Top" Classes="dim" FontSize="{StaticResource [Type] Small}"
+					   Margin="0,2,0,6" TextWrapping="Wrap"
+					   IsVisible="{Binding $parent[views:ItemSummary].ShowsId}"
+					   Text="{Binding SummaryFactsWithId}"/>
+
+			<!-- Why what is staged cannot be kept - a value out of range, a gem with nowhere to go - where the
+			     page has something to say (the item panel's ChangeNote): under the facts, the whole width, in
+			     the warning's colour. It stood in the foot, between the tools and KEEP, and wrapped there. -->
+			<TextBlock DockPanel.Dock="Top" FontSize="{StaticResource [Type] Small}"
+					   Margin="0,0,0,6" TextWrapping="Wrap"
+					   Foreground="{DynamicResource [Text] Warning}"
+					   IsVisible="{Binding $parent[views:ItemSummary].Warning, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+					   Text="{Binding $parent[views:ItemSummary].Warning}"/>
+
+			<!-- As tall as its host leaves it: the lines scroll inside. -->
+			<ScrollViewer HorizontalScrollBarVisibility="Disabled"
+						  VerticalScrollBarVisibility="Auto"
+						  AllowAutoHide="False">
+				<!-- Drawn by one control (ItemFactLines): as a list of line controls, every number
+				     stepped on the page made all of them anew - the item's lines are a new list after each
+				     change - and the lines flickered. Drawn, a new list is
+				     painted over the old. -->
+				<base:ItemFactLines Items="{Binding Tooltip}"/>
+			</ScrollViewer>
+		</DockPanel>
+	</Grid>
+</UserControl>

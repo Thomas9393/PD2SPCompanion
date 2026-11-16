@@ -1,0 +1,107 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Design.PreviewWith>
+		<Border Padding="20" Background="#0A0101" Height="220">
+			<ScrollViewer>
+				<StackPanel>
+					<TextBlock Text="one" Height="60"/>
+					<TextBlock Text="two" Height="60"/>
+					<TextBlock Text="three" Height="60"/>
+					<TextBlock Text="four" Height="60"/>
+				</StackPanel>
+			</ScrollViewer>
+		</Border>
+	</Design.PreviewWith>
+
+	<!--
+		The scrollbar: a sunken track, and a thumb in the selection red, brightening as it is
+		hovered and dragged. Flat colour rather than the button stone - at ten pixels wide a
+		texture is only noise, and the red ties the thumb to everything else that means
+		"this is the one you are on".
+
+		Replaces Fluent's implicit theme rather than restyling it. That also settles the
+		widening: Fluent's bar is a thin line that swells to a wide one on hover, and there
+		is no expanded state here at all - it is the slim bar all the time. The stepper
+		arrows are left out; the thumb and the wheel are enough, and a pair of tiny arrow
+		buttons would want artwork we do not have.
+	-->
+	<ControlTheme x:Key="[CtrlThm] Diablo2 ScrollThumb" TargetType="Thumb">
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Border Name="PART_Face"
+						Background="{DynamicResource [Brush] Selection - Highlight}"
+						BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}"
+						BorderThickness="1"
+						CornerRadius="2"/>
+			</ControlTemplate>
+		</Setter>
+
+		<Style Selector="^:pointerover /template/ Border#PART_Face, ^:focus-visible /template/ Border#PART_Face">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Selection - Highlight Hover}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+		</Style>
+		<Style Selector="^:pressed /template/ Border#PART_Face">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Selection - Highlight Hover}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+		</Style>
+	</ControlTheme>
+
+	<ControlTheme x:Key="{x:Type ScrollBar}" TargetType="ScrollBar">
+		<Setter Property="Background" Value="#26000000"/>
+		<Setter Property="Cursor" Value="Arrow"/>
+
+		<Setter Property="Template">
+			<ControlTemplate>
+				<!-- The gap between a bar and what it scrolls is the bar's own padding, drawn
+				     transparent, not a margin. A margin is space that belongs to nobody: the
+				     wheel over it reached neither the bar nor the scrolled content, and fell
+				     through to whatever was behind - measured on the vault list, dead
+				     for the 8 px beside every scrollbar in the app. Padding is the bar's, and the
+				     wheel over the bar scrolls. -->
+				<Border Background="Transparent" Padding="{TemplateBinding Padding}">
+				<Border Background="{TemplateBinding Background}"
+						BorderBrush="{DynamicResource [Brush] Template - Border#2}"
+						BorderThickness="1"
+						CornerRadius="3"
+						Padding="2">
+					<Track Name="PART_Track"
+						   Minimum="{TemplateBinding Minimum}"
+						   Maximum="{TemplateBinding Maximum}"
+						   Value="{TemplateBinding Value, Mode=TwoWay}"
+						   ViewportSize="{TemplateBinding ViewportSize}"
+						   Orientation="{TemplateBinding Orientation}">
+						<Track.Thumb>
+							<Thumb Theme="{StaticResource [CtrlThm] Diablo2 ScrollThumb}"/>
+						</Track.Thumb>
+					</Track>
+				</Border>
+				</Border>
+			</ControlTemplate>
+		</Setter>
+
+		<!-- A vertical track counts downwards, so its value runs the other way.
+		     The gap is part of the bar rather than of each page: docked, it would otherwise
+		     sit flush against whatever it scrolls. 18 wide is the 8 px gap, as padding, and
+		     the 10 px bar - the same room the old margin and width took together. -->
+		<Style Selector="^:vertical">
+			<Setter Property="Width" Value="18"/>
+			<Setter Property="MinWidth" Value="18"/>
+			<Setter Property="Padding" Value="8,0,0,0"/>
+		</Style>
+		<Style Selector="^:vertical /template/ Track#PART_Track">
+			<Setter Property="IsDirectionReversed" Value="True"/>
+		</Style>
+		<Style Selector="^:vertical /template/ Thumb">
+			<Setter Property="MinHeight" Value="28"/>
+		</Style>
+
+		<Style Selector="^:horizontal">
+			<Setter Property="Height" Value="18"/>
+			<Setter Property="MinHeight" Value="18"/>
+			<Setter Property="Padding" Value="0,8,0,0"/>
+		</Style>
+		<Style Selector="^:horizontal /template/ Thumb">
+			<Setter Property="MinWidth" Value="28"/>
+		</Style>
+	</ControlTheme>
+</ResourceDictionary>

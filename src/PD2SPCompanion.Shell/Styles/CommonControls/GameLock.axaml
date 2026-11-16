@@ -1,0 +1,44 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  A button turned off because the game is running - Save, Restore, Rename, and the vault
+	  moves, buy and sell that would write the game's files at the next save. Class "blocked",
+	  bound to the page's "game is running" state, beside IsEnabled and a tooltip that shows
+	  while disabled:
+
+	      <Button Classes.blocked="{Binding SaveBlocked}" IsEnabled="{Binding CanSaveNow}"
+	              ToolTip.Tip="{Binding SaveHint}" ToolTip.ShowOnDisabled="True"/>
+
+	  Red and readable rather than dimmed: an ordinary disabled button says "nothing to do", and
+	  this one has to say "something is in the way". Included last on a page, so it wins over
+	  the page's own icon colours. See GameSync.
+	-->
+	<Style Selector="Button.blocked">
+		<Setter Property="Cursor" Value="No"/>
+	</Style>
+
+	<!-- The action theme's frame and face (Save, Rename, the vault's toolbar). The colour only:
+	     the thickness stays whatever the button has, so the top bar's frameless Save stays
+	     frameless. -->
+	<Style Selector="Button.blocked:disabled /template/ Border#PART_Frame">
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Broken items}"/>
+	</Style>
+	<Style Selector="Button.blocked:disabled /template/ Grid#PART_Container">
+		<Setter Property="Opacity" Value="0.9"/>
+	</Style>
+
+	<!-- The small spend buttons (Pay) dim the whole button instead. -->
+	<Style Selector="Button.spend.blocked:disabled">
+		<Setter Property="Opacity" Value="0.9"/>
+	</Style>
+
+	<Style Selector="Button.blocked Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Broken items}"/>
+		<Setter Property="Opacity" Value="1"/>
+	</Style>
+	<!-- The button's own words only: a tooltip is in its button's logical tree, and a plain
+	     descendant selector would turn the tooltip red too (see ActionButton.axaml). -->
+	<Style Selector="Button.blocked > TextBlock, Button.blocked > Grid > TextBlock, Button.blocked > StackPanel > TextBlock">
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Danger}"/>
+	</Style>
+</Styles>

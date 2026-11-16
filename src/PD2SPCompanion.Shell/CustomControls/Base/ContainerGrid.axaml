@@ -1,0 +1,134 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+
+             mc:Ignorable="d"
+             x:Class="PD2SPCompanion.Shell.CustomControls.Base.ContainerGrid">
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/ItemTile.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Selection.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemMarks.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/StackCount.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/DuplicateBadge.axaml"/>
+
+		<!-- Joined to the block above: no top border and no top padding, so its cells start where
+		     that block's cells end and lie over its bottom frame, gold line and all. -->
+		<!-- A stretch of the vault's sheet (PageRowView): its sides framed, nothing above or below, so the next
+		     stretch's cells begin where its own end and an item lies over the join unbroken. -->
+		<Style Selector="Border.gridframe.band">
+			<Setter Property="BorderThickness" Value="1,0"/>
+			<Setter Property="Padding" Value="2,0"/>
+			<Setter Property="CornerRadius" Value="0"/>
+		</Style>
+
+		<Style Selector="Border.gridframe.joined">
+			<Setter Property="BorderThickness" Value="1,0,1,1"/>
+			<Setter Property="Padding" Value="2,0,2,2"/>
+			<Setter Property="CornerRadius" Value="0,0,2,2"/>
+		</Style>
+
+
+
+
+		<Style Selector="TextBlock.fact">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Normal items}"/>
+		</Style>
+		<Style Selector="TextBlock.magic">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Magic items}"/>
+		</Style>
+		<Style Selector="TextBlock.corrupt">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Corrupted}"/>
+		</Style>
+		<Style Selector="TextBlock.desecrate">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		</Style>
+		<Style Selector="TextBlock.skin">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Crafted items}"/>
+		</Style>
+		<!-- A requirement the character does not meet: red, as the game prints it. -->
+		<!-- A set piece's green bonus, in the set green. -->
+		<Style Selector="TextBlock.setbonus">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+		</Style>
+		<Style Selector="TextBlock.unmet">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+		</Style>
+		<Style Selector="TextBlock.warn">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+		</Style>
+		<Style Selector="TextBlock.bracket">
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+		</Style>
+	</UserControl.Styles>
+
+	<UserControl.Resources>
+		<!-- The few controls over a tile, built by the layer (TileLayer) on a tile that shows one and taken away
+		     when it no longer does. Everything else of a tile the layer paints. -->
+		<DataTemplate x:Key="TileExtras" x:DataType="vm:ItemTileViewModel">
+			<Panel>
+				<!-- The vault's moves, waiting for a save - see ItemMarks.axaml. At the
+				     top right, where nothing else on a tile sits. -->
+				<Path Classes="move up" IsVisible="{Binding IsLeaving}"
+					  HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,2,2,0"/>
+				<Path Classes="move down" IsVisible="{Binding IsArriving}"
+					  HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,2,2,0"/>
+
+				<!-- An item the game could not have held: the worn slots' alert, on a tile too
+				     (else a slot marked it and a grid did not). Bottom right on both -
+				     the one corner nothing else of a tile takes: the count is bottom left, the
+				     duplicate badge top left, a note's mark and the moves' arrows top right. -->
+				<Path Classes="pin small" Data="{StaticResource [Glyph] Alert}" IsVisible="{Binding IsImpossible}"
+					  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,1,1"
+					  Stroke="{DynamicResource [Text] Danger}" Fill="#66CC2200" IsHitTestVisible="False"/>
+
+				<!-- Held more than once, under the play rule: top left, a click shows
+				     every copy - see DuplicateBadge.axaml. -->
+				<Button Classes="dupe" IsVisible="{Binding IsDuplicate}"
+						Command="{Binding ShowCopiesCommand}"
+						ToolTip.Tip="{Binding DuplicateHint}"/>
+			</Panel>
+		</DataTemplate>
+	</UserControl.Resources>
+
+	<!-- The grid is drawn at the size the game gives it, so an empty cube is still four
+	     cells by four. -->
+	<Border Classes="gridframe" HorizontalAlignment="Center"
+			Classes.joined="{Binding $parent[base:ContainerGrid].IsJoinedAbove}"
+			Classes.band="{Binding $parent[base:ContainerGrid].IsBand}">
+		<Panel Width="{Binding $parent[base:ContainerGrid].Source.Width}"
+			   Height="{Binding $parent[base:ContainerGrid].Source.Height}">
+			<!-- The ruled cells sit underneath, so an item laid over them hides the lines it covers.
+			     One control draws them all and finds a cell by arithmetic (CellLayer): a control
+			     per cell was four hundred of them on one stash page, rebuilt with every move. -->
+			<base:CellLayer Source="{Binding $parent[base:ContainerGrid].Source}"
+							IsHolding="{Binding $parent[base:ContainerGrid].IsHolding}"
+							PlaceAtCommand="{Binding $parent[base:ContainerGrid].PlaceAtCommand}"/>
+
+			<!-- Charms only count below this. The game does not refuse one above it, so
+			     neither does the page. -->
+			<Border Classes="charmline"
+					IsVisible="{Binding $parent[base:ContainerGrid].Source.HasDivider}"
+					Margin="{Binding $parent[base:ContainerGrid].Source.DividerMargin}"/>
+
+			<!-- Every item, drawn by one control (TileLayer): there is no control an item.
+			     It paints each tile - the frame its button drew, the quality as a wash behind the art, the reds,
+			     the art, the ring, the gems, a stack's count - finds the one under the pointer by arithmetic, and
+			     gives what a button gave: the click, the tooltip, the name UI Automation finds an item by.
+			     A pick list for the drag rectangle of the section around the grid (DragPick), which asks it where
+			     its tiles are. A grid on a page with no such section is picked over by none.
+			     Not clipped on a stretch of the vault's sheet (IsBand): an item whose top is on its last row
+			     reaches down over the next stretch. -->
+			<base:TileLayer x:Name="Tiles" Classes="picklist"
+							Items="{Binding $parent[base:ContainerGrid].Source.Items}"
+							IsDimmed="{Binding $parent[base:ContainerGrid].IsDimmed}"
+							SocketOpacity="{Binding $parent[base:ContainerGrid].SocketOpacity}"
+							ClickTileCommand="{Binding $parent[base:ContainerGrid].ClickTileCommand}"
+							ExtrasTemplate="{StaticResource TileExtras}"
+							ClipToBounds="{Binding !$parent[base:ContainerGrid].IsBand}"/>
+		</Panel>
+	</Border>
+</UserControl>

@@ -1,0 +1,133 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:vault="using:PD2SPCompanion.Shell.Services.Vault"
+			 xmlns:data="using:PD2SPCompanion.Core.Items"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:controls="using:PD2SPCompanion.Shell.CustomControls.Base"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Vault_R"
+			 x:DataType="vm:VP_ViewModel_Vault_R"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_R CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Vault_R/>
+	</Design.DataContext>
+
+	<!-- Nothing here is new dress: the page text, the page-level buttons, the framed section with
+	     its small labels, the value box and the drop box are all shared files. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ComboBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemCard.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemWording.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemMarks.axaml"/>
+
+	</UserControl.Styles>
+
+	<Panel>
+		<!-- Edit with nothing chosen: the watermark the landing page wears, centred on the whole page as it is
+		     there - placed in the item panel under the title, it sat lower. Its words are at
+		     the foot of this panel, over everything, centred the same. -->
+		<Image Classes="D2LogoBG">
+			<Image.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="IsEdit"/>
+					<Binding Path="!Editor.HasItem"/>
+				</MultiBinding>
+			</Image.IsVisible>
+		</Image>
+
+		<!-- The page its bookmark shows: Edit, Grail, Forge or Search, each a page
+		     of a deck of its own - the main view's two pages are kept in one, and cross-fade as one gives way to
+		     another (PageDeck). The four are one page of that deck, so going between them was a cut where every
+		     other change of page is a fade. The same deck, the same fade, switched off by the same setting.
+		     Each has its own title row: the one leaving keeps its title while it fades. The code-behind puts the
+		     state shown in front. -->
+		<base:PageDeck Name="States" Margin="16">
+			<base:PageDeck.PageTransition>
+				<CrossFade Duration="{StaticResource [Anim] ViewPage Transition}"/>
+			</base:PageDeck.PageTransition>
+
+			<!-- Edit: the inventory page's item panel, over the vault's host. It has no background
+			     of its own - it sits on this page's. It had one, set Transparent here: once the stone
+			     was made at start-up the resource's change re-applied it, and its stone
+			     began again under the title, a line across the page. -->
+			<DockPanel Name="EditState" IsVisible="False">
+				<TextBlock DockPanel.Dock="Top" Classes="title" Text="{L 'Edit'}" Margin="0,0,0,12"/>
+				<views:VP_View_Inv_R Margin="-16,-8,-16,-16"
+									 DataContext="{Binding Editor}"/>
+			</DockPanel>
+
+			<!-- Grail: the shared grail panel (views/Shared/GrailPanel.axaml), where a card chosen searches for
+			     it. Beside its title what found is - the game's Discovery - an "i", as the crafting wizard's note (not
+			     the warning's "!"); at the title's right the
+			     page's fact: how many cards are shown. -->
+			<DockPanel Name="GrailState" IsVisible="False">
+				<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+					<StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+						<TextBlock Classes="title" Text="{L 'Compendium'}" VerticalAlignment="Center"/>
+						<Path Classes="pin" Data="{StaticResource [Glyph] Info}" Margin="10,0,0,0" VerticalAlignment="Center" Fill="Transparent" Stroke="{DynamicResource [Brush] Wiki - Text color}" ToolTip.Tip="{Binding GrailTip}"/>
+					</StackPanel>
+					<TextBlock Grid.Column="1" Classes="dim" VerticalAlignment="Center" Text="{Binding Grail.CountText}"
+							   AutomationProperties.AutomationId="Grail_Count"/>
+				</Grid>
+				<views:GrailPanel DataContext="{Binding Grail}"/>
+			</DockPanel>
+
+			<!-- Forge: an item made from nothing (views/MainPages/Vault/ForgePanel.axaml). -->
+			<DockPanel Name="ForgeState" IsVisible="False">
+				<TextBlock DockPanel.Dock="Top" Classes="title" Text="{L 'Forge'}" Margin="0,0,0,12"/>
+				<views:ForgePanel Margin="-16,-8,-16,-16" DataContext="{Binding Forge}"/>
+			</DockPanel>
+
+			<!-- Search: the item search, its conditions over what they find (views/Shared/SearchWindow.axaml). At its
+			     title's right, how many its conditions find. -->
+			<DockPanel Name="SearchState" IsVisible="False">
+				<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+					<TextBlock Grid.Column="0" Classes="title" Text="{L 'Search'}" VerticalAlignment="Center"/>
+					<TextBlock Grid.Column="1" Classes="dim" VerticalAlignment="Center"
+							   AutomationProperties.AutomationId="Found_Title"
+							   Text="{Binding Search.Found, FallbackValue=''}"/>
+				</Grid>
+				<views:SearchWindow DataContext="{Binding Search}"/>
+			</DockPanel>
+		</base:PageDeck>
+
+		<!-- Edit with nothing chosen, said over the watermark and centred with it: "Please select an item." as the
+		     pages say "Please load a character.", or, with several picked, how many - there is nothing to edit one by one.
+		     How several are picked is said only with several picked (under "select an item"
+		     the drag keys looked weird). -->
+		<base:LoadCharacterNotice Message="{L 'Please select an item.'}" ShowWatermark="False">
+			<base:LoadCharacterNotice.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="IsEdit"/>
+					<Binding Path="!Editor.HasItem"/>
+					<Binding Path="!Editor.IsPicking"/>
+				</MultiBinding>
+			</base:LoadCharacterNotice.IsVisible>
+		</base:LoadCharacterNotice>
+		<base:LoadCharacterNotice Message="{Binding Editor.PickedText}"
+								  ShowWatermark="False" Keys="{Binding SelectKeys}">
+			<base:LoadCharacterNotice.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="IsEdit"/>
+					<Binding Path="Editor.IsPicking"/>
+				</MultiBinding>
+			</base:LoadCharacterNotice.IsVisible>
+		</base:LoadCharacterNotice>
+	</Panel>
+</UserControl>

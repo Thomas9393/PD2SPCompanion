@@ -1,0 +1,13 @@
+# Core's inward-pointing violations still standing (tests/layers.py). Only ever shorter.
+Graphics/CharacterFigure.cs -> AttributeScale
+Graphics/CharacterFigure.cs -> ItemPresenter
+Graphics/CharacterFigure.cs -> ItemTints
+Graphics/CharacterFigure.cs -> ItemTypes
+Graphics/CharacterFigure.cs -> Requirements
+Graphics/CharacterFigure.cs -> WeaponSets
+Items/ItemLines.cs -> ItemSeason
+Items/ItemLines.cs -> Requirements
+Items/Legitimacy.cs -> ItemBlob
+Items/Legitimacy.cs -> ItemSeason
+Items/Skins.cs -> SkillTips
+Saves/ItemSeason.cs -> Migration

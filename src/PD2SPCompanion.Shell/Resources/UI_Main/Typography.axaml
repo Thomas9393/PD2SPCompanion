@@ -1,0 +1,36 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:sys="using:System">
+	<!--
+	  The type scale: five tiers, and the only place a font size or family is written as a value.
+	  The Diablo font is for names and
+	  headings - Display, Title, Heading - and the body font for everything read: labels, values,
+	  rows, notes. Every other file names a tier ({StaticResource [Type] Body}) or wears its class
+	  (Styles/CommonControls/PageText.axaml: display, title, heading, body, small); the build guard
+	  PD2UI007 refuses a literal elsewhere.
+
+	  Each step is about 1.2-1.3x the one below, so the tiers read as different sizes; no Diablo text
+	  goes below Small. Button and tab words are the Diablo font at Small - a role, not a sixth size.
+	-->
+
+	<!-- The one hero name on a page: the character card, the landing's chosen character. Diablo, bold. -->
+	<sys:Double x:Key="[Type] Display">28</sys:Double>
+
+	<!-- Page titles, the item's name, dialog titles, and big figures (level, attributes). Diablo, bold. -->
+	<sys:Double x:Key="[Type] Title">22</sys:Double>
+
+	<!-- Every section, card, panel and picker title, folding or not; names in a list. Diablo, bold. -->
+	<sys:Double x:Key="[Type] Heading">17</sys:Double>
+
+	<!-- Labels, values, inputs, list rows, messages, descriptions. The body font. -->
+	<sys:Double x:Key="[Type] Body">14</sys:Double>
+
+	<!-- Notes, empty states, dim lines, tags, limits, badges; button and tab words (in Diablo). -->
+	<sys:Double x:Key="[Type] Small">12</sys:Double>
+
+	<!-- The body font: the Inter built into the program (Avalonia.Fonts.Inter, WithInterFont in Program.cs), named
+	     by its collection. As the bare name "Inter" it gave way to an Inter installed in Windows: with the
+	     variable Inter put there, the body text of every page drew heavier.
+	     The Diablo font is DiabloFont, in App.axaml. -->
+	<FontFamily x:Key="BodyFont">fonts:Inter#Inter</FontFamily>
+</ResourceDictionary>

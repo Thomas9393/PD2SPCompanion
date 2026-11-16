@@ -1,0 +1,75 @@
+<Project>
+
+  <!--
+    Fails the build when a rule that has one home is written out by hand again. Imported by the Core
+    project, which every other project builds on, and scanning all of src, so a violation anywhere stops
+    any build.
+
+      PD2CODE001  SocketedItems.Prepend outside Saves/SaveItems.cs. An item and its sockets is
+                  item.WithSockets(), and every wider scope is a named walk of SaveItems. Eight hand-written
+                  walks had come to disagree on corpses, the golem and sockets.
+
+      PD2CODE002  A stat key built by hand: KeyOf(x.Stat, x.SkillId ?? ...). What a property writes or a line
+                  holds has its own overload, KeyOf(wrote) or KeyOf(line). Narrow on purpose: a key from a
+                  table row's parameter, KeyOf(stat, grant.Param), is right and passes, and so does a subject
+                  worked out in a local first. A rule that fires only on the inline form never fires wrongly.
+
+    Comments are not read. There is no way to allow a case: the rule's home is the exception.
+  -->
+
+  <UsingTask TaskName="GuardOneWay"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        var walk = new Regex(@"\bSocketedItems\s*\.\s*Prepend\b");
+        var handKey = new Regex(@"\bKeyOf\s*\(\s*[^;()]*?,\s*\(?[^;()]*?\.SkillId\s*\?\?");
+        var comment = new Regex(@"//[^\n]*");
+
+        foreach (var item in Files)
+        {
+            string path = item.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            // Comments blanked to spaces, so an example in one is not read and the lines still count.
+            string text = comment.Replace(File.ReadAllText(path), m => new string(' ', m.Length));
+
+            Func<int, int> lineOf = index =>
+            {
+                int line = 1;
+                for (int n = 0; n < index; n++) if (text[n] == '\n') line++;
+                return line;
+            };
+
+            bool walker = path.Replace('\\', '/').EndsWith("/Saves/SaveItems.cs", StringComparison.OrdinalIgnoreCase);
+            if (!walker)
+                foreach (Match m in walk.Matches(text))
+                    Log.LogError(null, "PD2CODE001", null, path, lineOf(m.Index), 1, 0, 0,
+                        "An item and its sockets written out by hand. Use item.WithSockets(), or the named walk of " +
+                        "SaveItems that says the scope (Saves/SaveItems.cs).");
+
+            foreach (Match m in handKey.Matches(text))
+                Log.LogError(null, "PD2CODE002", null, path, lineOf(m.Index), 1, 0, 0,
+                    "A stat key built by hand. Use KeyOf(wrote) or KeyOf(line): the subject of a key has one rule " +
+                    "(ItemStats.SkillOrParam).");
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GuardOneWay" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <OneWayGuarded Include="$(MSBuildThisFileDirectory)..\src\**\*.cs"
+                     Exclude="$(MSBuildThisFileDirectory)..\src\**\bin\**;$(MSBuildThisFileDirectory)..\src\**\obj\**" />
+    </ItemGroup>
+    <GuardOneWay Files="@(OneWayGuarded)" Condition="'@(OneWayGuarded)' != ''" />
+  </Target>
+
+</Project>

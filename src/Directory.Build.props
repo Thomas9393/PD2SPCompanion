@@ -1,0 +1,23 @@
+<Project>
+  <!--
+    The editor's version, one for every project under src: the exe, the core
+    library and the command line carry the same number, which AppVersion (Core) reads back.
+
+    Semantic versioning, MAJOR.MINOR.PATCH: a new season's support is a minor step, a fix a patch. Raise
+    VersionPrefix here, and add the release's section to CHANGELOG.md, when a release is made.
+
+    A build that is not Release says so: 1.0.0-dev. The SDK adds the commit it was built from
+    (1.0.0-dev+<commit>...), and the build date is kept beside it, so a bug report names the exact build.
+  -->
+  <PropertyGroup>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix Condition="'$(Configuration)' != 'Release'">dev</VersionSuffix>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>BuildDate</_Parameter1>
+      <_Parameter2>$([System.DateTime]::Now.ToString("yyyy-MM-dd"))</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>

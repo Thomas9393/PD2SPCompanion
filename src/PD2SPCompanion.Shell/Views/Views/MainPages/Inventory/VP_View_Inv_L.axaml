@@ -1,0 +1,1791 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:mvm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:controls="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Inv_L"
+			 x:DataType="vm:VP_ViewModel_Inv_L"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_L CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Inv_L/>
+	</Design.DataContext>
+
+	<UserControl.Resources>
+		<!-- One worn slot of the mercenary's panel, and the Iron Golem's one beside it: the box, its label
+		     while empty, the item's tile. A resource, as the golem's slot is drawn too - two
+		     lists draw with it. -->
+		<DataTemplate x:Key="MercSlot" x:DataType="vm:EquipSlotViewModel">
+		<Border Classes="slot"
+				Width="{Binding Width}"
+				Height="{Binding Height}">
+			<Panel>
+				<TextBlock Classes="slotlabel"
+						   Text="{Binding Label}"
+						   IsVisible="{Binding IsEmpty}"/>
+				<Button Classes="tile itemtip"
+						AutomationProperties.AutomationId="Tile"
+						AutomationProperties.Name="{Binding Item.Name}"
+						Classes.marked="{Binding Item.IsMarked}"
+						Classes.miss="{Binding Item.IsSearchMiss}"
+						Classes.dimmed="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).PageHasPicks}"
+						IsVisible="{Binding IsFilled}"
+						HorizontalAlignment="Stretch"
+						VerticalAlignment="Stretch"
+						Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClickWornCommand}"
+			CommandParameter="{Binding Item}"
+					ToolTip.ServiceEnabled="{Binding !$parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).IsTakingDrops}"
+					ToolTip.Tip="{x:Static views:VP_View_Inv_L.WornTip}">
+					<!-- Off while carrying: opened under the pointer, it took the release. -->
+					<!-- Its tooltip is made as it opens (VP_View_Inv_L, its static constructor); the tip named here only says there is one: a
+					     control a slot, built with the slot at every character opened, was 15 - 50 ms of an open. -->
+					<Panel>
+						<Border Background="{Binding Item.WashBrush}"
+								Opacity="{Binding Item.QualityWash}"/>
+						<!-- Red where the character cannot use it, as the game draws it. -->
+						<Border Background="#B0B01414" IsHitTestVisible="False"
+								IsVisible="{Binding Item.IsUnusable}"/>
+						<Image Source="{Binding Item.Sprite}" Stretch="None"
+				   Opacity="{Binding Item.SpriteOpacity}"/>
+						<!-- Selected or picked: a 2px light-gold ring over the art, no fill - the rarity wash stays
+						     readable and red keeps its meaning, unusable. -->
+						<Border Classes="selring" IsVisible="{Binding Item.IsMarked}"/>
+
+						<!-- An item the game could not have held. A corner mark rather than a
+						     wash: the cell already carries a colour for what the item is, and
+						     this is about where it came from. -->
+						<Path Classes="pin small" Data="{StaticResource [Glyph] Alert}" IsVisible="{Binding Item.IsImpossible}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,1,1" Stroke="{DynamicResource [Text] Danger}" Fill="#66CC2200"/>
+
+						<!-- Held more than once, under the play rule: a click shows every copy. -->
+						<Button Classes="dupe" IsVisible="{Binding Item.IsDuplicate}"
+						        Command="{Binding Item.ShowCopiesCommand}"
+						        ToolTip.Tip="{Binding Item.DuplicateHint}"/>
+
+						<!-- The same sockets the grid tiles wear, where the game puts them. An equipped item is
+						     the one most likely to be socketed, so leaving them off here hid them exactly where
+						     they matter. -->
+						<base:SocketRow DataContext="{Binding Item}"
+						                HorizontalAlignment="Center" VerticalAlignment="Center"
+						                Opacity="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).SocketOpacity}"/>
+
+						<TextBlock Classes="qty"
+								   IsVisible="{Binding Item.HasQuantity}"
+								   Text="{Binding Item.QuantityText}"/>
+					</Panel>
+				</Button>
+				<!-- Something carried over the slot: green where it would go on, red where not. -->
+				<Border Classes="slottarget"
+						Classes.allowed="{Binding IsAllowed}"
+						IsVisible="{Binding IsTarget}"/>
+			</Panel>
+		</Border>
+		</DataTemplate>
+		<!-- One line of the stash picker. The rule draws as a line and is refused in
+		     the code-behind; a ComboBox has no separator of its own. -->
+
+		<!-- One line of an Advanced Stats page - the character's and the mercenary's: the page's two columns, each a
+		     run of coloured pieces, a number saying under the pointer what it is made of; a gap between its groups. -->
+				<DataTemplate x:Key="SheetLineTemplate" x:DataType="vm:SheetLine">
+					<Panel>
+						<!-- The space between the page's groups. -->
+						<Border Height="8" IsVisible="{Binding IsGap}"/>
+
+						<Grid ColumnDefinitions="*,*" IsVisible="{Binding !IsGap}" Margin="0,1">
+							<ItemsControl Grid.Column="0" Grid.ColumnSpan="{Binding LeftSpan}" ItemsSource="{Binding Left}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:SheetSegment">
+										<TextBlock Classes="sheetline" Text="{Binding Text}" Foreground="{Binding Brush}"
+												   ToolTip.Tip="{Binding Tip}"/>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+							<ItemsControl Grid.Column="1" ItemsSource="{Binding Right}" IsVisible="{Binding HasRight}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:SheetSegment">
+										<TextBlock Classes="sheetline" Text="{Binding Text}" Foreground="{Binding Brush}"
+												   ToolTip.Tip="{Binding Tip}"/>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</Grid>
+					</Panel>
+				</DataTemplate>
+
+		<!-- The buff row of an Advanced Stats page: what is up for good, framed and not
+		     pressed; every cast, form, aura and spirit pressed on and off, faint while off - under its own caption,
+		     centred, wrapping. The character's, and the mercenary's: what of the party's
+		     reaches it, pressed alike ("Same buff line for merc stat sheet"). On the character's, the two skills
+		     either side of it on the same line, each under its caption, top aligned with the first row ("Put left
+		     and right skill just on the same line ... Just display the icon"); the game calls them the Left and
+		     Right Mouse Button Skills. -->
+		<DataTemplate x:Key="BuffRowTemplate" x:DataType="vm:CharacterSheetViewModel">
+			<StackPanel>
+			<!-- As far in on the right as on the left, as the sheet's well below. -->
+			<Grid ColumnDefinitions="110,*,110" Margin="22,0,22,0">
+				<!-- Left: the save's own, as the game's Action Icon - pressed, the skills it may hold. -->
+				<StackPanel Grid.Column="0" IsVisible="{Binding HasSkillBoxes}" HorizontalAlignment="Center">
+					<TextBlock Classes="buffcaption" Text="{L 'Left Skill'}"/>
+					<Button Classes="buff" HorizontalAlignment="Center" Margin="0,0,0,4" Tag="left"
+							AutomationProperties.AutomationId="Sheet_LeftSkill" AutomationProperties.Name="{Binding LeftChosen.Name}"
+							ToolTip.Tip="{Binding LeftChosen.Name}">
+						<Image Source="{Binding LeftChosen.Icon}" Width="32" Height="32"/>
+						<Button.Flyout>
+							<!-- The app's drop-down menu (Picker.axaml: menupanel, pickone rows, the held one lit), opening
+							     from the icon's own edge - the left list from its left, the right from its right. -->
+							<Flyout Placement="BottomEdgeAlignedLeft" HorizontalOffset="-24" Opening="SkillList_Opening" Opened="SkillList_Opened">
+								<!-- Room for the panel's shadow on every side, the offset putting its edge back on the icon's
+								     (the quick search's shadow). -->
+								<Border Classes="menupanel" Margin="24,4,24,28" BoxShadow="0 6 24 0 #C0000000">
+									<Border.Styles>
+										<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+										<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+									</Border.Styles>
+									<ScrollViewer MaxHeight="420" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+										<ItemsControl ItemsSource="{Binding LeftChoices}">
+											<ItemsControl.ItemTemplate>
+												<DataTemplate x:DataType="vm:SkillChoice">
+													<Button Classes="pickone" Classes.held="{Binding IsHeld}"
+															AutomationProperties.Name="{Binding Name}"
+															Command="{Binding $parent[ItemsControl].((vm:CharacterSheetViewModel)DataContext).PickCommand}"
+															CommandParameter="{Binding}" Click="SkillList_Picked">
+														<StackPanel Orientation="Horizontal" Spacing="8">
+															<Image Source="{Binding Icon}" Width="24" Height="24"/>
+															<TextBlock Text="{Binding Name}" VerticalAlignment="Center"
+																	   Foreground="{DynamicResource [Text] Body}"/>
+														</StackPanel>
+													</Button>
+												</DataTemplate>
+											</ItemsControl.ItemTemplate>
+										</ItemsControl>
+									</ScrollViewer>
+								</Border>
+							</Flyout>
+						</Button.Flyout>
+					</Button>
+				</StackPanel>
+				<StackPanel Grid.Column="1">
+					<TextBlock Classes="buffcaption" Text="{L 'Buffs'}"/>
+					<!-- One row of chips high however few: "None" stands where there are none. -->
+					<Panel MinHeight="40">
+					<TextBlock Foreground="{DynamicResource [Text] Muted}" Text="{L 'None'}" HorizontalAlignment="Center" VerticalAlignment="Center"
+						   Margin="0,0,0,4" IsVisible="{Binding !HasBuffs}"/>
+					<ItemsControl ItemsSource="{Binding Buffs}" IsVisible="{Binding HasBuffs}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate><WrapPanel ItemsAlignment="Center"/></ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="vm:BuffChip">
+						<Panel Margin="2,0,2,4">
+							<Button Classes="buff" Classes.off="{Binding IsOff}" IsVisible="{Binding Toggles}"
+									AutomationProperties.Name="{Binding Buff.Name}"
+									Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ToggleBuffCommand}"
+									CommandParameter="{Binding}"
+									ToolTip.Tip="{Binding Tip}">
+								<Panel>
+									<Image Source="{Binding Icon}" Width="32" Height="32"/>
+									<TextBlock Classes="buffletters" Text="{Binding Initials}"/>
+								</Panel>
+							</Button>
+							<Border Classes="buff fixed" IsVisible="{Binding IsFixed}" ToolTip.Tip="{Binding Tip}"
+									AutomationProperties.Name="{Binding Buff.Name}">
+								<Panel>
+									<Image Source="{Binding Icon}" Width="32" Height="32"/>
+									<TextBlock Classes="buffletters" Text="{Binding Initials}"/>
+								</Panel>
+							</Border>
+						</Panel>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+					</ItemsControl>
+					</Panel>
+				</StackPanel>
+				<!-- Right: the save's own, as the game's Action Icon - pressed, the skills it may hold. -->
+				<StackPanel Grid.Column="2" IsVisible="{Binding HasSkillBoxes}" HorizontalAlignment="Center">
+					<TextBlock Classes="buffcaption" Text="{L 'Right Skill'}"/>
+					<Button Classes="buff" HorizontalAlignment="Center" Margin="0,0,0,4" Tag="right"
+							AutomationProperties.AutomationId="Sheet_RightSkill" AutomationProperties.Name="{Binding RightChosen.Name}"
+							ToolTip.Tip="{Binding RightChosen.Name}">
+						<Image Source="{Binding RightChosen.Icon}" Width="32" Height="32"/>
+						<Button.Flyout>
+							<!-- The app's drop-down menu (Picker.axaml: menupanel, pickone rows, the held one lit), opening
+							     from the icon's own edge - the left list from its left, the right from its right. -->
+							<Flyout Placement="BottomEdgeAlignedRight" HorizontalOffset="24" Opening="SkillList_Opening" Opened="SkillList_Opened">
+								<!-- Room for the panel's shadow on every side, the offset putting its edge back on the icon's
+								     (the quick search's shadow). -->
+								<Border Classes="menupanel" Margin="24,4,24,28" BoxShadow="0 6 24 0 #C0000000">
+									<Border.Styles>
+										<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+										<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+									</Border.Styles>
+									<ScrollViewer MaxHeight="420" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+										<ItemsControl ItemsSource="{Binding RightChoices}">
+											<ItemsControl.ItemTemplate>
+												<DataTemplate x:DataType="vm:SkillChoice">
+													<Button Classes="pickone" Classes.held="{Binding IsHeld}"
+															AutomationProperties.Name="{Binding Name}"
+															Command="{Binding $parent[ItemsControl].((vm:CharacterSheetViewModel)DataContext).PickCommand}"
+															CommandParameter="{Binding}" Click="SkillList_Picked">
+														<StackPanel Orientation="Horizontal" Spacing="8">
+															<Image Source="{Binding Icon}" Width="24" Height="24"/>
+															<TextBlock Text="{Binding Name}" VerticalAlignment="Center"
+																	   Foreground="{DynamicResource [Text] Body}"/>
+														</StackPanel>
+													</Button>
+												</DataTemplate>
+											</ItemsControl.ItemTemplate>
+										</ItemsControl>
+									</ScrollViewer>
+								</Border>
+							</Flyout>
+						</Button.Flyout>
+					</Button>
+				</StackPanel>
+			</Grid>
+			</StackPanel>
+		</DataTemplate>
+	</UserControl.Resources>
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/ItemTile.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Selection.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ItemWording.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ComboBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/StackCount.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/GameLock.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/BareIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/FolderWays.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Badge.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/DuplicateBadge.axaml"/>
+
+		<!-- The tooltip's own colours, in the game's own roles. Declared before the rest:
+		     a later descendant selector wins over an earlier one, whatever its weight. -->
+		<!-- What the item is, rather than what it does. White, as the game words it - so
+		     a unique's own colour is its name's alone and reads as the thing it marks. -->
+		<!-- The folding header, as the landing page's earlier copies use. -->
+		<Style Selector="TextBlock.purse">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+		</Style>
+
+		<!-- Chrome in Styles/CommonControls/SpendButton.axaml; only the glyph is local. -->
+		<!-- The drawn glyphs only: the chevrons, which are direct children, and the eye,
+		     which sits in a Panel so its two halves can overlap. Written as child steps
+		     rather than "any Path inside", because a descendant selector also reaches the
+		     Path inside an icon from the set - and this rule's Stretch=None at 11x11 showed
+		     a 24x24 icon's top-left corner and nothing else. -->
+		<Style Selector="Button.spend:disabled > Path, Button.spend:disabled > Panel > Path">
+			<Setter Property="Opacity" Value="0.25"/>
+		</Style>
+
+
+
+
+		<!-- A socket drawn over the item: a gem in it, or an empty hole. -->
+		<!-- An empty socket is a hole in the item: a dark ring, centred in the cell it
+		     stands for. A filled one is the gem itself, unframed, which is how the game
+		     draws it. Both are sized by the socket rather than here, since an item with
+		     more sockets than cells has to draw them smaller to fit. -->
+		<Style Selector="Ellipse.hole">
+			<Setter Property="StrokeThickness" Value="1"/>
+			<Setter Property="Stroke" Value="#B4000000"/>
+			<Setter Property="Fill" Value="#7F000000"/>
+		</Style>
+
+
+		<!-- The I and II tabs above a weapon box, as the game puts them: a small flat choice, the current
+		     one filled in the primary gold (it was red). -->
+		<!-- The buff row's icons: a cast is a button, faint while off; what is up for good a plain frame. -->
+		<Style Selector="Button.buff">
+			<Setter Property="Width" Value="36"/>
+			<Setter Property="Height" Value="36"/>
+			<Setter Property="Padding" Value="1"/>
+			<Setter Property="Cursor" Value="Hand"/>
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="3"/>
+		</Style>
+		<Style Selector="Button.buff:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.buff:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		</Style>
+		<!-- On: the gold frame; off: faint and unframed. -->
+		<Style Selector="Button.buff.off">
+			<Setter Property="Opacity" Value="0.25"/>
+			<Setter Property="BorderBrush" Value="Transparent"/>
+		</Style>
+		<Style Selector="Border.buff">
+			<Setter Property="Width" Value="36"/>
+			<Setter Property="Height" Value="36"/>
+			<Setter Property="Padding" Value="1"/>
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="3"/>
+		</Style>
+		<Style Selector="TextBlock.buffletters">
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		</Style>
+
+		<!-- The sheet's text: the page's body face, which reads at this size - the game's own, small capitals at
+		     the body's size, did not. -->
+		<Style Selector="TextBlock.sheetline">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="LineHeight" Value="20"/>
+		</Style>
+
+
+		<Style Selector="Button.settab">
+			<Setter Property="Width" Value="26"/>
+			<Setter Property="Height" Value="20"/>
+			<Setter Property="Padding" Value="0"/>
+			<Setter Property="Margin" Value="0,0,0,6"/>
+			<Setter Property="Cursor" Value="Hand"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Button - Secondary}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+		</Style>
+		<Style Selector="Button.settab TextBlock">
+			<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Brush] Button - Primary}"/>
+		</Style>
+		<Style Selector="Button.settab:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.settab:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		</Style>
+		<Style Selector="Button.settab.current /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Button - Primary}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary}"/>
+		</Style>
+		<Style Selector="Button.settab.current TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] On Primary}"/>
+		</Style>
+
+		<!-- The difficulty tabs: as wide as their word - after the tabs' own style, which a later one overrides. -->
+		<!-- The Advanced Stats lines' well: a thin gold frame, the pages list's own fill, and an inner shadow along its
+		     edge, so the sheet sits in the
+		     section rather than on it. -->
+		<Style Selector="Border.sheetwell">
+			<!-- As far in on every side as its left edge, under the section's title. -->
+			<Setter Property="Margin" Value="22"/>
+			<Setter Property="Padding" Value="14,10"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="3"/>
+			<Setter Property="Background" Value="{DynamicResource [ABrush] Black - A25%}"/>
+			<Setter Property="BoxShadow" Value="inset 0 0 14 2 #B0000000"/>
+		</Style>
+
+		<!-- The captions over the buff row and the two skills: the section heading's face, centred. -->
+		<Style Selector="TextBlock.buffcaption">
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Heading}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+			<Setter Property="Margin" Value="0,0,0,6"/>
+		</Style>
+
+
+
+		<!-- A section's pick menu: there, holding the header's height, but unseen and out of
+		     reach until picking is on. -->
+		<!-- A worn slot something is carried over: the grid cells' target colours. -->
+		<Style Selector="Border.slottarget">
+			<Setter Property="IsHitTestVisible" Value="False"/>
+			<Setter Property="Background" Value="#3CFF3322"/>
+		</Style>
+		<Style Selector="Border.slottarget.allowed">
+			<Setter Property="Background" Value="#3C00FF66"/>
+		</Style>
+
+		<Style Selector="Panel.pickmenu">
+			<Setter Property="Opacity" Value="0"/>
+			<Setter Property="IsHitTestVisible" Value="False"/>
+		</Style>
+		<Style Selector="Panel.pickmenu.shown">
+			<Setter Property="Opacity" Value="1"/>
+			<Setter Property="IsHitTestVisible" Value="True"/>
+		</Style>
+
+
+		<!-- An equipment slot keeps its box whether or not it holds anything, so the
+		     panel reads as the game's does rather than collapsing around what is worn. -->
+		<!-- Only the weapon boxes fade, and only while a set change is in flight:
+		     nothing else on the panel is changing, so nothing else should flicker. -->
+		<Style Selector="Border.slot.weapon">
+			<Setter Property="Transitions">
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.11"/>
+				</Transitions>
+			</Setter>
+		</Style>
+		<Style Selector="Border.slot.weapon.swapping">
+			<Setter Property="Opacity" Value="0.1"/>
+		</Style>
+
+		<Style Selector="Border.slot">
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="#3CA79066"/>
+			<!-- Black, as the grids are. The quality wash is drawn over whatever backs the
+			     cell, so a slot sitting on the grey panel instead would read far lighter
+			     than the same item does in the inventory. -->
+			<Setter Property="Background" Value="Black"/>
+			<Setter Property="CornerRadius" Value="2"/>
+			<Setter Property="Margin" Value="3"/>
+		</Style>
+		<Style Selector="TextBlock.slotlabel">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Opacity" Value="0.5"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="TextAlignment" Value="Center"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+		</Style>
+		<!-- A row of the pages' list: which pane shows it, in the headings' gold. Its lock is every row's (BareIcon.axaml). -->
+		<Style Selector="TextBlock.panemark">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+		</Style>
+		<!-- A page's whole name, not drawn while the list is squeezed and its short one is: laid out all the same. -->
+		<Style Selector="TextBlock.pagename.gone">
+			<Setter Property="Opacity" Value="0"/>
+		</Style>
+	</UserControl.Styles>
+
+	<Panel>
+	<DockPanel Margin="16" IsVisible="{Binding Session.IsLoaded}">
+		<Grid DockPanel.Dock="Top" RowDefinitions="Auto,Auto" Margin="0,0,0,12">
+			<!-- The character's name and its reload, save, undo and close are in the top bar, on
+			     every page; this page is the inventory. -->
+			<!-- The title, and the page's facts at the right as the vault's are: what the character holds, and its gold. -->
+			<Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+				<TextBlock Classes="title" Text="{L 'Inventory'}"/>
+				<TextBlock Grid.Column="1" Classes="dim" VerticalAlignment="Center" Text="{Binding FactsText}"/>
+			</Grid>
+
+			<!-- The page's tools. No search's button here: the search is the
+			     window's, in its top row (QuickSearchBar), and the item search is the right page's, under its bookmark. -->
+			<DockPanel Grid.Row="1" Margin="0,8,0,0" VerticalAlignment="Center"
+					   IsVisible="{Binding HasCharacter}">
+				<!-- What is done to the selected item, at the left - as the vault's line has it
+				     (what is done at the left, what is shown at the right) - Store all with it, beside Store.
+				     How the sockets are shown stays at the right. The row begins with its first tool: no rule
+				     parts the tools from a search's button. -->
+				<StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="6">
+					<!-- Where the vault row has its own: what moves an item out first (Store, as the vault's
+					     Withdraw), the other actions, the bin last. -->
+					<!-- A copy into the vault, into the folder it is showing. The item stays. Ctrl and
+					     Shift sort it instead: the code-behind's StoreSorted reads them. -->
+					<Button Classes="lock" Tag="store"
+							Command="{Binding StoreToVaultCommand}"
+							IsEnabled="{Binding CanStore}"
+							Classes.blocked="{Binding StoreBlocked}"
+							ToolTip.Tip="{Binding StoreTip}"
+							ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] To vault}"/>
+					</Button>
+
+					<!-- Store all, beside Store (far apart at the line's two ends they were a gap
+					     to cross): everything on every container page, the
+					     inventory to the last shared page - never what is worn, the mercenary's or the golem's. Its own chest,
+					     no word on it. It asks twice, as the bin does, in green: one click moved
+					     158 items on the test pad. Ctrl and Shift on the first click say how - StoreAllTiers reads them;
+					     the second confirms. -->
+					<base:BinButton Name="StoreAllButton" Tag="storeall" Positive="True" Leads="True"
+									Command="{Binding StoreEverythingCommand}"
+									IsArmed="{Binding StoreAllArmed}"
+									IsEnabled="{Binding !StoreBlocked}"
+									Tip="{Binding StoreAllHint}">
+						<base:BinButton.Glyph>
+							<Path Classes="pin filled" Data="{StaticResource [Glyph] Store all}"/>
+						</base:BinButton.Glyph>
+					</base:BinButton>
+					<!-- Its other ways, listed: sorted, and crafting bases only - Ctrl and Shift on the
+					     button, which its tooltip alone told, and which stay. A narrow arrow joined to it, the two one
+					     split button (a gap stood between them):
+					     over the row's spacing and one more, so the two frames share the line between them, the
+					     button's right corners and the arrow's left square. No tooltip of its own: it is the button's
+					     arrow, and the button's tooltip says it all;
+					     what reads the window is told its name. -->
+					<Button Classes="lock" Width="15" Margin="-7,0,0,0" CornerRadius="0,4,4,0"
+							AutomationProperties.AutomationId="Inv_StoreAllMore"
+							AutomationProperties.Name="{L 'Fast inventory storing: all ways'}"
+							Click="StoreAllMore_Click"
+							IsEnabled="{Binding !StoreBlocked}">
+						<Path Classes="pin small" Data="{StaticResource [Glyph] Chevron}"/>
+					</Button>
+
+					<!-- Into the compendium: the item menu's Store in compendium and the key G, in
+					     sight - each selected that can go, one a card. Dimmed with the reason where none can. -->
+					<Button Classes="lock"
+							AutomationProperties.AutomationId="Inv_StoreCompendium"
+							Command="{Binding StoreInCompendiumSelectedCommand}"
+							IsVisible="{Binding HasCompendium}"
+							IsEnabled="{Binding CanStoreInCompendium}"
+							ToolTip.Tip="{Binding StoreInCompendiumHint}"
+							ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Arrow down}"/>
+					</Button>
+
+					<!-- Into the materials tab (similar to the new season's in-game affinity button): the game's
+					     Deposit materials and its key R, every material on the container pages - dimmed with the
+					     reason only where there is no shared stash (no need to hide it). -->
+					<Button Classes="lock"
+							AutomationProperties.AutomationId="Inv_StoreMaterials"
+							Command="{Binding StoreInMaterialsSelectedCommand}"
+							IsEnabled="{Binding CanStoreInMaterials}"
+							ToolTip.Tip="{Binding StoreInMaterialsHint}"
+							ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Deposit}"/>
+					</Button>
+
+					<!-- Put on, or for an item that is worn taken off; and put on the mercenary: in
+					     sight, where a right click and Ctrl + right click did them unseen. The other rows of an item's
+					     right-click menu - the other slot, the pane across - are the menu's and a drag's alone. -->
+					<Button Classes="lock"
+							AutomationProperties.AutomationId="Inv_Equip"
+							Command="{Binding EquipSelectedCommand}"
+							IsEnabled="{Binding CanEquip}"
+							ToolTip.Tip="{Binding EquipHint}"
+							ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin art" Data="{StaticResource [Glyph] Battle gear}"/>
+					</Button>
+					<Button Classes="lock"
+							AutomationProperties.AutomationId="Inv_EquipMerc"
+							Command="{Binding EquipSelectedOnMercCommand}"
+							IsEnabled="{Binding CanEquipMerc}"
+							ToolTip.Tip="{Binding EquipMercHint}"
+							ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Person plus}"/>
+					</Button>
+
+					<!-- The clipboard's three, where Duplicate stood: cut marks the selected to be
+					     moved by the paste, copy holds it to be made a second of - where the play mode duplicates, and there
+					     only - and paste puts what is held on the page the first pane shows. -->
+					<Button Classes="lock"
+							AutomationProperties.AutomationId="Inv_Cut"
+							Command="{Binding CutCommand}"
+							IsEnabled="{Binding CanCut}"
+							ToolTip.Tip="{Binding CutHint}"
+							ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Cut}"/>
+					</Button>
+					<Button Classes="lock"
+							AutomationProperties.AutomationId="Inv_Copy"
+							Command="{Binding CopySelectedCommand}"
+							IsVisible="{Binding Rules.Duplicates}"
+							IsEnabled="{Binding CanCut}"
+							ToolTip.Tip="{Binding CopyHint}"
+							ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Duplicate}"/>
+					</Button>
+					<Button Classes="lock"
+							AutomationProperties.AutomationId="Inv_Paste"
+							Command="{Binding PasteCommand}"
+							IsEnabled="{Binding CanPaste}"
+							ToolTip.Tip="{Binding PasteHint}"
+							ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Paste}"/>
+					</Button>
+
+					<!-- A bin deletes a thing, and always asks: twice on the button. -->
+					<base:BinButton Command="{Binding DeleteItemCommand}"
+									IsArmed="{Binding DeleteArmed}"
+									IsEnabled="{Binding CanDelete}"
+									Tip="{Binding DeleteHint}"/>
+
+					<!-- Identify, there only while something selected is unidentified - last, so
+					     nothing moves when it comes and goes. The menu's row has the same glyph. -->
+					<Button Classes="lock"
+							AutomationProperties.AutomationId="Inv_Identify"
+							IsVisible="{Binding CanIdentify}"
+							Command="{Binding IdentifySelectedCommand}"
+							ToolTip.Tip="{Binding IdentifyHint}">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Magnifier}"/>
+					</Button>
+				</StackPanel>
+				<Panel/>
+			</DockPanel>
+
+			<!-- How the page is shown: at the line's right end. (What is done
+			     to the selected item stands at the left, beside the search.) Icons alone:
+			     four words across the top of a page whose whole subject is items says less than four shapes.
+			     On a line of its own under the name: beside it, a long name and seven buttons cramped each
+			     other. -->
+			<StackPanel Grid.Row="1" Margin="0,8,0,0" HorizontalAlignment="Right"
+						Orientation="Horizontal" Spacing="6"
+						IsVisible="{Binding HasCharacter}">
+				<!-- The same thing X does, for anyone who never finds out about X. -->
+				<Button Classes="lock"
+						Classes.on="{Binding !SocketsFaded}"
+						Command="{Binding ToggleSocketsCommand}"
+						ToolTip.Tip="{Binding SocketHint}">
+					<Path Classes="pin" Data="{StaticResource [Glyph] Socket}"/>
+				</Button>
+
+				<!-- The socket guard, beside what shows the sockets: a gem let go of on an item
+				     by accident is not socketed while it is on. -->
+				<Button Classes="lock" Tag="socketguard"
+						Classes.on="{Binding SocketGuard}"
+						Command="{Binding ToggleSocketGuardCommand}"
+						ToolTip.Tip="{Binding SocketGuardHint}">
+					<Panel>
+						<Path Classes="pin" Data="{StaticResource [Glyph] Socket lock}" IsVisible="{Binding SocketGuard}"/>
+						<Path Classes="pin" Data="{StaticResource [Glyph] Socket unlock}" IsVisible="{Binding !SocketGuard}"/>
+					</Panel>
+				</Button>
+
+			</StackPanel>
+		</Grid>
+
+		<ScrollViewer IsVisible="{Binding HasCharacter}"
+					  AutomationProperties.AutomationId="Items_Scroll"
+					  HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False"
+					  SizeChanged="OnSectionsResized">
+			<!-- No gutter held for a scrollbar: the bar takes its own room only when it shows. -->
+			<StackPanel>
+
+				<!-- The page numbers are guessed rather than read from a table, so a wrong
+				     one has to announce itself instead of hiding items. -->
+				<Border IsVisible="{Binding HasUnknownPages}"
+						Margin="0,0,0,10" Padding="10,8"
+						BorderBrush="{DynamicResource [Brush] Rarity - Broken items}"
+						BorderThickness="1" CornerRadius="4"
+						Background="{DynamicResource [ABrush] R50 G50 B50 - A50%}">
+					<Grid ColumnDefinitions="*,Auto">
+						<TextBlock Grid.Column="0" Classes="dim" TextWrapping="Wrap" VerticalAlignment="Center"
+								   Text="{Binding UnknownPagesWarning}"/>
+						<!-- A repair, not an edit: in every play mode. -->
+						<Button Grid.Column="1" Margin="10,0,0,0" Height="28"
+								VerticalAlignment="Center"
+								Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+								Command="{Binding MoveStraysCommand}"
+								Content="{L 'MOVE TO INVENTORY'}"/>
+					</Grid>
+				</Border>
+
+				<!-- 1. What the character is wearing. Absent with no character, along with
+				     the mercenary below - neither is a thing the editor has to show. -->
+				<Border x:Name="EquippedSection"
+						Margin="0,0,0,10"
+						Classes="section"
+						IsVisible="{Binding HasCharacter}"
+						Padding="10,8">
+					<StackPanel>
+						<Grid Classes="sectionhead" ColumnDefinitions="*,Auto">
+						<Button Grid.Column="0" Classes="fold" Command="{Binding ToggleEquipmentCommand}">
+							<Grid ColumnDefinitions="Auto,*">
+								<Path Grid.Column="0" Classes="chevron"
+									  Classes.open="{Binding EquipmentIsOpen}"
+									  Data="{StaticResource [Glyph] Chevron}"/>
+								<TextBlock Grid.Column="1" Classes="section"
+										   Text="{Binding EquipmentHeader}"/>
+							</Grid>
+						</Button>
+						<!-- The header's buttons as the containers' are: the section's own action first,
+						     then its all/none/others menu - one group, 4 apart, 8 from the title. -->
+						<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4"
+									VerticalAlignment="Center" Margin="8,0,0,0">
+							<!-- The belt's contents, under the equipment: off to begin with. -->
+							<Button Classes="spend" VerticalAlignment="Center"
+									Classes.on="{Binding ShowBelt}"
+									IsVisible="{Binding EquipmentIsOpen}"
+									Command="{Binding ToggleBeltCommand}"
+									ToolTip.Tip="{L 'Belt'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Belt}"/>
+							</Button>
+							<!-- All, none or the others, of what is worn - bound to this section as
+							     the containers' menu is to theirs. -->
+							<Panel VerticalAlignment="Center"
+								   Classes="pickmenu" Classes.shown="{Binding ShowsEquippedPicks}"
+								   IsEnabled="{Binding ShowsEquippedPicks}">
+								<base:SortMenu DataContext="{Binding EquippedPicks}"
+											   Glyph="{StaticResource [Glyph] Select all}"/>
+							</Panel>
+						</StackPanel>
+						</Grid>
+
+						<!-- The corpse: what the character wore as it died, where it left the game without
+						     taking its body up - over the worn slots, which then stand empty. Packed into a small grid, centred
+						     under its caption (a row of boxes was abrupt). Each item is chosen and edited
+						     as any is; the button takes all of it back, as a click on the body does in game. Only while there is one. -->
+						<StackPanel Margin="0,10,0,0">
+							<StackPanel.IsVisible>
+								<MultiBinding Converter="{x:Static BoolConverters.And}">
+									<Binding Path="HasCorpse"/>
+									<Binding Path="EquipmentIsOpen"/>
+								</MultiBinding>
+							</StackPanel.IsVisible>
+							<StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+								<TextBlock FontWeight="Bold" Text="{L 'Corpse'}"
+										   FontFamily="{StaticResource DiabloFont}"
+										   FontSize="{StaticResource [Type] Heading}" Foreground="{DynamicResource [Text] Heading}"
+										   VerticalAlignment="Center"/>
+								<Button Classes="spend" VerticalAlignment="Center"
+										AutomationProperties.AutomationId="Corpse_Take"
+										Command="{Binding TakeFromCorpseCommand}"
+										ToolTip.Tip="{L 'Take all from corpse'}">
+									<Path Classes="pin art" Data="{StaticResource [Glyph] Battle gear}"/>
+								</Button>
+							</StackPanel>
+							<TextBlock Classes="dim" Text="{Binding CorpseDetail}"
+									   AutomationProperties.AutomationId="Corpse_Detail"
+									   HorizontalAlignment="Center" Margin="0,2,0,0"/>
+							<!-- No PlaceAtCommand and no IsHolding: its cells take no drop - nothing is put on a corpse. -->
+							<base:ContainerGrid HorizontalAlignment="Center" Margin="0,10,0,6"
+												AutomationProperties.AutomationId="Corpse_Grid"
+												Source="{Binding Session.CorpseGrid}"
+												IsDimmed="{Binding PageHasPicks}"
+												SocketOpacity="{Binding SocketOpacity}"
+												ClickTileCommand="{Binding ClickTileCommand}"/>
+						</StackPanel>
+
+						<!-- The game's own arrangement, each box placed where the game draws it:
+						     weapon over gloves, a ring, helm over armour over belt, amulet and the
+						     other ring, off-hand over boots - see EquipSlotViewModel.Slots. -->
+						<ItemsControl x:Name="EquippedSlots" Classes="picklist"
+									  ItemsSource="{Binding Equipped}"
+									  IsVisible="{Binding EquipmentIsOpen}"
+									  HorizontalAlignment="Center"
+									  Margin="0,10,0,4">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<Canvas Background="Transparent" Width="{x:Static vm:EquipSlotViewModel.PanelWidth}"
+											Height="{x:Static vm:EquipSlotViewModel.PanelHeight}"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.Styles>
+								<Style Selector="ItemsControl#EquippedSlots > ContentPresenter"
+									   x:DataType="vm:EquipSlotViewModel">
+									<Setter Property="Canvas.Left" Value="{Binding Left}"/>
+									<Setter Property="Canvas.Top" Value="{Binding Top}"/>
+								</Style>
+								<!-- The rows carry the spacing, so the box keeps only its side
+								     margins, as on the mercenary's panel. -->
+								<Style Selector="Border.slot">
+									<Setter Property="Margin" Value="3,0"/>
+								</Style>
+							</ItemsControl.Styles>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="vm:EquipSlotViewModel">
+									<StackPanel>
+										<!-- The weapon set tabs, above their box as the
+										     game places them. Both sets live on the
+										     character at once; these choose which of the
+										     two the box is showing. -->
+										<!-- I at the box's left edge, II at its right. -->
+										<Grid ColumnDefinitions="Auto,*,Auto" Width="{Binding Width}"
+											  IsVisible="{Binding HasSetTabs}">
+											<Button Grid.Column="0" Classes="settab"
+													Classes.current="{Binding $parent[ItemsControl].((vm:VP_ViewModel_Inv_L)DataContext).IsSetI}"
+													Command="{Binding $parent[ItemsControl].((vm:VP_ViewModel_Inv_L)DataContext).ShowSetICommand}" ToolTip.Tip="{L 'Weapon set I'}">
+												<TextBlock Text="I"/>
+											</Button>
+											<Button Grid.Column="2" Classes="settab"
+													Classes.current="{Binding $parent[ItemsControl].((vm:VP_ViewModel_Inv_L)DataContext).IsSetII}"
+													Command="{Binding $parent[ItemsControl].((vm:VP_ViewModel_Inv_L)DataContext).ShowSetIICommand}" ToolTip.Tip="{L 'Weapon set II'}">
+												<TextBlock Text="{L 'II'}"/>
+											</Button>
+										</Grid>
+
+										<Border Classes="slot"
+												Classes.weapon="{Binding HasSetTabs}"
+												Classes.swapping="{Binding $parent[ItemsControl].((vm:VP_ViewModel_Inv_L)DataContext).IsSwapping}"
+												Width="{Binding Width}"
+												Height="{Binding Height}">
+											<Panel>
+												<TextBlock Classes="slotlabel"
+														   Text="{Binding Label}"
+														   IsVisible="{Binding IsEmpty}"/>
+
+												<Button Classes="tile itemtip"
+														AutomationProperties.AutomationId="Tile"
+														AutomationProperties.Name="{Binding Item.Name}"
+														Classes.marked="{Binding Item.IsMarked}"
+														Classes.miss="{Binding Item.IsSearchMiss}"
+														Classes.dimmed="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).PageHasPicks}"
+														IsVisible="{Binding IsFilled}"
+														HorizontalAlignment="Stretch"
+														VerticalAlignment="Stretch"
+														Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClickWornCommand}"
+												CommandParameter="{Binding Item}"
+														ToolTip.ServiceEnabled="{Binding !$parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).IsTakingDrops}"
+														ToolTip.Tip="{x:Static views:VP_View_Inv_L.WornTip}">
+													<!-- Off while carrying: opened under the pointer, it took the release. -->
+													<!-- Its tooltip is made as it opens (VP_View_Inv_L, its static constructor); the tip named here only says there is one: a
+													     control a slot, built with the slot at every character opened, was 15 - 50 ms of an open. -->
+													<Panel>
+														<Border Background="{Binding Item.WashBrush}"
+																Opacity="{Binding Item.QualityWash}"/>
+														<!-- Red where the character cannot use it, as the game draws it. -->
+														<Border Background="#B0B01414" IsHitTestVisible="False"
+																IsVisible="{Binding Item.IsUnusable}"/>
+														<Image Source="{Binding Item.Sprite}" Stretch="None"
+													   Opacity="{Binding Item.SpriteOpacity}"/>
+														<!-- Selected or picked: a 2px light-gold ring over the art, no fill - the rarity wash stays
+														     readable and red keeps its meaning, unusable. -->
+														<Border Classes="selring" IsVisible="{Binding Item.IsMarked}"/>
+
+														<!-- An item the game could not have held. A corner mark rather than a
+														     wash: the cell already carries a colour for what the item is, and
+														     this is about where it came from. -->
+														<Path Classes="pin small" Data="{StaticResource [Glyph] Alert}" IsVisible="{Binding Item.IsImpossible}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,1,1" Stroke="{DynamicResource [Text] Danger}" Fill="#66CC2200"/>
+
+														<!-- Held more than once, under the play rule: a click shows every copy. -->
+														<Button Classes="dupe" IsVisible="{Binding Item.IsDuplicate}"
+														        Command="{Binding Item.ShowCopiesCommand}"
+														        ToolTip.Tip="{Binding Item.DuplicateHint}"/>
+
+														<!-- The same sockets the grid tiles wear, where the game puts them. An equipped item is
+														     the one most likely to be socketed, so leaving them off here hid them exactly where
+														     they matter. -->
+														<base:SocketRow DataContext="{Binding Item}"
+														                HorizontalAlignment="Center" VerticalAlignment="Center"
+														                Opacity="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).SocketOpacity}"/>
+
+														<TextBlock Classes="qty"
+																   IsVisible="{Binding Item.HasQuantity}"
+																   Text="{Binding Item.QuantityText}"/>
+													</Panel>
+												</Button>
+												<!-- Something carried over the slot: green where it would go
+												     on, red where not - the grid cells' colours. -->
+												<Border Classes="slottarget"
+														Classes.allowed="{Binding IsAllowed}"
+														IsVisible="{Binding IsTarget}"/>
+											</Panel>
+										</Border>
+									</StackPanel>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+
+						<!-- The belt, as the game draws it, when asked for: its potions pick,
+						     delete, store and lift out like any container's. -->
+						<Panel IsVisible="{Binding ShowBelt}" HorizontalAlignment="Center" Margin="0,6,0,4">
+							<Panel IsVisible="{Binding EquipmentIsOpen}">
+								<base:ContainerGrid
+									Source="{Binding Session.BeltGrid}"
+									IsDimmed="{Binding PageHasPicks}"
+									IsHolding="{Binding IsTakingDrops}"
+									SocketOpacity="{Binding SocketOpacity}"
+									ClickTileCommand="{Binding ClickTileCommand}"
+									PlaceAtCommand="{Binding PlaceAtCommand}"/>
+							</Panel>
+						</Panel>
+					</StackPanel>
+				</Border>
+
+				<!-- The character's sheet, under what it wears: the game's own Advanced Stats
+				     page, its lines, order and colours, each number saying under the pointer what it is made of. The
+				     resistances for the difficulty its tabs choose - the character's own to begin with. -->
+				<Border x:Name="SheetSection"
+						Margin="0,0,0,10"
+						Classes="section"
+						IsVisible="{Binding HasCharacter}"
+						Padding="10,8">
+					<StackPanel>
+						<Grid Classes="sectionhead" ColumnDefinitions="*,Auto">
+							<Button Grid.Column="0" Classes="fold" Command="{Binding ToggleSheetCommand}"
+									AutomationProperties.AutomationId="Sheet_Fold">
+								<Grid ColumnDefinitions="Auto,*">
+									<Path Grid.Column="0" Classes="chevron"
+										  Classes.open="{Binding SheetIsOpen}"
+										  Data="{StaticResource [Glyph] Chevron}"/>
+									<TextBlock Grid.Column="1" Classes="section" Text="{L 'Advanced Stats'}"/>
+								</Grid>
+							</Button>
+							<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4"
+										VerticalAlignment="Center" Margin="8,0,0,0"
+										IsVisible="{Binding SheetIsOpen}">
+								<!-- The weapon set the sheet is for, one button that swaps it - the same swap as Equipped's own tabs
+								     (so it is clear that the sheet has both modes; a single toggle,
+								     its icon changing from I to II). -->
+								<Button Classes="settab current" Margin="0" VerticalAlignment="Center"
+										AutomationProperties.AutomationId="Sheet_WeaponSet"
+										Command="{Binding SwapSheetSetCommand}" ToolTip.Tip="{L 'Swap weapon set'}">
+									<Panel>
+										<TextBlock Text="I" IsVisible="{Binding IsSetI}"/>
+										<TextBlock Text="{L 'II'}" IsVisible="{Binding IsSetII}"/>
+									</Panel>
+								</Button>
+							</StackPanel>
+						</Grid>
+
+						<!-- The buff row; its caption and line stay while the section is open, "None" where nothing is up. -->
+						<ContentControl Margin="0,8,0,0" IsVisible="{Binding SheetIsOpen}" Content="{Binding Sheet}"
+										ContentTemplate="{StaticResource BuffRowTemplate}"
+										AutomationProperties.AutomationId="Sheet_Buffs"/>
+
+						<!-- Left, the two columns splitting the section, its text under the section's title (centred it
+						     read worse): the fold's padding, its
+						     chevron and the title's margin in. -->
+						<!-- In a well: a thin gold frame, shaded inside along its edge - set into the section, not standing out
+						     of it. -->
+						<Border Classes="sheetwell" IsVisible="{Binding SheetIsOpen}">
+							<ItemsControl AutomationProperties.AutomationId="Sheet_Lines"
+										  ItemsSource="{Binding Sheet.Lines}"
+										  ItemTemplate="{StaticResource SheetLineTemplate}"/>
+						</Border>
+					</StackPanel>
+				</Border>
+
+				<!-- 2-4. The inventory, the cube and the personal stash. -->
+				<ItemsControl ItemsSource="{Binding Sections}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate x:DataType="vm:ContainerSectionViewModel">
+							<Border Margin="0,0,0,10"
+									Classes="section"
+									Padding="10,8"
+									AttachedToVisualTree="Section_Attached">
+								<StackPanel>
+									<Grid Classes="sectionhead" ColumnDefinitions="*,Auto,Auto,Auto">
+									<Button Grid.Column="0" Classes="fold"
+											Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ToggleSectionCommand}"
+											CommandParameter="{Binding}">
+										<Grid ColumnDefinitions="Auto,*">
+											<Path Grid.Column="0" Classes="chevron"
+												  Classes.open="{Binding IsOpen}"
+												  Data="{StaticResource [Glyph] Chevron}"/>
+											<TextBlock Grid.Column="1" Classes="section"
+													   Text="{Binding Header}"/>
+										</Grid>
+									</Button>
+
+									<!-- While picking: all, none or the others, of what this
+									     container shows. The vault's menu. Faded out rather than
+									     removed, so the header keeps its height: it is taller than
+									     the title, and appearing under a drag it pushed the grid
+									     down mid-stroke. The binding is on a
+									     panel around it: set on the menu, it would be read against
+									     the menu's own DataContext. -->
+										<!-- The two panes trade what they hold: two pages of one size - stash pages - change places, which no
+										     single drag does. In the section's header, as it is neither pane's own, and there only while there
+										     are two panes (it stood on the second
+										     pane's line) - after the gold's button, the picks' menu giving it room as it comes. Its arrows lie the way the panes do. -->
+										<Button Grid.Column="2" Classes="spend" VerticalAlignment="Center" Margin="6,0,0,0"
+												AutomationProperties.AutomationId="Inv_Swap"
+												IsVisible="{Binding ShowSecond}"
+												IsEnabled="{Binding CanSwap}"
+												ToolTip.Tip="{Binding SwapHint}" ToolTip.ShowOnDisabled="True"
+												Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).SwapPanesCommand}"
+												CommandParameter="{Binding}">
+											<Panel>
+												<Path Classes="pin" Data="{StaticResource [Glyph] Swap across}" IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).StashesSideBySide}"/>
+												<Path Classes="pin" Data="{StaticResource [Glyph] Swap down}" IsVisible="{Binding !$parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).StashesSideBySide}"/>
+											</Panel>
+										</Button>
+
+										<!-- The shared stash's gold, said here and set behind the button beside it, as the vault page's is,
+											 not a purse under each pane - the inventory's, the character's stash's and the shared one - with
+											 its stepper and the vault's arrows. Behind the button: the carried gold,
+											 the shared stash's and the vault's, each moving to the one beside it. -->
+										<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="8,0,0,0"
+													IsVisible="{Binding HasSharedGold}">
+											<TextBlock Classes="dim" VerticalAlignment="Center"
+													   AutomationProperties.AutomationId="Inv_GoldText"
+													   Text="{Binding SharedGold.Words, FallbackValue=''}"/>
+											<Button Classes="spend" VerticalAlignment="Center"
+													AutomationProperties.AutomationId="Inv_Gold"
+													ToolTip.Tip="{L 'Shared gold'}">
+												<Path Classes="pin" Data="{StaticResource [Glyph] Dollar}"/>
+
+												<Button.Flyout>
+													<!-- Framed in gold as a picker's panel is, and flush under the button, as the vault's. The
+														 panel is a popup, out of the page's tree: it takes ctrl and shift itself
+														 (GoldPanel_Attached). -->
+													<!-- Room for the panel's shadow on every side, the offset putting its edge back on the
+														 button's (the skill lists' soft shadow). -->
+													<Flyout Placement="BottomEdgeAlignedRight" HorizontalOffset="24">
+														<Border Classes="pickerpanel" Padding="14,10" Margin="24,4,24,28" BoxShadow="0 6 24 0 #C0000000"
+																AttachedToVisualTree="GoldPanel_Attached">
+															<Border.Styles>
+																<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+																<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+															</Border.Styles>
+															<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" MinWidth="300">
+																<!-- The open character's carried gold, and the arrows that move it to and from the shared
+																	 stash's under it (carried, shared, vault). Season 14 keeps no
+																	 gold in a character's own stash; the game moves carried gold to the shared stash by
+																	 its button, and these are that button. -->
+																<StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,6" MinHeight="36"
+																			IsVisible="{Binding GoldBetween, Converter={x:Static ObjectConverters.IsNotNull}}">
+																	<TextBlock Classes="purse" Text="{Binding CarriedGold.Label, FallbackValue=''}"/>
+																	<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{Binding CarriedGold.Limits, FallbackValue=''}"/>
+																</StackPanel>
+																<Panel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,6"
+																	   IsVisible="{Binding GoldBetween, Converter={x:Static ObjectConverters.IsNotNull}}">
+																	<TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="{StaticResource [Type] Body}"
+																			   Foreground="{DynamicResource [Text] Body}"
+																			   IsVisible="{Binding !Rules.TypesGold}"
+																			   Text="{Binding CarriedGold.Value, FallbackValue=''}"/>
+																	<StackPanel Orientation="Horizontal" Spacing="4"
+																				DataContext="{Binding CarriedGold}"
+																				IsVisible="{Binding $parent[Grid].((vm:ContainerSectionViewModel)DataContext).Rules.TypesGold}">
+																		<Button Classes="spend" Tag="empty"
+																				Command="{Binding LowerCommand}"
+																				IsEnabled="{Binding CanLower}"
+																				ToolTip.Tip="{Binding LowerHint}">
+																			<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+																		</Button>
+																		<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Wide}"
+																								 AutomationProperties.AutomationId="Inv_CarriedGoldBox"
+																								 Minimum="{Binding Minimum}"
+																								 Maximum="{Binding Maximum}"
+																								 Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"/>
+																		<Button Classes="spend" Tag="fill"
+																				Command="{Binding RaiseCommand}"
+																				IsEnabled="{Binding CanRaise}"
+																				ToolTip.Tip="{Binding RaiseHint}">
+																			<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+																		</Button>
+																	</StackPanel>
+																</Panel>
+
+																<!-- The arrows sit in the gap between the two purses they move between, the amount
+																	 they move in the panel's last row (a box with no caption
+																	 between the rows felt weird). -->
+																<StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="12"
+																			Margin="0,0,0,6" HorizontalAlignment="Center"
+																			DataContext="{Binding GoldBetween}"
+																			IsVisible="{Binding $self.DataContext, Converter={x:Static ObjectConverters.IsNotNull}}">
+																	<Button Classes="spend" Tag="down"
+																			AutomationProperties.AutomationId="Inv_GoldToShared"
+																			Command="{Binding MoveDownCommand}"
+																			IsEnabled="{Binding CanMoveDown}"
+																			ToolTip.Tip="{Binding DownHint}"
+																			ToolTip.ShowOnDisabled="True">
+																		<Path Classes="pin" Data="{StaticResource [Glyph] Arrow down}"/>
+																	</Button>
+																	<Button Classes="spend" Tag="up"
+																			AutomationProperties.AutomationId="Inv_GoldToCarried"
+																			Command="{Binding MoveUpCommand}"
+																			IsEnabled="{Binding CanMoveUp}"
+																			ToolTip.Tip="{Binding UpHint}"
+																			ToolTip.ShowOnDisabled="True">
+																		<Path Classes="pin" Data="{StaticResource [Glyph] Arrow up}"/>
+																	</Button>
+																</StackPanel>
+
+																<StackPanel Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0" MinHeight="36">
+																	<TextBlock Classes="purse" Text="{Binding SharedGold.Label}"/>
+																	<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{Binding SharedGold.Limits}"/>
+																</StackPanel>
+
+																<!-- In a mode that does not type gold, the amount as words instead. -->
+																<TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="{StaticResource [Type] Body}"
+																		   Foreground="{DynamicResource [Text] Body}"
+																		   IsVisible="{Binding !Rules.TypesGold}"
+																		   Text="{Binding SharedGold.Value}"/>
+
+																<StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="4"
+																			DataContext="{Binding SharedGold}"
+																			IsVisible="{Binding $parent[Grid].((vm:ContainerSectionViewModel)DataContext).Rules.TypesGold}">
+																	<!-- Modifiers on the press: only the pointer args carry them, and shift is what
+																		 tells a step from emptying the purse outright (SpendGold). -->
+																	<Button Classes="spend" Tag="empty"
+																			Command="{Binding LowerCommand}"
+																			IsEnabled="{Binding CanLower}"
+																			ToolTip.Tip="{Binding LowerHint}">
+																		<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+																	</Button>
+																	<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Wide}"
+																							 AutomationProperties.AutomationId="Inv_GoldBox"
+																							 Minimum="{Binding Minimum}"
+																							 Maximum="{Binding Maximum}"
+																							 Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"/>
+																	<Button Classes="spend" Tag="fill"
+																			Command="{Binding RaiseCommand}"
+																			IsEnabled="{Binding CanRaise}"
+																			ToolTip.Tip="{Binding RaiseHint}">
+																		<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+																	</Button>
+																</StackPanel>
+
+																<!-- The arrows to and from the vault, under the shared stash's purse - in every play
+																	 mode, since moving gold makes none. The purse changes at once; the vault's side
+																	 waits for the save. Its balance is never typed: it is the sum of its moves. -->
+																<StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="12"
+																			Margin="0,6,0,0" HorizontalAlignment="Center"
+																			DataContext="{Binding SharedGold}"
+																			IsVisible="{Binding HasVault}">
+																	<Button Classes="spend" Tag="deposit"
+																			AutomationProperties.AutomationId="Inv_GoldToVault"
+																			Command="{Binding DepositCommand}"
+																			IsEnabled="{Binding CanDeposit}"
+																			ToolTip.Tip="{Binding DepositHint}"
+																			ToolTip.ShowOnDisabled="True">
+																		<Path Classes="pin" Data="{StaticResource [Glyph] To vault}"/>
+																	</Button>
+																	<Button Classes="spend" Tag="withdraw"
+																			AutomationProperties.AutomationId="Inv_GoldFromVault"
+																			Command="{Binding WithdrawGoldCommand}"
+																			IsEnabled="{Binding CanWithdrawGold}"
+																			ToolTip.Tip="{Binding WithdrawHint}"
+																			ToolTip.ShowOnDisabled="True">
+																		<Path Classes="pin" Data="{StaticResource [Glyph] From vault}"/>
+																	</Button>
+																</StackPanel>
+																<StackPanel Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,6,16,0" MinHeight="36"
+																			IsVisible="{Binding SharedGold.HasVault}">
+																	<TextBlock Classes="purse" VerticalAlignment="Center" Text="{L 'Vault gold'}"/>
+																</StackPanel>
+																<TextBlock Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,0,0"
+																		   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}"
+																		   IsVisible="{Binding SharedGold.HasVault}"
+																		   Text="{Binding SharedGold.VaultAmount}"/>
+
+																<!-- How much every arrow moves, typed once for all of them. -->
+																<Border Grid.Row="5" Grid.ColumnSpan="2" Height="1" Margin="0,10,0,8"
+																		Background="{DynamicResource [Brush] Frame - Golden Dim}"
+																		IsVisible="{Binding MovesGold}"/>
+																<StackPanel Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0"
+																			IsVisible="{Binding MovesGold}">
+																	<TextBlock Classes="purse" Text="{L 'Amount moved'}"/>
+																	<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" Text="{L 'Shift: all of it'}"/>
+																</StackPanel>
+																<controls:NumericTextBox Grid.Row="6" Grid.Column="1" Classes="value" HorizontalAlignment="Right"
+																						 Width="{StaticResource [UI] Box Wide}"
+																						 AutomationProperties.AutomationId="Inv_GoldMoveAmount"
+																						 IsVisible="{Binding MovesGold}"
+																						 Minimum="0"
+																						 Maximum="{x:Static vm:GoldViewModel.MostMoved}"
+																						 Text="{Binding SharedGold.MoveAmount, UpdateSourceTrigger=PropertyChanged}"/>
+															</Grid>
+														</Border>
+													</Flyout>
+												</Button.Flyout>
+											</Button>
+										</StackPanel>
+
+									<Panel Grid.Column="3" VerticalAlignment="Center" Margin="4,0,0,0"
+										   Classes="pickmenu" Classes.shown="{Binding ShowsPicks}"
+										   IsEnabled="{Binding ShowsPicks}">
+										<StackPanel Orientation="Horizontal" Spacing="4">
+											<!-- Store all is in the tool row, behind Store. -->
+											<base:SortMenu DataContext="{Binding Picks}"
+														   Glyph="{StaticResource [Glyph] Select all}"/>
+										</StackPanel>
+									</Panel>
+									</Grid>
+
+										<!-- The section's pages in a list at its left, always in sight, and the panes
+										     beside it (it was a drop box over each pane, with the lock of the page it
+										     showed beside it). A row a page: its name,
+											 and at the row's end its lock, there to be clicked - gold while it is on, faint while it is off. A click
+											 shows the page in the first pane; a right click in the second, opening it - and on the page the second
+											 shows, shuts it. While two panes are up the rows say which shows them, I and II. What is carried and let
+											 go on a row goes to that page (VP_ViewModel_Inv_L.DropCarriedOnPage). -->
+										<base:SidePanel IsVisible="{Binding IsOpen}" Margin="0,10,0,0" Gap="14" SideMinWidth="100" SideTop="32"
+														SideLeastHeight="170">
+											<!-- The list gives way to the grids: as wide as its longest name where there
+											     is room, narrower where there is not, a name cut short said whole in its row's tooltip. In no
+											     frame of its own - it is the section's - with a rule down its right side between it and the
+											     grids, as tall as the section. -->
+											<!-- In a frame of its own after all, rows and locks together: the frames' gold
+											     and no shadow - as tall as its rows, not as the section. Its corners as
+											     its rows' are (a container's 8 until then). -->
+											<Border Padding="0" MaxWidth="200" VerticalAlignment="Top" ClipToBounds="True"
+													BorderThickness="1" CornerRadius="2" BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}"
+													IsVisible="{Binding HasPages}">
+												<!-- Scrolled where the grids beside it are shorter than its rows (beside the
+												     inventory's grid the section was as tall as the list, and empty under the grid): as tall as
+												     they are, six rows at the least (SidePanel.SideLeastHeight). Its bar has room of its own at the
+												     list's right, beside the locks: one that came and went over the list lay across the locks'
+												     column. Hard by that column:
+												     a bar's own 8 of room to its left is there to keep it off what it scrolls, and here the
+												     locks' column ends in its own shade (no gap between the
+												     lock column and the scrollbar). -->
+												<ScrollViewer Classes="pagelist" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+															  AutomationProperties.AutomationId="Pane_PagesScroll"
+															  AllowAutoHide="False">
+													<ScrollViewer.Styles>
+														<Style Selector="ScrollViewer.pagelist /template/ ScrollBar:vertical">
+															<Setter Property="Width" Value="10"/>
+															<Setter Property="MinWidth" Value="10"/>
+															<Setter Property="Padding" Value="0"/>
+														</Style>
+													</ScrollViewer.Styles>
+												<Grid ColumnDefinitions="*,Auto">
+													<!-- The list's own shade, a light one; its locks' column a deeper. -->
+													<Border Grid.Column="0" Background="{DynamicResource [ABrush] Black - A25%}"/>
+													<ItemsControl Grid.Column="0" ItemsSource="{Binding Pages}" VerticalAlignment="Top" Margin="3,3,2,3"
+																  AutomationProperties.AutomationId="Pane_Pages">
+														<ItemsControl.ItemTemplate>
+															<DataTemplate x:DataType="vm:StashPageChoice">
+																<Panel>
+																	<Border Height="1" Margin="2,4"
+																			IsVisible="{Binding IsSeparator}"
+																			Background="{DynamicResource [Brush] Frame - Golden Dim}"/>
+																	<Button Classes="pickone folderrow pagerow"
+																			Classes.held="{Binding IsShown}"
+																			base:KeepInView.When="{Binding IsShown}"
+																			Classes.drop="{Binding IsDropTarget}"
+																			IsVisible="{Binding !IsSeparator}"
+																			HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+																			AutomationProperties.AutomationId="PageRow"
+																			AutomationProperties.Name="{Binding Label}"
+																			base:TrimmedTip.Tip="{Binding Label}"
+																			base:TrimmedTip.Always="{Binding RowHint}"
+																			ToolTip.VerticalOffset="4"
+																			Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ShowPageCommand}"
+																			CommandParameter="{Binding}">
+																		<Grid ColumnDefinitions="16,*" Height="22">
+																			<TextBlock Grid.Column="0" Classes="panemark" Text="{Binding PaneMark}"
+																					   AutomationProperties.AutomationId="PageRow_Pane"
+																					   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+																			<!-- Its name, whole where the list has its own width; squeezed, the short one - SP 1, PStash, Mat - with
+																			     the whole name in the tooltip. Both are
+																			     laid out always, one of them drawn: the
+																			     list's own width is its whole
+																			     names', whichever is in sight. -->
+																			<TextBlock Grid.Column="1" Text="{Binding Label}" VerticalAlignment="Center"
+																					   TextTrimming="CharacterEllipsis"
+																					   Classes="pagename" Classes.gone="{Binding $parent[base:SidePanel].IsSqueezed}"/>
+																			<TextBlock Grid.Column="1" Text="{Binding Short}" VerticalAlignment="Center"
+																					   AutomationProperties.AutomationId="PageRow_Short"
+																					   TextTrimming="LeadingCharacterEllipsis"
+																					   IsVisible="{Binding $parent[base:SidePanel].IsSqueezed}"/>
+																		</Grid>
+																	</Button>
+																</Panel>
+															</DataTemplate>
+														</ItemsControl.ItemTemplate>
+													</ItemsControl>
+													<!-- The pages' locks, in a column of their own beside the rows, as
+													     the vault tree's are: a deep shade with a rule down its left side
+													     in the
+													     frames' gold, as tall as the list's rule beside it. A cell is a row's height - 24, and 1 under it; the rule
+													     between the character's pages and the shared ones is 9. Gold while a lock is on, faint while it is off. -->
+													<Border Grid.Column="1" Width="21"
+															Background="{DynamicResource [ABrush] Black - A50%}"
+															BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}" BorderThickness="1,0,0,0">
+														<ItemsControl ItemsSource="{Binding Pages}" VerticalAlignment="Top" Margin="0,3">
+															<ItemsControl.ItemTemplate>
+																<DataTemplate x:DataType="vm:StashPageChoice">
+																	<Panel>
+																		<Panel Height="9" IsVisible="{Binding IsSeparator}"/>
+																		<Panel Height="24" Margin="0,0,0,1" IsVisible="{Binding !IsSeparator}">
+																			<!-- The page's lock: the cube's, the character's stash's and each shared page's. -->
+																			<Button Classes="bareicon rowlock" VerticalAlignment="Center" HorizontalAlignment="Center"
+																					Classes.on="{Binding IsLocked}"
+																					IsVisible="{Binding CanLock}"
+																					AutomationProperties.AutomationId="PageRow_Lock"
+																					AutomationProperties.Name="{Binding Label}"
+																					Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).TogglePageLockCommand}"
+																					CommandParameter="{Binding}"
+																					ToolTip.Tip="{Binding LockHint}">
+																				<Panel>
+																					<Path Classes="pin small" Data="{StaticResource [Glyph] Lock}" IsVisible="{Binding IsLocked}"/>
+																					<Path Classes="pin small" Data="{StaticResource [Glyph] Unlock}" IsVisible="{Binding !IsLocked}"/>
+																				</Panel>
+																			</Button>
+																			<!-- The inventory's is its own: the charm area's. -->
+																			<Button Classes="bareicon rowlock" VerticalAlignment="Center" HorizontalAlignment="Center"
+																					Classes.on="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).InventoryLock}"
+																					IsVisible="{Binding IsInventory}"
+																					AutomationProperties.AutomationId="PageRow_Lock"
+																					AutomationProperties.Name="{Binding Label}"
+																					Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ToggleInventoryLockCommand}"
+																					ToolTip.Tip="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).InventoryLockHint}">
+																				<Panel>
+																					<Path Classes="pin small" Data="{StaticResource [Glyph] Lock}" IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).InventoryLock}"/>
+																					<Path Classes="pin small" Data="{StaticResource [Glyph] Unlock}" IsVisible="{Binding !$parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).InventoryLock}"/>
+																				</Panel>
+																			</Button>
+																		</Panel>
+																	</Panel>
+																</DataTemplate>
+															</ItemsControl.ItemTemplate>
+														</ItemsControl>
+													</Border>
+												</Grid>
+												</ScrollViewer>
+											</Border>
+
+											<!-- The panes. Side by side when the panel is wide enough, stacked when it is not: a WrapPanel is that
+												 rule and needs no code, since the parts flow across while there is room and drop to the next line
+												 when there is not. -->
+											<!-- Each line's panes centred: a narrow pane under a wide one stands under its middle. -->
+											<WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" ItemsAlignment="Center">
+												<StackPanel VerticalAlignment="Top" Margin="0,0,0,6">
+													<!-- The pane's line, in the same stack as its grid so its ends are the grid's: the page it shows -
+														 with its number while there are two - and that page's tools at the right. As tall with tools as
+														 without, so the grid stands where it stood whichever page is shown. -->
+													<Grid ColumnDefinitions="*,Auto" Margin="0,0,0,6" MinHeight="26"
+														  IsVisible="{Binding ShowPicker}"
+														  Classes.materials="{Binding ShowsMaterials}">
+														<!-- On the materials tab the line is as wide as the tab's frames, so the clear ends at their
+															 right edge. -->
+														<Grid.Styles>
+															<Style Selector="Grid.materials">
+																<Setter Property="HorizontalAlignment" Value="Left"/>
+																<Setter Property="Width" Value="{Binding #FirstMaterialsTab.Bounds.Width}"/>
+															</Style>
+														</Grid.Styles>
+														<TextBlock Grid.Column="0" Classes="dim" VerticalAlignment="Center" Margin="2,0,8,0"
+																   AutomationProperties.AutomationId="Pane_Title"
+																   Text="{Binding FirstTitle}" TextTrimming="CharacterEllipsis"/>
+														<!-- Sort and Close gaps for the page shown, where it is a stash
+														     page: the vault's own menu and its button. -->
+														<!-- Dimmed on a locked page, each saying why in its own tooltip (SortChoice.Blocked, CloseGapsHint): what
+														     is blocked just now is dimmed. A tooltip on the pair is not seen - a dimmed button shows its own. -->
+														<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
+																	IsVisible="{Binding SelectedPage.CanArrange, FallbackValue=False}"
+																	IsEnabled="{Binding !SelectedPage.IsLocked, FallbackValue=True}">
+															<base:SortMenu DataContext="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).FirstOrder}"/>
+															<Button Classes="spend" VerticalAlignment="Center"
+																	AutomationProperties.AutomationId="Pane_CloseGaps"
+																	Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).CloseGapsCommand}"
+																	CommandParameter="first"
+																	ToolTip.Tip="{Binding SelectedPage.CloseGapsHint}" ToolTip.ShowOnDisabled="True">
+																<Path Classes="pin" Data="{StaticResource [Glyph] Close gaps}"/>
+															</Button>
+														</StackPanel>
+														<!-- The materials tab's clear, where a page's tools stand (moved from the tool
+															 row to the tab's header line). Asks twice as delete does. -->
+														<base:BinButton Grid.Column="1" VerticalAlignment="Center"
+																		IsVisible="{Binding ShowsMaterials}"
+																		Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClearMaterialsCommand}"
+																		IsArmed="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClearMaterialsArmed}"
+																		IsEnabled="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).CanClearMaterials}"
+																		Tip="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClearMaterialsHint}"/>
+													</Grid>
+
+													<!-- The grid, its cells, its tiles and their tooltips: one control, shared with the stash page
+														 rather than described twice. -->
+													<base:ContainerGrid Margin="0,0,0,2" IsDimmed="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).PageHasPicks}"
+														Source="{Binding Grid}"
+														IsVisible="{Binding ShowsGrid}"
+														IsHolding="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).IsTakingDrops}"
+														SocketOpacity="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).SocketOpacity}"
+														ClickTileCommand="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClickTileCommand}"
+														PlaceAtCommand="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).PlaceAtCommand}"/>
+
+													<!-- The shared stash's materials tab, when it is the page shown. The visibility sits on a panel
+														 around it: set on the tab itself, it would be read against the tab's own DataContext. Left, as
+														 wide as its frames. -->
+													<Panel IsVisible="{Binding ShowsMaterials}">
+														<base:MaterialsTab x:Name="FirstMaterialsTab" Margin="0,0,0,2" HorizontalAlignment="Left"
+															DataContext="{Binding SelectedPage.Sheet}"
+															IsHolding="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).IsTakingDrops}"
+															SocketOpacity="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).SocketOpacity}"
+															ClickTileCommand="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClickTileCommand}"
+															PlaceAtCommand="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).PlaceAtCommand}"/>
+													</Panel>
+												</StackPanel>
+
+												<!-- Between the two panes: room. As wide as a grid once the second has wrapped under the first - a
+													 WrapPanel gives a child the width it asks for - so the room is then a line of its own. Nothing
+													 stands in it: no gold moved between two purses, no arrows that move items. -->
+												<Panel IsVisible="{Binding ShowSecond}"
+													   Width="{Binding ControlsWidth}"
+													   Margin="10"/>
+
+												<!-- The second pane, the page a right click on a row gave it. -->
+												<StackPanel IsVisible="{Binding ShowSecond}"
+															VerticalAlignment="Top">
+													<Grid ColumnDefinitions="*,Auto" Margin="0,0,0,6" MinHeight="26"
+														  Classes.materials="{Binding SecondShowsMaterials}">
+														<Grid.Styles>
+															<Style Selector="Grid.materials">
+																<Setter Property="HorizontalAlignment" Value="Left"/>
+																<Setter Property="Width" Value="{Binding #SecondMaterialsTab.Bounds.Width}"/>
+															</Style>
+														</Grid.Styles>
+														<TextBlock Grid.Column="0" Classes="dim" VerticalAlignment="Center" Margin="2,0,8,0"
+																   AutomationProperties.AutomationId="Pane2_Title"
+																   Text="{Binding SecondTitle}" TextTrimming="CharacterEllipsis"/>
+														<!-- Sort and Close gaps for the page shown, as the first pane has them. -->
+														<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
+																	IsVisible="{Binding SecondPage.CanArrange, FallbackValue=False}"
+																	IsEnabled="{Binding !SecondPage.IsLocked, FallbackValue=True}">
+															<base:SortMenu DataContext="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).SecondOrder}"/>
+															<Button Classes="spend" VerticalAlignment="Center"
+																	AutomationProperties.AutomationId="Pane2_CloseGaps"
+																	Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).CloseGapsCommand}"
+																	CommandParameter="second"
+																	ToolTip.Tip="{Binding SecondPage.CloseGapsHint}" ToolTip.ShowOnDisabled="True">
+																<Path Classes="pin" Data="{StaticResource [Glyph] Close gaps}"/>
+															</Button>
+														</StackPanel>
+														<base:BinButton Grid.Column="1" VerticalAlignment="Center"
+																		IsVisible="{Binding SecondShowsMaterials}"
+																		Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClearMaterialsCommand}"
+																		IsArmed="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClearMaterialsArmed}"
+																		IsEnabled="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).CanClearMaterials}"
+																		Tip="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClearMaterialsHint}"/>
+													</Grid>
+
+													<base:ContainerGrid Margin="0,0,0,2" IsDimmed="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).PageHasPicks}"
+														Source="{Binding SecondGrid}"
+														IsVisible="{Binding SecondShowsGrid}"
+														IsHolding="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).IsTakingDrops}"
+														SocketOpacity="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).SocketOpacity}"
+														ClickTileCommand="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClickTileCommand}"
+														PlaceAtCommand="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).PlaceAtCommand}"/>
+
+													<!-- The visibility sits on a panel around it: set on the tab itself, it would be read against the
+														 tab's own DataContext. -->
+													<Panel IsVisible="{Binding SecondShowsMaterials}">
+														<base:MaterialsTab x:Name="SecondMaterialsTab" Margin="0,0,0,2" HorizontalAlignment="Left"
+															DataContext="{Binding SecondPage.Sheet}"
+															IsHolding="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).IsTakingDrops}"
+															SocketOpacity="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).SocketOpacity}"
+															ClickTileCommand="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).ClickTileCommand}"
+															PlaceAtCommand="{Binding $parent[UserControl].((vm:VP_ViewModel_Inv_L)DataContext).PlaceAtCommand}"/>
+													</Panel>
+												</StackPanel>
+											</WrapPanel>
+										</base:SidePanel>
+
+								</StackPanel>
+							</Border>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+				<!-- 5. The mercenary. Fewer slots, laid out the same way. -->
+				<Border x:Name="MercSection"
+						Classes="section" Margin="0,0,0,10" Padding="10,8"
+						IsVisible="{Binding HasCharacter}">
+					<StackPanel>
+						<Grid Classes="sectionhead" ColumnDefinitions="*,Auto">
+						<Button Grid.Column="0" Classes="fold" Command="{Binding ToggleMercCommand}">
+							<Grid ColumnDefinitions="Auto,*">
+								<Path Grid.Column="0" Classes="chevron"
+									  Classes.open="{Binding MercIsOpen}"
+									  Data="{StaticResource [Glyph] Chevron}"/>
+								<TextBlock Grid.Column="1" Classes="section"
+										   Text="{Binding MercHeader}"/>
+							</Grid>
+						</Button>
+						<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4"
+									VerticalAlignment="Center" Margin="8,0,0,0">
+							<!-- The Iron Golem's item, beside the mercenary's gear: there only while a golem stands.
+							     Lit while the item is shown. -->
+							<Button Classes="spend" VerticalAlignment="Center"
+									Classes.on="{Binding ShowGolem}"
+									Command="{Binding ToggleGolemCommand}"
+									ToolTip.Tip="{L 'Iron Golem'}">
+								<Button.IsVisible>
+									<MultiBinding Converter="{x:Static BoolConverters.And}">
+										<Binding Path="HasGolem"/>
+										<Binding Path="MercIsOpen"/>
+									</MultiBinding>
+								</Button.IsVisible>
+								<Path Classes="pin art" Data="{StaticResource [Glyph] Golem}"/>
+							</Button>
+							<Panel VerticalAlignment="Center"
+								   Classes="pickmenu" Classes.shown="{Binding ShowsMercPicks}"
+								   IsEnabled="{Binding ShowsMercPicks}">
+								<base:SortMenu DataContext="{Binding MercPicks}"
+											   Glyph="{StaticResource [Glyph] Select all}"/>
+							</Panel>
+						</StackPanel>
+						</Grid>
+
+						<StackPanel IsVisible="{Binding MercIsOpen}" Orientation="Horizontal" Spacing="28"
+									HorizontalAlignment="Center">
+							<!-- Said only where the section would otherwise stand empty: beside an Iron Golem's panel it
+							     hung at the left, half way down, like a label for something missing (a golem and no
+							     mercenary). The header says "none hired" already. -->
+							<TextBlock Classes="dim" Margin="0,10,0,2"
+									   HorizontalAlignment="Center" VerticalAlignment="Center"
+									   Text="{L 'No mercenary hired.'}">
+								<TextBlock.IsVisible>
+									<MultiBinding Converter="{x:Static BoolConverters.And}">
+										<Binding Path="!HasMerc"/>
+										<Binding Path="!GolemShown"/>
+									</MultiBinding>
+								</TextBlock.IsVisible>
+							</TextBlock>
+
+							<StackPanel IsVisible="{Binding HasMerc}" Margin="0,8,0,0" MinWidth="360">
+								<!-- Its name; "Level 77 Barbarian", as a character's card reads; its variant, by its
+								     attack or aura and no difficulty - PD2's are the same mercenary across them
+								     (the kind as the header and one line of everything under it
+								     was too repetitive and noisy beside the controls that said it again). -->
+								<!-- The name, centred, and after it the pencil that edits the mercenary - its name,
+								     variant and level, a dead one revived, in a popup (it stood in the section's tool
+								     row, where beside an Iron Golem's
+								     button it did not say what it edits). The name stays in the middle whatever its
+								     length: the pencil hangs in the column after it. A bare glyph (BareIcon.axaml), not
+								     the tools' framed square, which stood taller than the name. The row is one height
+								     with or without it, so the lines do not move where there is none - the play mode
+								     that does not edit the character has no pencil: hidden, not dimmed. -->
+								<!-- What follows the name hangs after it in a holder of no width (the Canvas): it takes no
+								     room, so the name is in the middle whatever its length and whether or not anything
+								     follows. Set in columns it pushed the line aside wherever the block was narrow -
+								     seen with the DEAD badge. -->
+								<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="22">
+									<TextBlock FontWeight="Bold" Text="{Binding MercName}"
+											   AutomationProperties.AutomationId="Merc_NameLine"
+											   FontFamily="{StaticResource DiabloFont}"
+											   FontSize="{StaticResource [Type] Heading}" Foreground="{DynamicResource [Text] Heading}"
+											   VerticalAlignment="Center"/>
+									<Canvas Width="0" Height="22">
+										<StackPanel Canvas.Left="4" Height="22" Orientation="Horizontal">
+											<Button Classes="bareicon" VerticalAlignment="Center"
+													AutomationProperties.AutomationId="Merc_Edit"
+													IsVisible="{Binding EditsMerc}"
+													Command="{Binding EditMercCommand}"
+													ToolTip.Tip="{L 'Edit mercenary'}">
+												<Path Classes="pin" Data="{StaticResource [Glyph] Pencil}"/>
+											</Button>
+										</StackPanel>
+									</Canvas>
+								</StackPanel>
+								<!-- Two lines of one kind, in one style (the second had the body's white, the third the
+								     dim grey). -->
+								<!-- The level line stays in the middle; after it, while the mercenary is dead, the badge a
+								     dead character's card wears (Badge.axaml: DEAD, in the broken items' red). The row
+								     is the badge's height with or without it. -->
+								<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="20" Margin="0,2,0,0">
+									<TextBlock Classes="dim" Text="{Binding MercLevelLine}"
+											   AutomationProperties.AutomationId="Merc_LevelLine"
+											   VerticalAlignment="Center"/>
+									<Canvas Width="0" Height="20">
+										<StackPanel Canvas.Left="6" Height="20" Orientation="Horizontal" Spacing="4">
+											<Border Classes="badge" VerticalAlignment="Center"
+													IsVisible="{Binding MercIsDead}"
+													BorderBrush="{DynamicResource [Brush] Rarity - Broken items}">
+												<TextBlock Text="{L 'DEAD'}" AutomationProperties.AutomationId="Merc_Dead"
+														   Foreground="{DynamicResource [Text] Danger}"/>
+											</Border>
+											<!-- Revive, where a dead character's is: after the DEAD badge (it stood after
+											     the pencil for an hour).
+											     There only while it is dead and the play mode edits the character. A bare
+											     glyph, where the character's card has the framed square: this line is a
+											     line of small text, and the square would stand over it. -->
+											<Button Classes="bareicon" VerticalAlignment="Center"
+													AutomationProperties.AutomationId="Merc_Revive"
+													IsVisible="{Binding ShowsMercRevive}"
+													Command="{Binding ReviveMercCommand}"
+													ToolTip.Tip="{L 'Revive mercenary'}">
+												<Path Classes="pin" Data="{StaticResource [Glyph] Revive}"/>
+											</Button>
+										</StackPanel>
+									</Canvas>
+								</StackPanel>
+								<TextBlock Classes="dim" Text="{Binding MercVariantName}"
+										   AutomationProperties.AutomationId="Merc_VariantLine"
+										   HorizontalAlignment="Center" Margin="0,2,0,0"/>
+
+								<ItemsControl x:Name="MercSlots" Classes="picklist"
+											  ItemsSource="{Binding MercEquipped}"
+											  ItemTemplate="{StaticResource MercSlot}"
+											  HorizontalAlignment="Center"
+											  Margin="0,10,0,4">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<!-- Placed, not laid out: each box where the game
+											     draws it - see EquipSlotViewModel.MercSlots. -->
+											<Canvas Background="Transparent" Width="{x:Static vm:EquipSlotViewModel.MercPanelWidth}"
+													Height="{x:Static vm:EquipSlotViewModel.MercPanelHeight}"/>
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+									<ItemsControl.Styles>
+										<Style Selector="ItemsControl#MercSlots > ContentPresenter"
+											   x:DataType="vm:EquipSlotViewModel">
+											<Setter Property="Canvas.Left" Value="{Binding Left}"/>
+											<Setter Property="Canvas.Top" Value="{Binding Top}"/>
+										</Style>
+										<!-- The rows already carry the spacing, so the box keeps
+										     only its side margins; the usual 3 all round would
+										     make every box taller than the cells it covers. -->
+										<Style Selector="Border.slot">
+											<Setter Property="Margin" Value="3,0"/>
+										</Style>
+									</ItemsControl.Styles>
+								</ItemsControl>
+							</StackPanel>
+
+							<!-- The Iron Golem beside the mercenary: the one item it was made of, chosen and edited as
+							     any item is, and the button that dismisses it - the item then back on the character.
+							     It is not lifted: the save keeps it with the golem. -->
+							<StackPanel IsVisible="{Binding GolemShown}" Margin="0,8,0,0">
+								<StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+									<TextBlock FontWeight="Bold" Text="{L 'Iron Golem'}"
+											   FontFamily="{StaticResource DiabloFont}"
+											   FontSize="{StaticResource [Type] Heading}" Foreground="{DynamicResource [Text] Heading}"
+											   VerticalAlignment="Center"/>
+									<Button Classes="spend" VerticalAlignment="Center"
+											Command="{Binding DismissGolemCommand}"
+											ToolTip.Tip="{L 'Dismiss Iron Golem'}">
+										<Path Classes="pin" Data="{StaticResource [Glyph] Exit}"/>
+									</Button>
+								</StackPanel>
+								<!-- What it was made of, on the line the mercenary's kind and level have: the two
+								     panels' boxes start level. -->
+								<TextBlock Classes="dim" Text="{Binding GolemDetail}"
+										   HorizontalAlignment="Center" Margin="0,2,0,0"/>
+
+								<ItemsControl x:Name="GolemSlots" Classes="picklist"
+											  ItemsSource="{Binding GolemSlots}"
+											  ItemTemplate="{StaticResource MercSlot}"
+											  HorizontalAlignment="Center"
+											  Margin="0,10,0,4"/>
+							</StackPanel>
+						</StackPanel>
+					</StackPanel>
+				</Border>
+
+				<!-- The mercenary's sheet, beneath the mercenary's section as an
+				     Advanced Stats (Mercenary) section of its own: the same page read off the mercenary, the party's
+				     buffs as the character's row
+				     has them on. -->
+				<Border x:Name="MercSheetSection"
+						Margin="0,0,0,10"
+						Classes="section"
+						IsVisible="{Binding HasMerc}"
+						Padding="10,8">
+					<StackPanel>
+						<Grid Classes="sectionhead" ColumnDefinitions="*,Auto">
+							<Button Grid.Column="0" Classes="fold" Command="{Binding ToggleMercSheetCommand}"
+									AutomationProperties.AutomationId="MercSheet_Fold">
+								<Grid ColumnDefinitions="Auto,*">
+									<Path Grid.Column="0" Classes="chevron"
+										  Classes.open="{Binding MercSheetIsOpen}"
+										  Data="{StaticResource [Glyph] Chevron}"/>
+									<TextBlock Grid.Column="1" Classes="section" Text="{L 'Advanced Stats (Mercenary)'}"/>
+								</Grid>
+							</Button>
+						</Grid>
+
+						<ContentControl Margin="0,8,0,0" IsVisible="{Binding MercSheetIsOpen}" Content="{Binding MercSheet}"
+										ContentTemplate="{StaticResource BuffRowTemplate}"
+										AutomationProperties.AutomationId="MercSheet_Buffs"/>
+
+						<Border Classes="sheetwell" IsVisible="{Binding MercSheetIsOpen}">
+							<ItemsControl AutomationProperties.AutomationId="MercSheet_Lines"
+										  ItemsSource="{Binding MercSheet.Lines}"
+										  ItemTemplate="{StaticResource SheetLineTemplate}"/>
+						</Border>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+		</ScrollViewer>
+	</DockPanel>
+
+	<!-- What is on the cursor is drawn by the window (MainView), over both pages: carried to the
+	     vault list on the right, it has to be seen there too. -->
+
+		<!-- The mercenary edited, over this page: the character rename popup's manner -
+		     title, the fields, one button to close. Every change is kept as it is made, as on the Edit page:
+		     there is no answer to give, so the button only closes; so do the veil and Escape. -->
+		<Border Classes="veil"
+				IsVisible="{Binding IsMercEditPresent}"
+				Classes.shown="{Binding IsMercEditOpen}"
+				IsHitTestVisible="{Binding IsMercEditOpen}">
+			<Border.KeyBindings>
+				<KeyBinding Gesture="Escape" Command="{Binding CloseMercEditCommand}"/>
+			</Border.KeyBindings>
+			<Panel>
+				<Button Classes="backdrop" Command="{Binding CloseMercEditCommand}"/>
+				<Panel Classes="pickerframe">
+					<Border Classes="pickerpanel" VerticalAlignment="Center" HorizontalAlignment="Center">
+						<StackPanel>
+							<!-- Closed by the header's cross, as every panel is - CLOSE at the foot
+							     until then. The focus goes to it as the popup opens: Enter then closes it, and no key
+							     changes the mercenary by accident - an opening picker's focus goes to its first text box
+							     otherwise, which here is the level's. -->
+							<Grid ColumnDefinitions="*,Auto">
+								<TextBlock Grid.Column="0" Classes="pickertitle" VerticalAlignment="Center" Text="{L 'Edit mercenary'}"/>
+								<Button Grid.Column="1" Classes="spend" Margin="12,0,0,0"
+										base:PickerKeys.TakesFocus="True"
+										AutomationProperties.AutomationId="Merc_Close"
+										Command="{Binding CloseMercEditCommand}"
+										ToolTip.Tip="{L 'Close'}">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+								</Button>
+							</Grid>
+
+							<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto" Margin="0,12,0,0">
+								<TextBlock Grid.Row="0" Grid.Column="0" Classes="fieldname" Margin="0,0,12,0" Text="{L 'Name'}"/>
+								<ComboBox Grid.Row="0" Grid.Column="1" Classes="slots" Width="{StaticResource [UI] Pair Width}" MinWidth="0"
+										  AutomationProperties.AutomationId="Merc_Name"
+										  ItemsSource="{Binding MercNames}"
+										  SelectedIndex="{Binding MercNameIndex}"/>
+
+								<TextBlock Grid.Row="1" Grid.Column="0" Classes="fieldname" Margin="0,8,12,0" Text="{L 'Variant'}"/>
+								<ComboBox Grid.Row="1" Grid.Column="1" Classes="slots" Width="{StaticResource [UI] Pair Width}" MinWidth="0" Margin="0,8,0,0"
+										  AutomationProperties.AutomationId="Merc_Variant"
+										  ItemsSource="{Binding MercVariants}"
+										  SelectedIndex="{Binding MercVariantIndex}"/>
+
+								<TextBlock Grid.Row="2" Grid.Column="0" Classes="fieldname" Margin="0,8,12,0" Text="{L 'Level'}"/>
+								<StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="0,8,0,0"
+											HorizontalAlignment="Right">
+									<Button Classes="spend"
+											AutomationProperties.AutomationId="Merc_LevelDown"
+											Tag="merc:down"
+											Command="{Binding LowerMercLevelCommand}"
+											IsEnabled="{Binding CanLowerMercLevel}"
+											ToolTip.Tip="{Binding LowerMercLevelHint}" ToolTip.ShowOnDisabled="True">
+										<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+									</Button>
+									<controls:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Small}"
+															 AutomationProperties.AutomationId="Merc_Level"
+															 Minimum="1" Maximum="{Binding MercLevelMost}"
+															 Text="{Binding MercLevelText}"
+															 ToolTip.Tip="{Binding MercLevelHint}"/>
+									<Button Classes="spend"
+											AutomationProperties.AutomationId="Merc_LevelUp"
+											Tag="merc:up"
+											Command="{Binding RaiseMercLevelCommand}"
+											IsEnabled="{Binding CanRaiseMercLevel}"
+											ToolTip.Tip="{Binding RaiseMercLevelHint}" ToolTip.ShowOnDisabled="True">
+										<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+									</Button>
+								</StackPanel>
+							</Grid>
+						</StackPanel>
+					</Border>
+				</Panel>
+			</Panel>
+		</Border>
+
+		<!-- (The search panel does not open over this page: it is the window's - SearchWindow.) -->
+
+		<!-- In place of the page while nothing is open, the same as the character and
+		     misc pages. The shared stash is only reached through a character, so with
+		     none there is nothing here to show. -->
+		<base:LoadCharacterNotice
+			IsVisible="{Binding !Session.IsLoaded}"
+			Command="{Binding $parent[views:MainView].((mvm:MainViewModel)DataContext).GoHomeCommand}"/>
+	</Panel>
+</UserControl>

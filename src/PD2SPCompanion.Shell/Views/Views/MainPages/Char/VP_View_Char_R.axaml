@@ -1,0 +1,434 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:mvm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:ctrl="using:PD2SPCompanion.Shell.Controls"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Char_R"
+			 x:DataType="vm:VP_ViewModel_Char_R"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_R CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Char_R/>
+	</Design.DataContext>
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Badge.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Choice.axaml"/>
+
+		<!-- A tree's tab is two lines where its name is long: as tall as it needs, at least a row. -->
+		<Style Selector="Button.choice.skilltree">
+			<Setter Property="Height" Value="NaN"/>
+			<Setter Property="MinHeight" Value="28"/>
+			<Setter Property="Padding" Value="8,5"/>
+			<Setter Property="Margin" Value="3,0"/>
+			<Setter Property="VerticalAlignment" Value="Stretch"/>
+		</Style>
+		<!-- A folded card is its heading alone: it gives up the height it fills open. -->
+		<Style Selector="Border.foldcard.folded">
+			<Setter Property="VerticalAlignment" Value="Top"/>
+		</Style>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+
+		<!-- Tree tabs are choice buttons (Choice.axaml). All three on one row, a third each: a long name wraps
+		     inside its own button and the row grows to suit; the grid gives every tab that
+		     height, so they stay level rather than one standing taller than the rest. -->
+
+		<!-- A skill is its icon and its name. No frame: nothing here is clickable, so a
+		     border would promise something the page does not do. Points show as a badge on
+		     the icon, and an unreachable skill is dimmed. -->
+		<Style Selector="Border.skill">
+			<!-- Anchored under the plate rather than following the pointer, so the tooltip
+			     appears in the same place every time and does not sit over the skill it is
+			     describing. -->
+			<Setter Property="ToolTip.Placement" Value="Bottom"/>
+			<Setter Property="ToolTip.VerticalOffset" Value="6"/>
+			<Setter Property="Width" Value="104"/>
+			<!-- The vertical gap is where the dependency arrows run. Rows sitting three
+			     pixels apart left no room for one, so a link between neighbouring rows had
+			     nowhere to be drawn at all. -->
+			<Setter Property="Margin" Value="4,15"/>
+			<Setter Property="Padding" Value="6,6"/>
+			<Setter Property="CornerRadius" Value="3"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Field}"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<!-- Stretched, so every plate in a row is as tall as the tallest of them
+			     rather than each shrinking to its own name. -->
+			<Setter Property="VerticalAlignment" Value="Stretch"/>
+		</Style>
+		<!-- A skill with points in it is framed in full gold, as everything chosen is. -->
+		<Style Selector="Border.skill.taken">
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+			<Setter Property="Background" Value="#4D000000"/>
+		</Style>
+		<Style Selector="Border.skill.locked">
+			<Setter Property="Opacity" Value="0.35"/>
+		</Style>
+		<Style Selector="Border.skill Image">
+			<Setter Property="Width" Value="48"/>
+			<Setter Property="Height" Value="48"/>
+			<Setter Property="Effect" Value="drop-shadow(0 2 5 #C0000000)"/>
+		</Style>
+		<Style Selector="Border.skill:not(.taken) Image">
+			<Setter Property="Opacity" Value="0.55"/>
+		</Style>
+
+	</UserControl.Styles>
+
+	<Panel>
+		<!-- The watermark, the same one this panel shows with nothing chosen. -->
+		<Image Classes="D2LogoBG" IsVisible="{Binding !Session.IsLoaded}"/>
+		<DockPanel Margin="16" IsVisible="{Binding Session.IsLoaded}">
+		<!-- Attributes, above the skills, their
+		     view model still the left page's. The subtle panel treatment: a translucent
+		     grey over a soft black edge, letting the stone show through. Black behind a
+		     gold frame is for the character card and the character list, where art has to
+		     read against it - a panel of numbers does not need it and reads heavier for
+		     having it. -->
+		<Border Classes="section" DockPanel.Dock="Top" Margin="0,0,0,12" DataContext="{Binding Stats}" x:DataType="vm:VP_ViewModel_Char_L">
+			<DockPanel Margin="16,12">
+				<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto">
+					<!-- Folds, as the inventory's sections do. -->
+					<Button Grid.Column="0" Classes="fold" Command="{Binding ToggleAttributesCommand}">
+						<Grid ColumnDefinitions="Auto,*">
+							<Path Grid.Column="0" Classes="chevron" Classes.open="{Binding AttributesOpen}"
+								  Data="{StaticResource [Glyph] Chevron}"/>
+							<TextBlock Grid.Column="1" Classes="heading" Text="{L 'Attributes'}"
+									   Margin="8,0,0,0" VerticalAlignment="Center"/>
+						</Grid>
+					</Button>
+					<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6"
+								VerticalAlignment="Center">
+						<TextBlock Text="{L 'Points to spend'}" Classes="dim" VerticalAlignment="Center"/>
+						<!-- Free mode only: points out of nowhere, either side of the count. -->
+						<Button Classes="spend" Tag="remove points"
+								IsVisible="{Binding Rules.AddsCharacterPoints}"
+								IsEnabled="{Binding CanRemoveUnspent}"
+								Command="{Binding RemoveUnspentCommand}"
+								ToolTip.Tip="{Binding RemoveUnspentTip}" ToolTip.ShowOnDisabled="True">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+						</Button>
+						<!-- The count in the level's value box: typed in Free mode, read elsewhere. -->
+						<base:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Small}" Height="28" MinWidth="0" Minimum="0" Maximum="9999"
+											 FontSize="{StaticResource [Type] Body}"
+											 HorizontalContentAlignment="Center" TextAlignment="Center"
+											 IsReadOnly="{Binding !Rules.AddsCharacterPoints}"
+											 Text="{Binding UnspentText}"
+											 KeyDown="UnspentBox_KeyDown" LostFocus="UnspentBox_LostFocus"/>
+						<Button Classes="spend" Tag="add points"
+								IsVisible="{Binding Rules.AddsCharacterPoints}"
+								Command="{Binding AddUnspentCommand}"
+								ToolTip.Tip="{L 'Add points&#x0a;Ctrl + LMB: 5 points&#x0a;Shift + LMB: 20 points&#x0a;Ctrl + Shift + LMB: the most'}">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+						</Button>
+					</StackPanel>
+				</Grid>
+
+				<!-- Under the attributes, on the page with the skills it refunds too (the left page
+				     is the quests'). -->
+				<!-- Respec, and beside it Refit: points moved into Strength and
+				     Dexterity until the worn gear meets them. Its Ctrl+click is read on the press - see
+				     RefitBaseOnly. -->
+				<!-- The card's two actions, compact on the right as the other cards': flat
+				     secondary buttons, the icon left and the label centred in the rest. -->
+				<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right"
+							Margin="0,6,0,0" IsVisible="{Binding ShowsRespec}">
+					<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch"
+							Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+							Command="{Binding RespecCommand}"
+							ToolTip.Tip="{Binding RespecTip}" ToolTip.ShowOnDisabled="True">
+						<!-- The undo arrow: back to before, as every reset; the clock is the history list's. -->
+						<Grid ColumnDefinitions="Auto,*">
+							<Path Classes="pin label" Data="{StaticResource [Glyph] Undo}" Grid.Column="0"/>
+							<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'RESPEC'}"/>
+						</Grid>
+					</Button>
+					<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch" Tag="refit"
+							Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+							Command="{Binding RefitGearCommand}"
+							ToolTip.Tip="{L 'Meet equipped gear\'s Strength and Dexterity'}">
+						<Grid ColumnDefinitions="Auto,*">
+							<Path Classes="pin label" Data="{StaticResource [Glyph] Refit}" Grid.Column="0"/>
+							<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'REFIT'}"/>
+						</Grid>
+					</Button>
+				</StackPanel>
+
+				<!-- Without the class table there is no floor, so no respec is offered. -->
+				<TextBlock DockPanel.Dock="Bottom" Classes="dim" TextWrapping="Wrap"
+						   Foreground="{DynamicResource [Text] Danger}"
+						   Text="{L 'Attributes locked: charstats.txt not readable.'}">
+					<TextBlock.IsVisible>
+						<MultiBinding Converter="{x:Static BoolConverters.And}">
+							<Binding Path="AttributesOpen"/>
+							<Binding Path="!CanRespec"/>
+						</MultiBinding>
+					</TextBlock.IsVisible>
+				</TextBlock>
+
+				<!-- The four rows outgrow a short window, so they scroll rather than being
+				     clipped. The app-wide scrollbar theme applies here with no extra work.
+				     AllowAutoHide off so the bar docks beside the rows and takes its own
+				     width; left on, it floats over them and sits on the plus buttons. -->
+				<ScrollViewer HorizontalScrollBarVisibility="Disabled"
+							  AllowAutoHide="False" Margin="0,12,0,0"
+							  IsVisible="{Binding AttributesOpen}">
+				<!-- A row's figure is drawn by one control (AttributeFigure, which says the rule and what was tried
+				     before it): as wide as the longest figure of its kind - the rows the gear adds nothing to, and
+				     the rows it adds to - the points in a column, the gear's signs in a line. The margin is the one unit
+				     of air each side of the longest. -->
+				<ItemsControl ItemsSource="{Binding Attributes}" VerticalAlignment="Top">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate x:DataType="vm:AttributeRowViewModel">
+							<Grid Margin="0,0,0,12">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="Auto"/>
+									<ColumnDefinition Width="Auto"/>
+									<ColumnDefinition Width="Auto"/>
+								</Grid.ColumnDefinitions>
+								<StackPanel Grid.Column="0" VerticalAlignment="Center">
+									<TextBlock Text="{Binding Label}"
+											   FontSize="{StaticResource [Type] Body}"
+											   Foreground="{DynamicResource [Text] Body}"/>
+									<TextBlock Text="{Binding Floor}" Classes="dim"/>
+								</StackPanel>
+
+								<!-- The steppers are the play mode's: hidden in Legit, where the page reads
+								     the attributes and changes none. Their Ctrl and Shift clicks go with them. -->
+								<Button Grid.Column="1" Classes="spend"
+										Command="{Binding LowerCommand}"
+										IsVisible="{Binding $parent[ItemsControl].((vm:VP_ViewModel_Char_L)DataContext).Rules.EditsCharacter}"
+										Tag="refund" AutomationProperties.AutomationId="Attr_Remove"
+										IsEnabled="{Binding CanLower}"
+										ToolTip.Tip="{Binding LowerTip}" ToolTip.ShowOnDisabled="True">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+								</Button>
+
+								<!-- The attribute's own points, and after them in an item property's blue what the
+								     gear in use adds: "30 +20". The tooltip says the sum and its two parts, and is
+								     there only where the gear adds something. -->
+								<base:AttributeFigure Grid.Column="2" Margin="8,0" VerticalAlignment="Center"
+													  AutomationProperties.AutomationId="Attribute_Figure"
+													  Points="{Binding Value}"
+													  GearSign="{Binding BonusSign}"
+													  GearNumber="{Binding BonusNumber}"
+													  PointsOfAll="{Binding PointsOfAll}"
+													  GearOfAll="{Binding GearOfAll}"
+													  FontFamily="{StaticResource DiabloFont}"
+													  FontSize="{StaticResource [Type] Title}" FontWeight="Bold"
+													  SignFont="{StaticResource BodyFont}"
+													  Foreground="{DynamicResource [Text] Heading}"
+													  GearBrush="{DynamicResource [Brush] Rarity - Magic items}"
+													  ToolTip.Tip="{Binding ValueTip}"/>
+
+								<Button Grid.Column="3" Classes="spend"
+										Command="{Binding RaiseCommand}"
+										IsVisible="{Binding $parent[ItemsControl].((vm:VP_ViewModel_Char_L)DataContext).Rules.EditsCharacter}"
+										Tag="invest" AutomationProperties.AutomationId="Attr_Add"
+										IsEnabled="{Binding CanRaise}"
+										ToolTip.Tip="{Binding RaiseTip}" ToolTip.ShowOnDisabled="True">
+									<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+								</Button>
+							</Grid>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+				</ScrollViewer>
+			</DockPanel>
+		</Border>
+
+		<!-- The skills, in a card as the attributes are: the heading and points to
+		     spend, the tree tabs, the tree, and their respec at the foot. -->
+		<Border
+				Classes="section foldcard" Classes.folded="{Binding !SkillsOpen}">
+			<DockPanel Margin="16,12">
+				<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto">
+					<Button Grid.Column="0" Classes="fold" Command="{Binding ToggleSkillsCommand}">
+						<Grid ColumnDefinitions="Auto,*">
+							<Path Grid.Column="0" Classes="chevron" Classes.open="{Binding SkillsOpen}"
+								  Data="{StaticResource [Glyph] Chevron}"/>
+							<TextBlock Grid.Column="1" Classes="heading" Text="{L 'Skills'}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+						</Grid>
+					</Button>
+					<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Bottom"
+								ToolTip.Tip="{L 'Skills read only'}"
+								ToolTip.ServiceEnabled="{Binding !EditsSkills}">
+						<TextBlock Text="{L 'Points to spend'}" Classes="dim" VerticalAlignment="Center"/>
+						<!-- Free mode only: skill points out of nowhere, spent in the game. -->
+						<Button Classes="spend" Tag="remove points"
+								IsVisible="{Binding Rules.AddsCharacterPoints}"
+								IsEnabled="{Binding CanRemoveUnspent}"
+								Command="{Binding RemoveUnspentCommand}"
+								ToolTip.Tip="{Binding RemoveUnspentTip}" ToolTip.ShowOnDisabled="True">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+						</Button>
+						<!-- The count in the level's value box: typed in Free mode, read elsewhere. -->
+						<base:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Small}" Height="28" MinWidth="0" Minimum="0" Maximum="9999"
+											 FontSize="{StaticResource [Type] Body}"
+											 HorizontalContentAlignment="Center" TextAlignment="Center"
+											 IsReadOnly="{Binding !Rules.AddsCharacterPoints}"
+											 Text="{Binding UnspentText}"
+											 KeyDown="UnspentBox_KeyDown" LostFocus="UnspentBox_LostFocus"/>
+						<Button Classes="spend" Tag="add points"
+								IsVisible="{Binding Rules.AddsCharacterPoints}"
+								Command="{Binding AddUnspentCommand}"
+								ToolTip.Tip="{L 'Add points&#x0a;Ctrl + LMB: 5 points&#x0a;Shift + LMB: 20 points&#x0a;Ctrl + Shift + LMB: the most'}">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+						</Button>
+					</StackPanel>
+				</Grid>
+
+				<!-- The skills' own respec, compact on the right as the attributes'. -->
+				<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right"
+							Margin="0,10,0,0" IsVisible="{Binding ShowsRespec}">
+					<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}" HorizontalContentAlignment="Stretch"
+							Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+							Command="{Binding RespecSkillsCommand}"
+							ToolTip.Tip="{Binding RespecSkillsTip}" ToolTip.ShowOnDisabled="True">
+						<Grid ColumnDefinitions="Auto,*">
+							<Path Classes="pin label" Data="{StaticResource [Glyph] Undo}" Grid.Column="0"/>
+							<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'RESPEC'}"/>
+						</Grid>
+					</Button>
+				</StackPanel>
+
+				<Panel IsVisible="{Binding SkillsOpen}" Margin="0,12,0,0">
+				<TextBlock Classes="dim" IsVisible="{Binding !HasTree}"
+						   HorizontalAlignment="Center" VerticalAlignment="Center"
+						   Text="{L 'No skill tree to show.'}"/>
+
+				<Grid IsVisible="{Binding HasTree}" RowDefinitions="Auto,*">
+					<!-- The gap between tabs is a right margin on each, so the last one leaves the
+					     strip ending short of the panel below. Pulling the strip's own right edge
+					     out by the same amount lines the two up. -->
+					<ItemsControl Grid.Row="0" ItemsSource="{Binding Pages}" Margin="-3,0,-3,10">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<UniformGrid Columns="3"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate x:DataType="vm:SkillPageViewModel">
+								<Button Classes="choice skilltree"
+										Classes.current="{Binding IsCurrent}"
+										Command="{Binding $parent[ItemsControl].((vm:VP_ViewModel_Char_R)DataContext).ShowPageCommand}"
+										CommandParameter="{Binding Number}">
+									<TextBlock Text="{Binding Header}"
+											   TextWrapping="Wrap"
+											   TextAlignment="Center"/>
+								</Button>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+
+					<!-- The chosen tree, as the game lays it out: three columns by six rows - in the card, no frame of
+					     its own. -->
+					<Border Grid.Row="1">
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+							<!-- The arrows are drawn underneath from where the plates actually
+							     landed, so both have to fill the same space. -->
+							<Panel>
+								<ctrl:SkillLinks Source="{Binding #SkillGrid}"/>
+
+							<ItemsControl x:Name="SkillGrid" ItemsSource="{Binding CurrentCells}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+											  ColumnDefinitions="*,*,*"/>
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.Styles>
+									<Style Selector="ItemsControl#SkillGrid > ContentPresenter" x:DataType="vm:SkillCellViewModel">
+										<Setter Property="Grid.Row" Value="{Binding GridRow}"/>
+										<Setter Property="Grid.Column" Value="{Binding GridColumn}"/>
+									</Style>
+								</ItemsControl.Styles>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate x:DataType="vm:SkillCellViewModel">
+										<Border Classes="skill"
+												Classes.taken="{Binding ShowsBadge}"
+												Classes.locked="{Binding !IsReachable}"
+												ToolTip.Tip="{Binding Tooltip}">
+										<StackPanel VerticalAlignment="Top">
+											<Panel HorizontalAlignment="Center">
+												<Image Source="{Binding Icon}" IsVisible="{Binding HasIcon}"/>
+
+												<!-- Points sit on the icon, as the game shows them. -->
+												<!-- And after them, in an item property's blue, the levels items add:
+												     "20 +3". Runs of one text, so the badge's
+												     own style still dresses it; the sign in the body's font, as the
+												     attributes' is. -->
+												<Border Classes="badge"
+														IsVisible="{Binding ShowsBadge}"
+														HorizontalAlignment="Right" VerticalAlignment="Bottom"
+														Margin="0,0,-2,-2"
+														Background="#CC000000"
+														BorderBrush="{DynamicResource [UI] GradBrush - Frame - Golden#02}">
+													<TextBlock AutomationProperties.AutomationId="Skill_Points"
+															   Foreground="{DynamicResource [Text] Body}"><Run Text="{Binding PointsText}"/><Run Text="{Binding BonusSign}" FontFamily="{StaticResource BodyFont}" Foreground="{DynamicResource [Brush] Rarity - Magic items}"/><Run Text="{Binding BonusNumber}" Foreground="{DynamicResource [Brush] Rarity - Magic items}"/></TextBlock>
+												</Border>
+											</Panel>
+
+											<TextBlock Text="{Binding Name}"
+													   FontSize="{StaticResource [Type] Small}" TextWrapping="Wrap"
+													   TextAlignment="Center"
+													   HorizontalAlignment="Center"
+													   Margin="0,4,0,0"
+													   Foreground="{DynamicResource [Text] Body}"/>
+
+											<!-- A point out and a point in, where the play mode edits the
+											     character; Ctrl and Shift for 5 and 20, as the attributes'. See SkillEditor. -->
+											<StackPanel Orientation="Horizontal" Spacing="4"
+														HorizontalAlignment="Center" Margin="0,4,0,0"
+														IsVisible="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_R)DataContext).EditsSkills}">
+												<Button Classes="spend" Tag="skill out"
+														IsEnabled="{Binding HasPoints}"
+														Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_R)DataContext).RemovePointCommand}"
+														CommandParameter="{Binding}"
+														ToolTip.Tip="{Binding RemoveTip}" ToolTip.ShowOnDisabled="True">
+													<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+												</Button>
+												<Button Classes="spend" Tag="skill in"
+														IsEnabled="{Binding CanAdd}"
+														Command="{Binding $parent[UserControl].((vm:VP_ViewModel_Char_R)DataContext).AddPointCommand}"
+														CommandParameter="{Binding}"
+														ToolTip.Tip="{Binding AddTip}"
+														ToolTip.ShowOnDisabled="True">
+													<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+												</Button>
+											</StackPanel>
+										</StackPanel>
+										</Border>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+							</Panel>
+						</ScrollViewer>
+					</Border>
+				</Grid>
+				</Panel>
+			</DockPanel>
+		</Border>
+		</DockPanel>
+
+	</Panel>
+</UserControl>

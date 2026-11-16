@@ -1,0 +1,21 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  A key, as a cap: what is pressed, set apart from what it does (after Diablo 4's
+	  tooltips). One look wherever a key is named: a tooltip's lines and the sheet of keys (KeyHints), and the
+	  end of a right-click menu's row (ActMenuHost). A file of its own because a menu opens in a popup, which
+	  takes the styles it is given.
+	-->
+	<Style Selector="Border.keycap">
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="3"/>
+		<Setter Property="Padding" Value="5,0"/>
+		<Setter Property="Margin" Value="0,1,8,1"/>
+		<Setter Property="HorizontalAlignment" Value="Left"/>
+	</Style>
+	<Style Selector="TextBlock.key">
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+</Styles>

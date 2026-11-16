@@ -1,0 +1,147 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="760"
+             x:Class="PD2SPCompanion.Shell.Views.DropPanel"
+             x:DataType="vm:DropPanelViewModel">
+
+	<!-- The drop panel, over the Experimental page: a
+	     multiple for each of PD2's special items and each high rune, its odds in each difficulty before and after,
+	     and presets. Three sections that fold as the Edit page's do: the presets open, the two lists folded
+	     ("items and runes normally set to folded"); the presets in the panel, not a picker over it. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SettingRow.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Alert.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Tick.axaml"/>
+	</UserControl.Styles>
+
+	<Border Classes="veil"
+			IsVisible="{Binding IsPresent}"
+			Classes.shown="{Binding IsOpen}"
+			IsHitTestVisible="{Binding IsOpen}">
+		<Panel>
+			<Button Classes="backdrop" Command="{Binding CloseCommand}"/>
+
+			<Panel Classes="pickerframe">
+				<Border Classes="pickerpanel">
+					<DockPanel>
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+							<TextBlock Grid.Column="0" Classes="pickertitle" Text="{L 'Drop rates'}"/>
+							<Button Grid.Column="1" Classes="spend"
+									Command="{Binding CloseCommand}"
+									ToolTip.Tip="{L 'Close'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+							</Button>
+						</Grid>
+
+						<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+							<StackPanel>
+								<!-- The presets: Vanilla built in, then the kept ones (the shared section). -->
+								<views:PresetSection Margin="0,0,0,10"/>
+
+								<!-- Special items, high runes: folded until opened; the header's box sets the whole group,
+								     stepped or typed, and empty under "Mixed" while its rows differ. -->
+								<ItemsControl ItemsSource="{Binding Groups}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate x:DataType="vm:DropGroupViewModel">
+											<Border Classes="section" Padding="10,8" Margin="0,0,0,10">
+												<StackPanel>
+													<Grid ColumnDefinitions="*,Auto,Auto">
+														<Button Grid.Column="0" Classes="fold" Command="{Binding ToggleCommand}">
+															<Grid ColumnDefinitions="Auto,*">
+																<Path Grid.Column="0" Classes="chevron"
+																	  Classes.open="{Binding IsOpen}"
+																	  Data="{StaticResource [Glyph] Chevron}"/>
+																<TextBlock Grid.Column="1" Classes="section" Text="{Binding Title}"/>
+															</Grid>
+														</Button>
+														<!-- What the group's multiples cost, kept out of sight until wanted: the old boxes' sign. -->
+														<Path Grid.Column="1" Classes="pin alert" Data="{StaticResource [Glyph] Alert}" Margin="0,0,10,0"
+															  VerticalAlignment="Center"
+															  IsVisible="{Binding Warning, Converter={x:Static ObjectConverters.IsNotNull}}"
+															  ToolTip.Tip="{Binding Warning}"/>
+														<!-- Every row's multiple: stepped, or typed; empty under "Mixed" while they differ. -->
+														<StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+															<Button Classes="spend" Command="{Binding StepDownCommand}" Tag="rate down"
+																	ToolTip.Tip="{L 'Lower all&#x0a;Ctrl + LMB: /10&#x0a;Shift + LMB: min value'}">
+																<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+															</Button>
+															<base:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Small}" Height="28" MinWidth="0"
+																				 Minimum="1" Maximum="1000"
+																				 FontSize="{StaticResource [Type] Body}"
+																				 HorizontalContentAlignment="Center" TextAlignment="Center"
+																				 PlaceholderText="{L 'Mixed'}"
+																				 Text="{Binding MultipleText}"/>
+															<Button Classes="spend" Command="{Binding StepUpCommand}" Tag="rate up"
+																	ToolTip.Tip="{L 'Raise all&#x0a;Ctrl + LMB: x10&#x0a;Shift + LMB: max value'}">
+																<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+															</Button>
+														</StackPanel>
+													</Grid>
+
+													<StackPanel Spacing="4" Margin="0,6,0,0" IsVisible="{Binding IsOpen}">
+														<TextBlock Classes="dim" Text="{Binding Hint}" Margin="0,0,0,4" TextWrapping="Wrap" IsVisible="{Binding HasHint}"/>
+														<!-- The group's own switch, where it has one: chipped and flawed gems left out. -->
+														<Grid Classes="settingrow" ColumnDefinitions="*,Auto" IsVisible="{Binding HasSwitch}">
+															<TextBlock Grid.Column="0" Classes="body" VerticalAlignment="Center" Text="{Binding SwitchText}"/>
+															<ToggleButton Grid.Column="1" Classes="tick" IsChecked="{Binding SwitchOn, Mode=TwoWay}">
+																<Path Data="{StaticResource [Glyph] Tick}" IsVisible="{Binding SwitchOn}"/>
+															</ToggleButton>
+														</Grid>
+														<ItemsControl ItemsSource="{Binding Rows}">
+															<ItemsControl.ItemTemplate>
+																<DataTemplate x:DataType="vm:DropRowViewModel">
+																	<Grid Classes="settingrow" ColumnDefinitions="36,*,Auto">
+																		<!-- Centred in its slot: a book or the Jawbone is drawn narrower than a square item. -->
+																		<Image Grid.Column="0" Source="{Binding Sprite}"
+																			   MaxWidth="28" MaxHeight="28" Stretch="Uniform"
+																			   HorizontalAlignment="Center" VerticalAlignment="Center"
+																			   RenderOptions.BitmapInterpolationMode="None"/>
+																		<StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,12,0">
+																			<TextBlock Classes="body" Text="{Binding Name}"/>
+																			<TextBlock Classes="dim" Text="{Binding Odds}" TextWrapping="Wrap"/>
+																		</StackPanel>
+																		<!-- The multiple: stepped through 1-1000, or typed. -->
+																		<StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+																			<Button Classes="spend" Command="{Binding StepDownCommand}" Tag="rate down" ToolTip.Tip="{L 'Lower&#x0a;Ctrl + LMB: /10&#x0a;Shift + LMB: min value'}">
+																				<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+																			</Button>
+																			<base:NumericTextBox Classes="value" Width="{StaticResource [UI] Box Small}" Height="28" MinWidth="0"
+																								 Minimum="1" Maximum="1000"
+																								 FontSize="{StaticResource [Type] Body}"
+																								 HorizontalContentAlignment="Center" TextAlignment="Center"
+																								 Text="{Binding MultipleText}"/>
+																			<Button Classes="spend" Command="{Binding StepUpCommand}" Tag="rate up" ToolTip.Tip="{L 'Raise&#x0a;Ctrl + LMB: x10&#x0a;Shift + LMB: max value'}">
+																				<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+																			</Button>
+																		</StackPanel>
+																	</Grid>
+																</DataTemplate>
+															</ItemsControl.ItemTemplate>
+														</ItemsControl>
+													</StackPanel>
+												</StackPanel>
+											</Border>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</StackPanel>
+						</ScrollViewer>
+					</DockPanel>
+				</Border>
+			</Panel>
+		</Panel>
+	</Border>
+</UserControl>

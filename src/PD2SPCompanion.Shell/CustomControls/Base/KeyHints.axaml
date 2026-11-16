@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:generic="using:PD2SPCompanion.Shell.Services.Generic"
+             xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             x:Class="PD2SPCompanion.Shell.CustomControls.Base.KeyHints">
+	<!-- What the keys do, a line a key: the key as a cap, and what it does beside it (after
+	     Diablo 4's tooltips). The caps stand in a column of one width, as wide as the widest, so what each does
+	     begins on one line down the strip (a shorter or longer key made
+	     the text begin at another place on its line, which did not look good).
+	     One control for every place that says it: the foot of an item's tooltip (ItemActionTip) and every other
+	     tooltip with such lines in it (KeyedTip) - the same style for every control that has a key hint. -->
+	<UserControl.Styles>
+		<!-- A key, as a cap: what is pressed, set apart from what it does. A right-click menu's rows end in the
+		     same cap (ActMenuHost), so the look is a file of its own. -->
+		<StyleInclude Source="/Styles/CommonControls/KeyCap.axaml"/>
+		<Style Selector="TextBlock.does">
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="TextWrapping" Value="Wrap"/>
+		</Style>
+	</UserControl.Styles>
+
+	<ItemsControl Name="Lines" Grid.IsSharedSizeScope="True">
+		<ItemsControl.ItemTemplate>
+			<DataTemplate x:DataType="generic:TipHint">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" SharedSizeGroup="Keys"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<!-- As wide as the widest key, and no narrower than the strip asks (KeysWidth). -->
+					<Panel Grid.Column="0" MinWidth="{Binding $parent[base:KeyHints].KeysWidth}">
+						<Border Classes="keycap">
+							<TextBlock Classes="key" Text="{Binding Keys}"/>
+						</Border>
+					</Panel>
+					<TextBlock Grid.Column="1" Classes="does" Text="{Binding Does}"/>
+				</Grid>
+			</DataTemplate>
+		</ItemsControl.ItemTemplate>
+	</ItemsControl>
+</UserControl>

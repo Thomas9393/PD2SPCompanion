@@ -1,0 +1,1336 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 
+             xmlns:vm="clr-namespace:PD2SPCompanion.Shell.ViewModels"
+             xmlns:core="using:PD2SPCompanion.Core"
+             xmlns:settings="using:PD2SPCompanion.Shell.Services.Settings"
+			 xmlns:ctrl_primitive="using:PD2SPCompanion.Shell.CustomControls.Primitives"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 
+			 FontFamily="{StaticResource BodyFont}"
+			 FontSize="{StaticResource [Type] Body}"
+			 Foreground="{DynamicResource [Text] Body}"
+			 
+             x:Class="PD2SPCompanion.Shell.Views.MainView"
+             x:DataType="vm:MainViewModel">
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<vm:MainViewModel />
+	</Design.DataContext>
+	
+	<!-- Resources -->
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<!-- Standalone Resource Declaration -->
+			<!-- The Items icon, on the sidebar and on its bookmark: game-icons.net "Swords Emblem" by
+			     Lorc, CC BY 3.0 - credited in THIRD-PARTY-NOTICES.md. -->
+			<StreamGeometry x:Key="Glyph.SwordsEmblem">M66.54 18.002c-.327-.007-.655-.005-.98.006-4.064.136-8.105 1.634-11.39 4.535-7.508 6.632-8.218 18.094-1.586 25.602 4.394 4.974 10.906 6.945 16.986 5.792l57.838 65.475-50.373 44.498 24.188 27.38c9.69-21.368 22.255-39.484 37.427-54.65l6.91 36.188c25.092-6.29 49.834-10.563 74.366-12.873l-23.912-27.07-38.66-12.483c17.117-12.9 36.734-22.97 58.62-30.474l-24.19-27.385-50.37 44.496-57.92-65.57c1.79-5.835.617-12.43-3.72-17.34-3.498-3.96-8.34-6.03-13.235-6.128zm384.397 0c-4.895.1-9.735 2.168-13.232 6.127-4.338 4.91-5.514 11.506-3.723 17.343l-57.92 65.568-50.37-44.497-24.188 27.385c21.884 7.504 41.5 17.573 58.62 30.472l-38.66 12.485-23.255 26.324c24.71 1.863 49.367 5.706 74.118 11.46l6.498-34.03c15.173 15.166 27.74 33.282 37.43 54.65l24.185-27.38-50.372-44.498 57.838-65.475c6.08 1.153 12.593-.818 16.987-5.792 6.63-7.508 5.92-18.97-1.586-25.602-3.285-2.9-7.326-4.4-11.39-4.535-.326-.01-.653-.013-.98-.006zm-186.425 158.51c-39.56-.098-79.467 5.226-120.633 16.095-2.046 90.448 34.484 209.35 118.47 259.905 81.295-49.13 122.402-169.902 120.552-259.914-39.75-10.496-78.91-15.988-118.39-16.086zm-117.176 153.5L60.47 428.35l-12.2 63.894 61.9-19.994 68.49-77.535c-12.86-20.108-23.246-42.03-31.324-64.703zm228.203 6.11c-8.69 22.238-19.577 43.634-32.706 63.142l64.473 72.986 61.898 19.994-12.2-63.894-81.466-92.23z</StreamGeometry>
+			<!-- Material Design Icons by Pictogrammers (Apache 2.0, THIRD-PARTY-NOTICES.md): the chrome's
+			     flask, chest, anvil, scales and trophy, copied as published, on their 24-unit grid with its
+			     padding - drawn unstretched (Path.mdi), so they keep the size the icon pack gave them. -->
+			<StreamGeometry x:Key="Glyph.Flask">M5,19A1,1 0 0,0 6,20H18A1,1 0 0,0 19,19C19,18.79 18.93,18.59 18.82,18.43L13,8.35V4H11V8.35L5.18,18.43C5.07,18.59 5,18.79 5,19M6,22A3,3 0 0,1 3,19C3,18.4 3.18,17.84 3.5,17.37L9,7.81V6A1,1 0 0,1 8,5V4A2,2 0 0,1 10,2H14A2,2 0 0,1 16,4V5A1,1 0 0,1 15,6V7.81L20.5,17.37C20.82,17.84 21,18.4 21,19A3,3 0 0,1 18,22H6M13,16L14.34,14.66L16.27,18H7.73L10.39,13.39L13,16M12.5,12A0.5,0.5 0 0,1 13,12.5A0.5,0.5 0 0,1 12.5,13A0.5,0.5 0 0,1 12,12.5A0.5,0.5 0 0,1 12.5,12Z</StreamGeometry>
+			<StreamGeometry x:Key="Glyph.TreasureChest">M5,4H19A3,3 0 0,1 22,7V11H15V10H9V11H2V7A3,3 0 0,1 5,4M11,11H13V13H11V11M2,12H9V13L11,15H13L15,13V12H22V20H2V12Z</StreamGeometry>
+			<!-- Tune: the Edit bookmark's, since the anvil went to the Forge. -->
+			<StreamGeometry x:Key="Glyph.Tune">M3,17V19H9V17H3M3,5V7H13V5H3M13,21V19H21V17H13V15H11V21H13M7,9V11H3V13H7V15H9V9H7M21,13V11H11V13H21M15,9H17V7H21V5H17V3H15V9Z</StreamGeometry>
+			<StreamGeometry x:Key="Glyph.Anvil">M9,5V10C13.03,12.47 8.44,14.97 6,16V19H21V16C14.59,13.27 17.47,9 22,8V5H9M2,6C2.81,8.13 4.42,9.5 7,10V6H2Z</StreamGeometry>
+			<StreamGeometry x:Key="Glyph.ScaleBalance">M12,3C10.73,3 9.6,3.8 9.18,5H3V7H4.95L2,14C1.53,16 3,17 5.5,17C8,17 9.56,16 9,14L6.05,7H9.17C9.5,7.85 10.15,8.5 11,8.83V20H2V22H22V20H13V8.82C13.85,8.5 14.5,7.85 14.82,7H17.95L15,14C14.53,16 16,17 18.5,17C21,17 22.56,16 22,14L19.05,7H21V5H14.83C14.4,3.8 13.27,3 12,3M12,5A1,1 0 0,1 13,6A1,1 0 0,1 12,7A1,1 0 0,1 11,6A1,1 0 0,1 12,5M5.5,10.25L7,14H4L5.5,10.25M18.5,10.25L20,14H17L18.5,10.25Z</StreamGeometry>
+			<!-- Material Symbols by Google (Apache 2.0, THIRD-PARTY-NOTICES.md): Manage Search, the Search bookmark's,
+			     copied as published - on its 960-unit grid, so it is drawn fitted, to the
+			     20 its ink is wide on the 24 the others are drawn on. -->
+			<StreamGeometry x:Key="Glyph.ManageSearch">M80-200v-80h400v80H80Zm0-200v-80h200v80H80Zm0-200v-80h200v80H80Zm744 400L670-354q-24 17-52.5 25.5T560-320q-83 0-141.5-58.5T360-520q0-83 58.5-141.5T560-720q83 0 141.5 58.5T760-520q0 29-8.5 57.5T726-410l154 154-56 56ZM560-400q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Z</StreamGeometry>
+			<StreamGeometry x:Key="Glyph.Trophy">M18 2C17.1 2 16 3 16 4H8C8 3 6.9 2 6 2H2V11C2 12 3 13 4 13H6.2C6.6 15 7.9 16.7 11 17V19.08C8 19.54 8 22 8 22H16C16 22 16 19.54 13 19.08V17C16.1 16.7 17.4 15 17.8 13H20C21 13 22 12 22 11V2H18M6 11H4V4H6V11M20 11H18V4H20V11Z</StreamGeometry>
+
+			<!-- A group of the sheet of keys (KeySheetService): its heading, then its keys as caps (KeyHints). -->
+			<DataTemplate x:Key="KeyGroup" x:DataType="settings:KeyGroup">
+				<StackPanel Margin="0,0,0,14">
+					<TextBlock Text="{Binding Title}" Margin="0,0,0,4"
+							   FontFamily="{StaticResource DiabloFont}" FontSize="{StaticResource [Type] Heading}" FontWeight="Bold"
+							   Foreground="{DynamicResource [Text] Heading}"/>
+					<base:KeyHints Hints="{Binding Keys}" KeysWidth="170"/>
+				</StackPanel>
+			</DataTemplate>
+		</ResourceDictionary>
+	</UserControl.Resources>
+
+	<!-- Styles -->
+	<UserControl.Styles>
+		<Style Selector="Image">
+			<!-- Over everything else in the frame, the character strip included, which slides in
+			     from under the top-left one and takes its shadow. -->
+			<Style Selector="^.UI_Corner">
+				<Setter Property="ZIndex" Value="3"/>
+				<Setter Property="IsHitTestVisible" Value="False"/>
+				<Setter Property="Effect" Value="drop-shadow(0 0 6 Black)"/>
+				<Setter Property="Width" Value="{DynamicResource [UI] Frame CornerSize}"/>
+				<Setter Property="Height" Value="{DynamicResource [UI] Frame CornerSize}"/>
+			</Style>
+			<Style Selector="^.UI_Mid_Decor">
+				<Setter Property="IsHitTestVisible" Value="False"/>
+				<Setter Property="Effect" Value="drop-shadow(0 0 8 Black)"/>
+				<Setter Property="Width" Value="{DynamicResource [UI] Frame MidDecorSize}"/>
+			</Style>
+		</Style>
+		<Style Selector="Border.SubFrame_Border_1">
+			<Setter Property="Padding" Value="2"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Template - Background}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Silver#01}"/>
+			<Style Selector="^.H">
+				<Setter Property="Height" Value="{DynamicResource [UI] Frame BorderSize}"/>
+			</Style>
+			<Style Selector="^.V">
+				<Setter Property="Width" Value="{DynamicResource [UI] Frame BorderSize}"/>
+			</Style>
+		</Style>
+		<!-- The character's controls in the silver bar across the top: small enough to sit in it. -->
+		<!-- The character strip arrives and leaves: a fade and a short slide in from the left, from
+		     under the corner piece - see UI_Corner. -->
+		<Style Selector="Border.charbar">
+			<Setter Property="Opacity" Value="0"/>
+			<Setter Property="RenderTransform" Value="translateX(-24px)"/>
+			<Setter Property="IsHitTestVisible" Value="False"/>
+			<Setter Property="Transitions">
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.25" Easing="CubicEaseOut"/>
+					<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.25" Easing="CubicEaseOut"/>
+				</Transitions>
+			</Setter>
+		</Style>
+		<Style Selector="Border.charbar.shown">
+			<Setter Property="Opacity" Value="1"/>
+			<Setter Property="RenderTransform" Value="none"/>
+			<Setter Property="IsHitTestVisible" Value="True"/>
+		</Style>
+		<!-- The message strip under the left page: in as the character strip comes in, from under
+		     the corner piece, the first time there is something to say. Dimmed once the message is a few
+		     seconds old, and put away once nothing has been said for a while (idle, below) - see MessageLog. -->
+		<Style Selector="Border.msgbar">
+			<Setter Property="Opacity" Value="0"/>
+			<Setter Property="RenderTransform" Value="translateX(-24px)"/>
+			<Setter Property="Transitions">
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.25" Easing="CubicEaseOut"/>
+					<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.25" Easing="CubicEaseOut"/>
+				</Transitions>
+			</Setter>
+		</Style>
+		<!-- The right page's strip comes in from under its own corner piece, the other way. -->
+		<Style Selector="Border.msgbar.right">
+			<Setter Property="RenderTransform" Value="translateX(24px)"/>
+		</Style>
+		<Style Selector="Border.msgbar.shown">
+			<Setter Property="Opacity" Value="1"/>
+			<Setter Property="RenderTransform" Value="none"/>
+		</Style>
+		<!-- Idle: out of sight where it lies, and back under the pointer - with its tooltip, the last ten.
+		     Faded, not moved or collapsed: what the pointer comes back to is there. -->
+		<Style Selector="Border.msgbar.shown.idle">
+			<!-- Out slowly, so it is seen to go. The
+			     transition before the value it is for: set after it, the value had changed by the old one. -->
+			<Setter Property="Transitions">
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.7" Easing="CubicEaseInOut"/>
+				</Transitions>
+			</Setter>
+			<Setter Property="Opacity" Value="0"/>
+		</Style>
+		<!-- And back at once under the pointer; out slowly again when the pointer leaves. -->
+		<Style Selector="Border.msgbar.shown.idle:pointerover">
+			<Setter Property="Transitions">
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+				</Transitions>
+			</Setter>
+			<Setter Property="Opacity" Value="1"/>
+		</Style>
+		<!-- The words dim, not the strip: faded whole, the silver ornament showed through the backing
+		     and the line could not be read. -->
+		<Style Selector="Border.msgbar.stale TextBlock">
+			<Setter Property="Opacity" Value="0.55"/>
+		</Style>
+		<Style Selector="Border.msgbar TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		</Style>
+		<Style Selector="Border.msgbar.caution TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Warning}"/>
+		</Style>
+		<!-- Faded out rather than removed, so out of the Tab order while it is hidden. -->
+		<Style Selector="Border.charbar:not(.shown) Button">
+			<Setter Property="IsTabStop" Value="False"/>
+		</Style>
+		<!-- Icons alone: what each does is in its tooltip, the landing page's own. -->
+		<Style Selector="Button.topbar">
+			<Setter Property="Height" Value="22"/>
+			<Setter Property="Width" Value="30"/>
+			<Setter Property="MinHeight" Value="0"/>
+			<Setter Property="Padding" Value="0"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<!-- No frame: at this size the theme's gold outline read as heavy. The face stays. -->
+		<Style Selector="Button.topbar /template/ Border#PART_Frame">
+			<Setter Property="BorderThickness" Value="0"/>
+		</Style>
+		<!-- The glyph's colour; its size and stroke are every icon's (Glyph.axaml). -->
+		<Style Selector="Button.topbar Path">
+			<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		</Style>
+		<!-- The pillar as it always was - its own width, framed in silver, from the window's top to its foot - with
+		     the two pages lying over it:
+		     between them it shows as a slim gutter, above and below them whole. -->
+		<Style Selector="Border.SubFrame_Bar_1">
+			<Setter Property="Width" Value="{DynamicResource [UI] Frame BarWidth}"/>
+			<Setter Property="Background" Value="Black"/>
+			<Setter Property="Effect" Value="drop-shadow(0 0 10 Black)"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Silver#01}"/>
+			<Setter Property="IsHitTestVisible" Value="False"/>
+		</Style>
+		<Style Selector="Border.MainContent">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Template - Background}"/>
+			<Setter Property="ClipToBounds" Value="True"/>
+			<Setter Property="Effect" Value="drop-shadow(0 0 8 Black)"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+		</Style>
+		<!-- The left page's frame is the right page's in a mirror: with one brush on both, each
+		     ran dim at its left to bright at its right, and at the spine a bright edge stood beside a dim one. Dim
+		     at the spine on both, bright at the outer edges: "more natural lighting indicating the spine is inside
+		     while outside have stronger reflection" (shown both ways round, bright at the spine not chosen). -->
+		<Style Selector="Border.MainContent.mirrored">
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02 - Mirrored}"/>
+		</Style>
+		<!-- Sidebar tooltips sit to the right of the rail. Their appearance is the app-wide
+		     ToolTip style; only the placement is particular to the sidebar. -->
+		<Style Selector="ToggleButton.SideBar, Button.Logo">
+			<Setter Property="ToolTip.Placement" Value="Right"/>
+			<Setter Property="ToolTip.VerticalOffset" Value="0"/>
+			<Setter Property="ToolTip.HorizontalOffset" Value="{DynamicResource [UI] Sidebar ToolTipOffset}"/>
+		</Style>
+
+		<!-- The logo is a round medallion, so the default Button chrome drew a rectangular
+		     hover/press box around it. The box is removed outright and the states are shown
+		     on the icon instead, the way the nav buttons below already do it. -->
+		<Style Selector="Button.Logo">
+			<Setter Property="RenderTransformOrigin" Value="50%,50%"/>
+			<Setter Property="RenderTransform" Value="none"/>
+			<Setter Property="Transitions">
+				<Transitions>
+					<TransformOperationsTransition Property="RenderTransform" Duration="0:0:.08"/>
+				</Transitions>
+			</Setter>
+		</Style>
+		<Style Selector="Button.Logo /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderBrush" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+		</Style>
+		<Style Selector="Button.Logo:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.Logo:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderBrush" Value="Transparent"/>
+		</Style>
+		<Style Selector="Button.Logo:pressed /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderBrush" Value="Transparent"/>
+		</Style>
+		<Style Selector="Button.Logo > Image">
+			<Setter Property="Opacity" Value="0.85"/>
+		</Style>
+		<Style Selector="Button.Logo:pointerover > Image, Button.Logo:focus-visible > Image">
+			<Setter Property="Opacity" Value="1"/>
+		</Style>
+		<Style Selector="Button.Logo:pressed">
+			<Setter Property="RenderTransform" Value="scale(0.93)"/>
+		</Style>
+
+		<Style Selector="ToggleButton.SideBar">
+			<Setter Property="Width" Value="{DynamicResource [UI] Sidebar IconWidth}"/>
+			<Setter Property="Height" Value="{DynamicResource [UI] Sidebar IconWidth}"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="Effect" Value="drop-shadow(0 0 10 Black)"/>
+			<Setter Property="Theme" Value="{DynamicResource [CtrlThm] Diablo2 TButton_SideBar}"/>
+			<Setter Property="Padding" Value="3"/>
+			<Setter Property="Margin" Value="0 6"/>
+			<Setter Property="CornerRadius" Value="6"/>
+			
+			<Style Selector="^ > Path">
+				<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+				<Setter Property="StrokeThickness" Value="1.4"/>
+				<Setter Property="StrokeJoin" Value="Round"/>
+				<Setter Property="Fill" Value="#22000000"/>
+				<Setter Property="Stretch" Value="Uniform"/>
+				<Setter Property="Margin" Value="5"/>
+			</Style>
+			<!-- A filled glyph drawn as a path, sized and coloured as the icon set's are. -->
+			<!-- Max, not fixed, size: a shape fitted into a fixed box is drawn from its left edge,
+			     so a glyph taller than wide sat off centre (the helm). Fitted to its own size, the
+			     alignment centres it. -->
+			<Style Selector="^ > Path.glyph">
+				<Setter Property="Fill" Value="#F2E9D2"/>
+				<Setter Property="StrokeThickness" Value="0"/>
+				<Setter Property="Stretch" Value="Uniform"/>
+				<Setter Property="MaxWidth" Value="27"/>
+				<Setter Property="MaxHeight" Value="27"/>
+				<Setter Property="Margin" Value="0"/>
+				<Setter Property="HorizontalAlignment" Value="Center"/>
+				<Setter Property="VerticalAlignment" Value="Center"/>
+			</Style>
+			<!-- A Material Design shape: its own 24-unit grid, unstretched, scaled to the 27 the
+			     sidebar's icons are. -->
+			<Style Selector="^ > Path.glyph.mdi">
+				<Setter Property="Stretch" Value="None"/>
+				<Setter Property="Width" Value="24"/>
+				<Setter Property="Height" Value="24"/>
+				<Setter Property="RenderTransform" Value="scale(1.125)"/>
+			</Style>
+			<Style Selector="^ > Image, ^ > Path">
+				<Setter Property="Opacity" Value="0.66"/>
+			</Style>
+			<Style Selector="^:checked > Image, ^:checked > Path">
+				<Setter Property="Opacity" Value="1"/>
+			</Style>
+			<!-- No character open. The control theme's :disabled state only restyles the
+			     content presenter, which these buttons do not show, so the icon has to say
+			     it - in the same opacity idiom as idle and checked above. -->
+			<Style Selector="^:disabled > Image, ^:disabled > Path">
+				<Setter Property="Opacity" Value="0.2"/>
+			</Style>
+			<Style Selector="^:disabled">
+				<!-- The Effect parser has no "none" keyword; clearing it needs x:Null. -->
+				<Setter Property="Effect" Value="{x:Null}"/>
+			</Style>
+		</Style>
+		<!-- A folder the editor found, offered to be taken as it stands. -->
+
+		<!-- A bookmark: a tab against its page's outer edge, rounded on the side away from the page.
+		     The one open is lit and gold-framed; the rest sit dim until pointed at. -->
+		<Style Selector="Button.bookmark">
+			<Setter Property="Width" Value="40"/>
+			<Setter Property="Height" Value="50"/>
+			<Setter Property="Margin" Value="0,0,0,6"/>
+			<Setter Property="Padding" Value="0"/>
+			<Setter Property="Cursor" Value="Hand"/>
+			<Setter Property="Background" Value="{DynamicResource [Brush] Button - Face}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="Effect" Value="drop-shadow(0 0 6 Black)"/>
+			<Setter Property="ToolTip.VerticalOffset" Value="0"/>
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border Background="{TemplateBinding Background}"
+							BorderBrush="{TemplateBinding BorderBrush}"
+							BorderThickness="{TemplateBinding BorderThickness}"
+							CornerRadius="{TemplateBinding CornerRadius}">
+						<ContentPresenter Content="{TemplateBinding Content}"
+										  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+					</Border>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		<Style Selector="StackPanel.left > Button.bookmark">
+			<Setter Property="CornerRadius" Value="6,0,0,6"/>
+			<Setter Property="BorderThickness" Value="1,1,0,1"/>
+			<Setter Property="ToolTip.Placement" Value="Left"/>
+		</Style>
+		<Style Selector="StackPanel.right > Button.bookmark">
+			<Setter Property="CornerRadius" Value="0,6,6,0"/>
+			<Setter Property="BorderThickness" Value="0,1,1,1"/>
+			<Setter Property="ToolTip.Placement" Value="Right"/>
+		</Style>
+		<!-- A filled glyph drawn as a path, as on the sidebar: fitted, then centred. -->
+		<Style Selector="Button.bookmark > Path.glyph">
+			<Setter Property="Fill" Value="#F2E9D2"/>
+			<Setter Property="StrokeThickness" Value="0"/>
+			<Setter Property="Stretch" Value="Uniform"/>
+			<Setter Property="MaxWidth" Value="24"/>
+			<Setter Property="MaxHeight" Value="24"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<Style Selector="Button.bookmark > Path.glyph">
+			<Setter Property="Opacity" Value="0.55"/>
+		</Style>
+		<Style Selector="Button.bookmark:pointerover > Path.glyph, Button.bookmark:focus-visible > Path.glyph">
+			<Setter Property="Opacity" Value="0.85"/>
+		</Style>
+		<!-- A Material Design shape: its own 24-unit grid, unstretched - the 24 the bookmarks' icons are. -->
+		<Style Selector="Button.bookmark > Path.glyph.mdi">
+			<Setter Property="Stretch" Value="None"/>
+			<Setter Property="Width" Value="24"/>
+			<Setter Property="Height" Value="24"/>
+		</Style>
+		<Style Selector="Button.bookmark.current">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Button - Current Face}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+		</Style>
+		<Style Selector="Button.bookmark.current > Path.glyph">
+			<Setter Property="Opacity" Value="1"/>
+		</Style>
+		<!-- The Forge holding an item, left by a selection: framed and lit as a search's finds are, in the
+		     gold of the buttons - something is waiting there, nothing was found. -->
+		<Style Selector="Button.bookmark.holds">
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		</Style>
+		<Style Selector="StackPanel.right > Button.bookmark.holds">
+			<Setter Property="BorderThickness" Value="0,2,2,2"/>
+		</Style>
+		<Style Selector="Button.bookmark.holds > Path.glyph">
+			<Setter Property="Opacity" Value="1"/>
+		</Style>
+		<Style Selector="Button.bookmark.holds > Path.glyph">
+			<Setter Property="Fill" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		</Style>
+		<!-- The vault on the right while the left page has it: there, but not to be taken. -->
+		<Style Selector="Button.bookmark:disabled > Path.glyph">
+			<Setter Property="Opacity" Value="0.2"/>
+		</Style>
+
+		<!-- Last, so a running game's red wins over the top bar's gold. -->
+		<StyleInclude Source="/Styles/CommonControls/GameLock.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/BareIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+	</UserControl.Styles>
+
+	<!-- Main Content -->
+	<Border Background="{DynamicResource [Brush] Template - Background}"
+			BorderBrush="{DynamicResource [Brush] Template - Border#1}"
+			BorderThickness="0">
+	  <Panel>
+		<Border BorderBrush="{DynamicResource [UI] GradBrush - Frame - Golden#01}" BorderThickness="2"
+				Padding="4" Margin="4"
+				CornerRadius="3">
+			<Grid ColumnDefinitions="Auto,*,Auto">
+				<!-- SideBar -->
+				<Border Grid.Column="0" Margin="0 0 3 0" Name="SideBar"
+						Width="{DynamicResource [UI] Sidebar Width}"
+						BorderBrush="{DynamicResource [UI] GradBrush - Frame - Golden#02}"
+						BorderThickness="1" CornerRadius="2 0 0 2"
+						Background="{DynamicResource [UI] ImageBrush - Background#1}"
+						ClipToBounds="True"
+						ZIndex="1">
+					<Grid RowDefinitions="Auto, Auto, *, Auto">
+						<!-- 1. Logo - also the way back to the landing page -->
+						<Button Grid.Row="0" Name="Logo"
+								Command="{Binding GoHomeCommand}"
+								ToolTip.Tip="{L 'Home (Ctrl + 1)'}"
+								Classes="Logo"
+								Background="Transparent"
+								BorderThickness="0"
+								Padding="0"
+								Margin="0 12 0 6"
+								Cursor="Hand"
+								HorizontalAlignment="Center">
+							<!-- The editor's own badge, the app icon (pd2spc.ico) at 4x the button's size. -->
+							<Image Source="/Assets/pd2spc-logo.png"
+								   RenderOptions.BitmapInterpolationMode="HighQuality"
+								   Effect="drop-shadow(0 0 20 Black)"
+								   Width="{DynamicResource [UI] Sidebar IconWidth}"/>
+						</Button>
+						<!-- 2. Bar -->
+						<Border Grid.Row="1"
+								Height="1" Margin="6"
+								Effect="drop-shadow(0 0 10 Black)"
+								Background="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+						<!-- 3. Main Button Groups -->
+						<StackPanel Grid.Row="2">
+							<!-- 3.1. Char -->
+							<RadioButton IsVisible="False"
+										 IsChecked="{Binding ElementName=SideBar_Char, Path=IsChecked}"
+										 GroupName="SideBar"/>
+							<ToggleButton Classes="SideBar"
+										  Name="SideBar_Char"
+										  IsEnabled="{Binding Session.IsLoaded}"
+										  IsChecked="{Binding Button_Char_isChecked, Mode=TwoWay}"
+										  Command="{Binding Button_Char_PressCommand}"
+										  ToolTip.Tip="{Binding CharacterPageTip}" ToolTip.ShowOnDisabled="True">
+								<!-- Every sidebar icon is a filled glyph in one colour and size. A closed medieval helm:
+								     game-icons.net "Barbute" by Lorc,
+								     CC BY 3.0 - credited in THIRD-PARTY-NOTICES.md. -->
+								<Path Classes="glyph" Data="M255.406 17.75C189.313 39.42 124.536 85.124 79.03 150.344c21.238 57.44 32.72 94.314 32.72 131.375 0 36.493-11.52 73.723-32.125 129.655 49.72 36.73 100.08 58.95 150.313 64.938-5.052-60.378-9.83-120.748 1.593-181.125-30.644-3.28-61.384-13.286-92.03-30.72v-71.312c80.67 42.255 158.908 41.547 242.063 0v71.313c-30.06 14.376-60.192 24.722-90.25 29.28 8.684 60.46 7.723 120.915 2.03 181.375 46.386-7.335 92.89-28.824 139.032-64.312-33.966-112.954-34.03-145.933.594-260.47C391.162 84.844 317.924 39.89 255.405 17.75zm-75.125 212c-11.16-.13-19.646 3.174-21.25 9.156-2.33 8.7 10.778 19.76 29.282 24.72 18.505 4.957 35.388 1.92 37.72-6.782 2.33-8.7-10.775-19.76-29.282-24.72-5.783-1.55-11.396-2.315-16.47-2.374zm160.69 0c-5.074.06-10.687.825-16.47 2.375-18.507 4.96-31.613 16.018-29.28 24.72 2.33 8.7 19.213 11.738 37.717 6.78 18.505-4.958 31.613-16.018 29.282-24.72-1.604-5.98-10.09-9.286-21.25-9.155z"/>
+							</ToggleButton>
+							<!-- 3.2. Items: the inventory and the vault, as the book's bookmarks. Named Inventory still,
+							     for the tests. -->
+							<RadioButton IsVisible="False"
+										 IsChecked="{Binding ElementName=SideBar_Inventory, Path=IsChecked}"
+										 GroupName="SideBar"/>
+							<ToggleButton Classes="SideBar"
+										  Name="SideBar_Inventory"
+										  IsEnabled="{Binding Session.IsLoaded}"
+										  IsChecked="{Binding Button_Inventory_isChecked, Mode=TwoWay}"
+										  Command="{Binding Button_Inventory_PressCommand}"
+										  ToolTip.Tip="{Binding ItemsPageTip}" ToolTip.ShowOnDisabled="True">
+								<!-- Crossed swords on a shield. -->
+								<Path Classes="glyph" Data="{StaticResource Glyph.SwordsEmblem}"/>
+							</ToggleButton>
+							<!-- 3.3. Extra - a book with a ribbon: the grail and the rune
+							     wizard, which need no character. -->
+							<RadioButton IsVisible="False"
+										 IsChecked="{Binding ElementName=SideBar_Extra, Path=IsChecked}"
+										 GroupName="SideBar"/>
+							<ToggleButton Classes="SideBar"
+										  Name="SideBar_Extra"
+										  IsChecked="{Binding Button_Extra_isChecked, Mode=TwoWay}"
+										  Command="{Binding Button_Extra_PressCommand}"
+										  ToolTip.Tip="{L 'Extra (Ctrl + 4)'}">
+								<!-- Google's Material Symbols "Book Ribbon", filled: a
+								     path, since the icon set the app uses has no such glyph. -->
+								<Path Classes="glyph"
+									  Data="M480-160q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q74 0 126 17t112 52q11 6 16.5 14t5.5 21v418q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-481q15 5 29.5 11t28.5 14q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59Zm140-240v-440l120-40v440l-120 40Z"/>
+							</ToggleButton>
+						</StackPanel>
+						<!-- 3.5. Extra - a flask, for what is done to the game rather than to a
+						     character. It is the one page that works with nothing open, so it is
+						     not disabled with the others. -->
+						<RadioButton IsVisible="False"
+									 IsChecked="{Binding ElementName=SideBar_Experimental, Path=IsChecked}"
+									 GroupName="SideBar"/>
+						<StackPanel Grid.Row="3" Margin="0 6 0 12">
+						<Panel Margin="0 0 0 6" HorizontalAlignment="Center">
+							<ToggleButton Classes="SideBar"
+										  Name="SideBar_Experimental"
+										  IsChecked="{Binding Button_Experimental_isChecked, Mode=TwoWay}"
+										  Command="{Binding Button_Experimental_PressCommand}"
+										  ToolTip.Tip="{Binding ExperimentalTip}">
+								<Path Classes="glyph mdi" Data="{StaticResource Glyph.Flask}"/>
+							</ToggleButton>
+							<!-- Its files are in the game folder and the online notice is not yet dismissed: a red
+							     dot at the button's top right corner, 3 in from it each way.
+							     The button sits 6 down in this panel (its margin); the dot's centre is 3 below its
+							     top edge and 3 left of its right edge. -->
+							<Ellipse Width="12" Height="12" IsHitTestVisible="False"
+									 HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,3,-3,0"
+									 Fill="#E0401E" Stroke="#80000000" StrokeThickness="1"
+									 IsVisible="{Binding ExperimentalMarked}"/>
+						</Panel>
+
+						<!-- 3.6. Settings -->
+						<RadioButton IsVisible="False"
+									 IsChecked="{Binding ElementName=SideBar_Settings, Path=IsChecked}"
+									 GroupName="SideBar"/>
+						<ToggleButton Classes="SideBar"
+									  Name="SideBar_Settings"
+									  IsChecked="{Binding Button_Settings_isChecked, Mode=TwoWay}"
+									  Command="{Binding Button_Settings_PressCommand}"
+									  ToolTip.Tip="{L 'Settings (Ctrl + 6)'}">
+							<!-- Material Symbols "settings", one gear. -->
+							<Path Classes="glyph" Data="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm112-260q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Z"/>
+						</ToggleButton>
+						</StackPanel>
+					</Grid>
+				</Border>
+				
+				<!-- Main Content -->
+				<Grid Grid.Column="1"
+					  ColumnDefinitions	="Auto,*,Auto,*,Auto"
+					  RowDefinitions	="Auto,*,Auto,*,Auto"
+					  Background="{DynamicResource [UI] ImageBrush - Background#1}">
+					<!-- UI Main Frames Group -->
+					<!-- Frame Top -->
+					<Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5"
+							VerticalAlignment="Top"
+							Classes="SubFrame_Border_1 H">
+						<Rectangle Fill="{DynamicResource [UI] ImageBrush - SubFrame_Border#1 - T}"/>
+					</Border>
+					<!-- Frame Buttom -->
+					<Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"
+							VerticalAlignment="Bottom"
+							Classes="SubFrame_Border_1 H">
+						<Rectangle Fill="{DynamicResource [UI] ImageBrush - SubFrame_Border#1 - B}"/>
+					</Border>
+					<!-- Frame Left -->
+					<Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="5"
+							HorizontalAlignment="Left"
+							Classes="SubFrame_Border_1 V">
+						<Rectangle Fill="{DynamicResource [UI] ImageBrush - SubFrame_Border#1 - L}"/>
+					</Border>
+					<!-- Frame Right -->
+					<Border Grid.Row="0" Grid.Column="4" Grid.RowSpan="5"
+							HorizontalAlignment="Right"
+							Classes="SubFrame_Border_1 V">
+						<Rectangle Fill="{DynamicResource [UI] ImageBrush - SubFrame_Border#1 - R}"/>
+					</Border>
+
+					<!-- Frame Bar -->
+					<!-- Wider than the gutter's column by 13 each way: the pages, drawn after it, lie over that much of
+					     it; the message strips beside its foot leave it free. -->
+					<Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="5"
+							Margin="-13,0"
+							AutomationProperties.AutomationId="Frame_Pillar" AutomationProperties.AccessibilityView="Control"
+							Classes="SubFrame_Bar_1">
+						<!-- The art at its own width, its middle in the pillar's: what the pillar is narrower by is cut
+						     from each side alike (48 in the 36 the pillar has inside its frame). Centred by the layout,
+						     in whole pixels - not set 6 to the left: at 125% that is 7.5 pixels, drawn as 8 where 7 were
+						     cut from the other side, and the art stood a pixel left of the pillar's middle (asymmetry is
+						     easy to catch). -->
+						<Panel ClipToBounds="True">
+							<Rectangle Width="{DynamicResource [UI] Frame BarArt}" HorizontalAlignment="Center"
+									   Fill="{DynamicResource [UI] ImageBrush - SubFrame_Bar#1}"/>
+						</Panel>
+					</Border>
+					<!-- The pages' shadow on the pillar between them: dark at each page's edge, clear down the gutter's
+					     middle. Drawn, not an effect -
+					     the pages' own drop shadow is too soft to tell on the pillar's dark art. -->
+					<Border Grid.Row="1" Grid.Column="2" Grid.RowSpan="3" IsHitTestVisible="False">
+						<Border.Background>
+							<LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+								<GradientStop Offset="0" Color="#E6000000"/>
+								<GradientStop Offset="0.45" Color="#33000000"/>
+								<GradientStop Offset="0.55" Color="#33000000"/>
+								<GradientStop Offset="1" Color="#E6000000"/>
+							</LinearGradientBrush>
+						</Border.Background>
+					</Border>
+
+					<!-- Corner - Top Left -->
+					<Image Source="{DynamicResource [Art] Frame Corner}"
+						   Grid.Row="0" Grid.Column="0"
+						   VerticalAlignment="Top"
+						   HorizontalAlignment="Left"
+						   RenderTransform="rotate(0deg)"
+						   Classes="UI_Corner"/>
+					<!-- Corner - Bottom Left -->
+					<Image Source="{DynamicResource [Art] Frame Corner}"
+						   Grid.Row="4" Grid.Column="0"
+						   VerticalAlignment="Bottom"
+						   HorizontalAlignment="Left"
+						   RenderTransform="rotate(-90deg)"
+						   Classes="UI_Corner"/>
+					<!-- Corner - Top Right -->
+					<Image Source="{DynamicResource [Art] Frame Corner}"
+						   Grid.Row="0" Grid.Column="4"
+						   VerticalAlignment="Top"
+						   HorizontalAlignment="Right"
+						   RenderTransform="rotate(90deg)"
+						   Classes="UI_Corner"/>
+					<!-- Corner - Bottom Right -->
+					<Image Source="{DynamicResource [Art] Frame Corner}"
+						   Grid.Row="4" Grid.Column="4"
+						   VerticalAlignment="Bottom"
+						   HorizontalAlignment="Right"
+						   RenderTransform="rotate(180deg)"
+						   Classes="UI_Corner"/>
+
+					<!-- Mid Decor - Left -->
+					<Image Source="{DynamicResource [Art] Frame Ornament}"
+						   Grid.Row="2" Grid.Column="0"
+						   VerticalAlignment="Center"
+						   HorizontalAlignment="Left"
+						   RenderTransform="rotate(0deg)"
+						   Classes="UI_Mid_Decor"/>
+					<!-- Mid Decor - Right -->
+					<Image Source="{DynamicResource [Art] Frame Ornament}"
+						   Grid.Row="2" Grid.Column="4"
+						   VerticalAlignment="Center"
+						   HorizontalAlignment="Right"
+						   RenderTransform="rotate(180deg)"
+						   Classes="UI_Mid_Decor"/>
+					<!-- The Items page's bookmarks,
+					     standing out of each page's outer edge as a spell book's do. Left: the inventory
+					     or the vault. Right: Utilities, the vault - not while the left page has it, since
+					     there is one vault list - or Trade. Pulled in by the page's own 4px margin, so each
+					     tab meets its page's gold edge - no gap, no overlap. -->
+					<StackPanel Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" ZIndex="4"
+								HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,14,-4,0"
+								Classes="bookmarks left" IsVisible="{Binding Button_Inventory_isChecked}">
+						<!-- With no character the left page is shut: the grail is on the right. -->
+						<Button Name="Bookmark_Inventory" Classes="bookmark" Classes.current="{Binding IsLeftInventory}"
+								IsEnabled="{Binding Session.IsLoaded}"
+								Command="{Binding ShowLeftCommand}" CommandParameter="Inventory"
+								ToolTip.Tip="{Binding InventoryBookmarkTip}" ToolTip.ShowOnDisabled="True">
+							<Path Classes="glyph" Data="{StaticResource Glyph.SwordsEmblem}"/>
+						</Button>
+						<Button Name="Bookmark_Vault_Left" Classes="bookmark" Classes.current="{Binding IsLeftVault}"
+								IsEnabled="{Binding Session.IsLoaded}"
+								Command="{Binding ShowLeftCommand}" CommandParameter="Vault"
+								ToolTip.Tip="{Binding VaultBookmarkTip}" ToolTip.ShowOnDisabled="True">
+							<Path Classes="glyph mdi" Data="{StaticResource Glyph.TreasureChest}"/>
+						</Button>
+					</StackPanel>
+					<!-- Right, in two groups:
+					     Edit and the vault at the top, Trade and the Grail at the foot. -->
+					<StackPanel Grid.Row="1" Grid.Column="4" Grid.RowSpan="3" ZIndex="4"
+								HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-4,14,0,0"
+								Classes="bookmarks right" IsVisible="{Binding Button_Inventory_isChecked}">
+						<Button Name="Bookmark_Edit" Classes="bookmark" Classes.current="{Binding IsRightEdit}"
+								Command="{Binding ShowRightCommand}" CommandParameter="Edit"
+								ToolTip.Tip="{Binding EditBookmarkTip}">
+							<!-- Sliders: an item that is there, tuned. It was the anvil until the Forge took it. -->
+							<Path Classes="glyph mdi" Data="{StaticResource Glyph.Tune}"/>
+						</Button>
+						<Button Name="Bookmark_Vault_Right" Classes="bookmark" Classes.current="{Binding IsRightVault}"
+								IsEnabled="{Binding CanRightVault}"
+								Command="{Binding ShowRightCommand}" CommandParameter="Vault"
+								ToolTip.Tip="{Binding RightVaultBookmarkTip}" ToolTip.ShowOnDisabled="True">
+							<Path Classes="glyph mdi" Data="{StaticResource Glyph.TreasureChest}"/>
+						</Button>
+						<!-- The item search, in the right page's top group beneath the vault bookmark, under Manage
+						     Search's lines and glass. Marked
+						     while it keeps conditions it was left with (MainViewModel.SearchKeeps), as the Forge's
+						     is while it holds an item: nothing on the pages is dimmed then, and this says the
+						     search is still there. -->
+						<Button Name="Bookmark_Search" Classes="bookmark" Classes.current="{Binding IsRightSearch}"
+								Classes.holds="{Binding SearchKeeps}"
+								Command="{Binding ShowRightCommand}" CommandParameter="Search"
+								ToolTip.Tip="{Binding SearchBookmarkTip}">
+							<Path Classes="glyph" MaxWidth="20" Data="{StaticResource Glyph.ManageSearch}"/>
+						</Button>
+					</StackPanel>
+					<StackPanel Grid.Row="1" Grid.Column="4" Grid.RowSpan="3" ZIndex="4"
+								HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-4,0,0,14"
+								Classes="bookmarks right" IsVisible="{Binding Button_Inventory_isChecked}">
+						<!-- Virtual trading, beside whichever page is on the left: it buys into and sells out of
+						     the inventory or the vault (it used to put the inventory back). -->
+						<!-- The Forge, over trading: an item made from nothing. The anvil,
+						     which was Edit's. There where the play mode has it - Free's. -->
+						<!-- Marked while it holds an item it was taken from by a selection on the left
+						     (MainViewModel.ForgeWaits): the way back to what was being made. -->
+						<Button Name="Bookmark_Forge" Classes="bookmark" Classes.current="{Binding IsRightForge}"
+								Classes.holds="{Binding ForgeWaits}"
+								IsVisible="{Binding CanForge}"
+								Command="{Binding ShowRightCommand}" CommandParameter="Forge"
+								ToolTip.Tip="{Binding ForgeBookmarkTip}">
+							<Path Classes="glyph mdi" Data="{StaticResource Glyph.Anvil}"/>
+						</Button>
+						<Button Name="Bookmark_Trade" Classes="bookmark" Classes.current="{Binding IsRightTrade}"
+								Command="{Binding ShowRightCommand}" CommandParameter="Trade"
+								ToolTip.Tip="{Binding TradeBookmarkTip}">
+							<Path Classes="glyph mdi" Data="{StaticResource Glyph.ScaleBalance}"/>
+						</Button>
+						<Button Name="Bookmark_Grail" Classes="bookmark" Classes.current="{Binding IsRightGrail}"
+								Command="{Binding ShowRightCommand}" CommandParameter="Grail"
+								ToolTip.Tip="{Binding GrailBookmarkTip}">
+							<Path Classes="glyph mdi" Data="{StaticResource Glyph.Trophy}"/>
+						</Button>
+					</StackPanel>
+
+					<!-- The open character, from every page: its name and the landing page's own reload,
+					     save, undo and close, in the silver bar across the top. Going home to save was
+					     the one deep path in a flat layout. -->
+					<!-- On a dark backing from the silver frame's top edge to its bottom one, starting at
+					     the corner piece and as wide as what it holds - gold on the ornament did not
+					     read. The name, then the buttons after it. -->
+					<!-- From the grid's own left edge, past the corner piece - 48, [UI] Frame CornerSize.
+					     Not from the second column: the first is as wide as the side ornament, wider than
+					     the corner, and left a strip of ornament between the two. -->
+					<Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="48,0,0,0"
+							Height="{DynamicResource [UI] Frame BorderSize}" Padding="0,1"
+							VerticalAlignment="Top" HorizontalAlignment="Left"
+							ZIndex="2" Classes="charbar" Classes.shown="{Binding IsCharacterShown}">
+					<Border Background="#CC000000" Padding="10,0,3,0"
+							BorderThickness="1" BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<TextBlock VerticalAlignment="Center" Margin="0,0,16,0"
+								   FontFamily="{StaticResource DiabloFont}" FontSize="{StaticResource [Type] Heading}" FontWeight="Bold"
+								   Foreground="{DynamicResource [Text] Heading}"
+								   Text="{Binding Session.CharacterName}"/>
+
+						<StackPanel Orientation="Horizontal" Spacing="2">
+
+						<!-- The character saves by itself: no
+						     Save or Reload, but its history - undo, redo, and the list. Save is left
+						     for a backup on screen, where it restores. -->
+						<Button Classes="topbar" Theme="{DynamicResource [CtrlThm] Diablo2 Button_Action}"
+								Command="{Binding Home.UndoCommand}"
+								IsVisible="{Binding Home.IsEditing}"
+								ToolTip.Tip="{Binding Home.UndoHint}"
+								ToolTip.ShowOnDisabled="True">
+							<StackPanel Orientation="Horizontal">
+								<!-- Material Symbols "undo". -->
+								<Path Classes="pin" Data="{StaticResource [Glyph] Undo}"/>
+							</StackPanel>
+						</Button>
+						<Button Classes="topbar" Theme="{DynamicResource [CtrlThm] Diablo2 Button_Action}"
+								Command="{Binding Home.RedoCommand}"
+								IsVisible="{Binding Home.IsEditing}"
+								ToolTip.Tip="{Binding Home.RedoHint}"
+								ToolTip.ShowOnDisabled="True">
+							<StackPanel Orientation="Horizontal">
+								<!-- Material Symbols "redo". -->
+								<Path Classes="pin" Data="{StaticResource [Glyph] Redo}"/>
+							</StackPanel>
+						</Button>
+						<Button Classes="topbar" Theme="{DynamicResource [CtrlThm] Diablo2 Button_Action}"
+								IsVisible="{Binding Home.IsEditing}"
+								ToolTip.Tip="{L 'History'}">
+							<Button.Flyout>
+								<Flyout Placement="Bottom">
+									<views:HistoryList DataContext="{Binding Home}"/>
+								</Flyout>
+							</Button.Flyout>
+							<StackPanel Orientation="Horizontal">
+								<!-- Material Symbols "history". -->
+								<Path Classes="pin" Data="{StaticResource [Glyph] History}"/>
+							</StackPanel>
+						</Button>
+						<!-- Restore, while a backup is on screen: here alone (not on the Home card too). -->
+						<Button Classes="topbar" Theme="{DynamicResource [CtrlThm] Diablo2 Button_Action}"
+								AutomationProperties.AutomationId="Backup_Restore"
+								Command="{Binding Home.SaveCommand}"
+								IsVisible="{Binding Home.ShowsRestore}"
+								IsEnabled="{Binding Home.CanSaveNow}"
+								Classes.blocked="{Binding Home.GameBlocked}"
+								ToolTip.Tip="{Binding Home.SaveHint}"
+								ToolTip.ShowOnDisabled="True">
+							<StackPanel Orientation="Horizontal">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Save}"/>
+							</StackPanel>
+						</Button>
+						<Button Classes="topbar" Theme="{DynamicResource [CtrlThm] Diablo2 Button_Action}"
+								Command="{Binding Home.CloseCommand}"
+								IsEnabled="{Binding Home.CanLeave}"
+								ToolTip.Tip="{Binding Home.CloseHint}" ToolTip.ShowOnDisabled="True">
+							<StackPanel Orientation="Horizontal">
+								<!-- Closing the character: Material Symbols "logout" - on this strip only;
+								     the card's and the dialogs' crosses stay crosses. -->
+								<Path Classes="pin" Data="{StaticResource [Glyph] Exit}"/>
+							</StackPanel>
+						</Button>
+						</StackPanel>
+					</StackPanel>
+					</Border>
+					</Border>
+
+					<!-- The message strip: what the last action came to where it reaches another page, in
+					     the silver bar under the left page - from past the bottom-left corner piece (48,
+					     [UI] Frame CornerSize) to the central pillar. The top strip's backing and border.
+					     Hovering it shows the last ten. -->
+					<Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="48,0,13,0"
+							Height="{DynamicResource [UI] Frame BorderSize}" Padding="0,1"
+							VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
+							ZIndex="2" Classes="msgbar"
+							Classes.shown="{Binding Session.Messages.HasMessage}"
+							Classes.stale="{Binding !Session.Messages.IsFresh}"
+							Classes.idle="{Binding Session.Messages.IsIdle}"
+							Classes.caution="{Binding Session.Messages.IsCaution}"
+							IsHitTestVisible="{Binding Session.Messages.HasMessage}"
+							ToolTip.Tip="{Binding Session.Messages.History}"
+							ToolTip.Placement="Top" ToolTip.VerticalOffset="-6">
+						<Border Background="#CC000000" Padding="10,0,10,0"
+								BorderThickness="1" BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}">
+							<TextBlock VerticalAlignment="Center" FontSize="{StaticResource [Type] Body}"
+									   TextTrimming="CharacterEllipsis"
+									   Text="{Binding Session.Messages.Text}"/>
+						</Border>
+					</Border>
+
+					<!-- The right page's strip, the left one mirrored: from the central pillar to short of
+					     the bottom-right corner piece. What an action that stays on the right page came to -
+					     the item panel, the waypoints (Session.RightMessages). -->
+					<Border Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="2" Margin="13,0,48,0"
+							Height="{DynamicResource [UI] Frame BorderSize}" Padding="0,1"
+							VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
+							ZIndex="2" Classes="msgbar right"
+							Classes.shown="{Binding Session.RightMessages.HasMessage}"
+							Classes.stale="{Binding !Session.RightMessages.IsFresh}"
+							Classes.idle="{Binding Session.RightMessages.IsIdle}"
+							Classes.caution="{Binding Session.RightMessages.IsCaution}"
+							IsHitTestVisible="{Binding Session.RightMessages.HasMessage}"
+							ToolTip.Tip="{Binding Session.RightMessages.History}"
+							ToolTip.Placement="Top" ToolTip.VerticalOffset="-6">
+						<Border Background="#CC000000" Padding="10,0,10,0"
+								BorderThickness="1" BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}">
+							<TextBlock VerticalAlignment="Center" FontSize="{StaticResource [Type] Body}"
+									   TextTrimming="CharacterEllipsis"
+									   Text="{Binding Session.RightMessages.Text}"/>
+						</Border>
+					</Border>
+
+					<!-- UI Main Frames Group End -->
+
+					<!-- Main Content Container -->
+					<!-- Left Part -->
+					<Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="3"
+							Margin="4 0 0 0"
+							AutomationProperties.AutomationId="Frame_PageLeft" AutomationProperties.AccessibilityView="Control"
+							BorderThickness="2"
+							CornerRadius="{DynamicResource [UI] MainViewPage_L CornerSize}"
+							Classes="MainContent mirrored">
+						<!-- Each page kept once shown, hidden while another is in front (PageDeck):
+						     swapped out, a page was styled and measured again on every return. -->
+						<base:PageDeck Name="ViewPage_Left"
+									   Classes="MainViewPage"
+									   Content="{Binding CurrentPage_L}">
+							<base:PageDeck.PageTransition>
+								<CrossFade Duration="{StaticResource [Anim] ViewPage Transition}"/>
+							</base:PageDeck.PageTransition>
+						</base:PageDeck>
+					</Border>
+					<!-- Right Part -->
+					<Border Grid.Column="3" Grid.Row="1" Grid.RowSpan="3"
+							Margin="0 0 4 0"
+							AutomationProperties.AutomationId="Frame_PageRight" AutomationProperties.AccessibilityView="Control"
+							BorderThickness="2"
+							CornerRadius="{DynamicResource [UI] MainViewPage_R CornerSize}"
+							Classes="MainContent">
+						<!-- The right page's own locator: the vault list shown here is a view of its own,
+						     since the left page may still hold the other while the two cross-fade. -->
+						<base:PageDeck Name="ViewPage_Right"
+									   Classes="MainViewPage"
+									   ContentTemplate="{DynamicResource RightPageLocator}"
+									   Content="{Binding CurrentPage_R}">
+							<base:PageDeck.PageTransition>
+								<CrossFade Duration="{StaticResource [Anim] ViewPage Transition}"/>
+							</base:PageDeck.PageTransition>
+						</base:PageDeck>
+					</Border>
+				</Grid>
+				<!-- (The item search is not docked here, at the window's right and taking its width
+				     from the two pages: it is the right page's, under its Search bookmark.) -->
+			</Grid>
+		</Border>
+
+
+		<!-- The first run's question, over everything and over the one above it: until
+		     the game folder is settled there is nothing for the rest of the app to
+		     read, so nothing behind this is worth touching. -->
+		<Border IsVisible="{Binding Setup.IsShown}"
+				Opacity="{Binding Setup.Fade}"
+				IsHitTestVisible="{Binding Setup.IsAsking}"
+				Background="#E6000000" ZIndex="1">
+			<Border.Transitions>
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.26"
+							      Easing="CubicEaseOut"/>
+				</Transitions>
+			</Border.Transitions>
+
+			<Border Width="520"
+					HorizontalAlignment="Center" VerticalAlignment="Center"
+					Classes="pickerpanel"
+					Effect="drop-shadow(0 0 24 Black)">
+				<!-- The popup panels' dress (Picker.axaml: pickerpanel), not a black box of its own; the margin makes up
+				     the rest of the old 22,20. -->
+				<StackPanel Margin="10,10">
+					<TextBlock Text="{L 'Select Project Diablo II game folder'}"
+							   FontFamily="{StaticResource DiabloFont}"
+							   FontSize="{StaticResource [Type] Title}" FontWeight="Bold"
+							   Foreground="{DynamicResource [Text] Heading}"/>
+
+					<!-- Said only when there is something to say: the folder settled on before
+					     has gone. A first run is answered by the title. -->
+					<TextBlock Text="{Binding Setup.Reason}"
+							   TextWrapping="Wrap" Margin="0,10,0,0" FontSize="{StaticResource [Type] Body}"
+							   IsVisible="{Binding Setup.HasReason}"
+							   Foreground="{DynamicResource [Text] Body}"/>
+
+					<!-- More than one install found: each a row to pick, as the pickers' rows. One is simply what the box
+					     holds. -->
+					<ItemsControl ItemsSource="{Binding Setup.Found}" Margin="0,12,0,0"
+							      IsVisible="{Binding Setup.ShowsFound}">
+						<ItemsControl.Styles>
+							<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+						</ItemsControl.Styles>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate x:DataType="x:String">
+								<Button Classes="pickone"
+										Command="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).Setup.ChooseCommand}"
+										CommandParameter="{Binding}">
+									<StackPanel Orientation="Horizontal" Spacing="8">
+										<Path Classes="pin" Data="{StaticResource [Glyph] Folder}"/>
+										<TextBlock Text="{Binding}" TextWrapping="Wrap" VerticalAlignment="Center"
+												   Foreground="{DynamicResource [Text] Body}"/>
+									</StackPanel>
+								</Button>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+
+					<!-- The box, and the Settings page's folder button beside it. -->
+					<Grid ColumnDefinitions="*,8,Auto" Margin="0,12,0,0">
+						<Grid.Styles>
+							<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+						</Grid.Styles>
+						<!-- As tall as the folder button beside it. -->
+						<TextBox Grid.Column="0" Height="26" MinHeight="0" Padding="6,0" FontSize="{StaticResource [Type] Body}"
+							     VerticalContentAlignment="Center"
+							     PlaceholderText="{L 'Game folder'}"
+							     Text="{Binding Setup.Folder, UpdateSourceTrigger=PropertyChanged}"/>
+						<Button Grid.Column="2" Classes="spend" VerticalAlignment="Center"
+								Command="{Binding Setup.BrowseCommand}"
+								ToolTip.Tip="{L 'Browse'}">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Open folder}"/>
+						</Button>
+					</Grid>
+
+					<!-- Which install it is, once it will do: the Settings page's version line. -->
+					<TextBlock Margin="0,4,0,0" FontSize="{StaticResource [Type] Small}" Foreground="{DynamicResource [Text] Muted}"
+							   IsVisible="{Binding Setup.HasFolderVersion}"
+							   Text="{Binding Setup.FolderVersion}"/>
+
+					<!-- Why the folder will not do, as the other inline warnings are said. -->
+					<StackPanel Orientation="Horizontal" Spacing="6" Margin="0,8,0,0" IsVisible="{Binding Setup.HasProblem}">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Alert}" VerticalAlignment="Top" Stroke="{DynamicResource [Text] Warning}"/>
+						<TextBlock Text="{Binding Setup.Problem}" TextWrapping="Wrap" MaxWidth="440"
+								   Foreground="{DynamicResource [Text] Warning}"/>
+					</StackPanel>
+
+					<!-- The play mode, on a first run only: Casual lit until another is chosen. -->
+					<StackPanel Margin="0,20,0,0" IsVisible="{Binding Setup.AsksMode}">
+						<StackPanel.Styles>
+							<StyleInclude Source="/Styles/CommonControls/Choice.axaml"/>
+						</StackPanel.Styles>
+
+						<!-- That it can be changed later is a hover away, not a line always there. -->
+						<StackPanel Orientation="Horizontal" Spacing="8">
+							<TextBlock Text="{L 'Play mode'}" VerticalAlignment="Center"
+									   FontFamily="{StaticResource DiabloFont}"
+									   FontSize="{StaticResource [Type] Heading}" FontWeight="Bold"
+									   Foreground="{DynamicResource [Text] Heading}"/>
+							<Path Classes="pin" Data="{StaticResource [Glyph] Info}" VerticalAlignment="Center" Fill="Transparent" Stroke="{DynamicResource [Text] Muted}" ToolTip.Tip="{L 'Changeable in Settings'}"/>
+						</StackPanel>
+
+						<!-- A flat choice group (Choice.axaml): outlined, the chosen one filled. -->
+						<UniformGrid Columns="3" Margin="-3,10,-3,0">
+							<Button Classes="choice" Classes.current="{Binding Setup.IsLegit}" Margin="3,0"
+									Command="{Binding Setup.ChooseModeCommand}" CommandParameter="Legit"
+									Content="{L 'LEGIT'}"/>
+							<Button Classes="choice" Classes.current="{Binding Setup.IsCasual}" Margin="3,0"
+									Command="{Binding Setup.ChooseModeCommand}" CommandParameter="Casual"
+									Content="{L 'CASUAL'}"/>
+							<Button Classes="choice" Classes.current="{Binding Setup.IsFree}" Margin="3,0"
+									Command="{Binding Setup.ChooseModeCommand}" CommandParameter="Free"
+									Content="{L 'FREE'}"/>
+						</UniformGrid>
+
+						<!-- What the lit one means. -->
+						<TextBlock Text="{Binding Setup.ModeNote}" TextWrapping="Wrap"
+								   Margin="0,8,0,0" FontSize="{StaticResource [Type] Body}"
+								   Foreground="{DynamicResource [Text] Body}"/>
+					</StackPanel>
+
+					<!-- The confirm dialog's answers. Quit is here at all because this overlay covers the title bar:
+					     without it there is no way off a machine the game is not on. -->
+					<StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" Margin="0,22,0,0">
+						<!-- Compact, fitted to their labels and grouped at the bottom right, as the cards' CREATE and APPLY; the answer first and cancel last, Fluent 2's order for a Windows dialog (the two stretched halves looked cramped). -->
+						<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+								HorizontalContentAlignment="Stretch"
+								Theme="{DynamicResource [CtrlThm] Button_Primary}"
+								IsEnabled="{Binding Setup.CanContinue}"
+								Command="{Binding Setup.AcceptCommand}">
+							<!-- The icon at the left edge, the label centred in the space it leaves. -->
+							<Grid ColumnDefinitions="Auto,*">
+								<Path Classes="pin label" Data="{StaticResource [Glyph] Tick}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+								<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'CONTINUE'}"/>
+							</Grid>
+						</Button>
+						<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+								HorizontalContentAlignment="Stretch"
+								Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+								Command="{Binding Setup.QuitCommand}">
+							<!-- The icon at the left edge, the label centred in the space it leaves. -->
+							<Grid ColumnDefinitions="Auto,*">
+								<Path Classes="pin label" Data="{StaticResource [Glyph] Close}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+								<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'QUIT'}"/>
+							</Grid>
+						</Button>
+					</StackPanel>
+				</StackPanel>
+			</Border>
+		</Border>
+		<!-- No notice of the grail's new finds here, at the bottom right: the editor logs no
+		     finds - the grail is the game's Discovery. -->
+
+		<!-- The one question the app stops to ask. Over everything, including the title
+		     bar, so nothing else can be touched until it is answered. -->
+		<!-- "asking": a veil to the pages' keys (ItemPanels.IsVeiled), as a picker's is. -->
+		<!-- It fades in and out as a picker's veil does (Border.veil; without it, it was there and gone with
+		     no transition at all): in the window while Present, shown - and taking the pointer - while asking. -->
+		<Border Name="QuestionPanel" Classes="asking veil" Classes.shown="{Binding Confirm.IsAsking}"
+				IsVisible="{Binding Confirm.IsPresent}" IsHitTestVisible="{Binding Confirm.IsAsking}"
+				Background="{DynamicResource [ABrush] Veil}">
+			<!-- As wide as its buttons need, at least 420; capped so a long question wraps. -->
+			<Border MinWidth="420" MaxWidth="560"
+					HorizontalAlignment="Center" VerticalAlignment="Center"
+					Classes="pickerpanel"
+					Effect="drop-shadow(0 0 24 Black)">
+				<!-- The popup panels' dress (Picker.axaml: pickerpanel), not a black box of its own; the margin makes up
+				     the rest of the old 22,20. -->
+				<StackPanel Margin="10,10">
+					<TextBlock Text="{Binding Confirm.Title}"
+							   FontFamily="{StaticResource DiabloFont}"
+							   FontSize="{StaticResource [Type] Title}" FontWeight="Bold"
+							   Foreground="{DynamicResource [Text] Heading}"/>
+					<TextBlock Text="{Binding Confirm.Message}"
+							   TextWrapping="Wrap" Margin="0,10,0,0" FontSize="{StaticResource [Type] Body}"
+							   Foreground="{DynamicResource [Text] Body}"/>
+					<!-- Each button as wide as its label needs, so a long one - DELETE FOLDER - is never cut. A hidden
+					     second answer takes no room. -->
+					<StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" Margin="0,22,0,0">
+						<!-- Compact, fitted to their labels and grouped at the bottom right, as the cards' CREATE and APPLY; the answer first and cancel last, Fluent 2's order for a Windows dialog (the two stretched halves looked cramped). -->
+						<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+								HorizontalContentAlignment="Stretch"
+								Theme="{DynamicResource [CtrlThm] Button_Primary}"
+								Command="{Binding Confirm.AcceptCommand}"
+								ToolTip.Tip="{Binding Confirm.ConfirmHint}">
+							<!-- The icon at the left edge, the label centred in the space it leaves. -->
+							<Grid ColumnDefinitions="Auto,*">
+								<Path Classes="pin label" Data="{StaticResource [Glyph] Tick}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" IsVisible="{Binding !Confirm.IsDelete}"/>
+								<Path Classes="pin label" Data="{StaticResource [Glyph] Bin}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" IsVisible="{Binding Confirm.IsDelete}"/>
+								<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{Binding Confirm.ConfirmLabel}"/>
+							</Grid>
+						</Button>
+						<!-- The second yes, where there is one: after the whole answer, before cancel. -->
+						<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+								IsVisible="{Binding Confirm.HasAlternative}"
+								Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+								Command="{Binding Confirm.AlternativeCommand}"
+								ToolTip.Tip="{Binding Confirm.AlternativeHint}">
+							<TextBlock Text="{Binding Confirm.AlternativeLabel}" VerticalAlignment="Center"/>
+						</Button>
+						<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+								HorizontalContentAlignment="Stretch"
+								Theme="{DynamicResource [CtrlThm] Button_Secondary}"
+								Command="{Binding Confirm.RejectCommand}">
+							<!-- The icon at the left edge, the label centred in the space it leaves. -->
+							<Grid ColumnDefinitions="Auto,*">
+								<Path Classes="pin label" Data="{StaticResource [Glyph] Close}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" IsVisible="{Binding !Confirm.NeedsClick}"/>
+								<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{Binding Confirm.CancelLabel}"/>
+							</Grid>
+						</Button>
+					</StackPanel>
+				</StackPanel>
+			</Border>
+		</Border>
+
+		<!-- What's new: the release notes, in a popup over everything as the question above is - by itself once after an
+		     update, and from Settings' About card (WhatsNewService). -->
+		<!-- Closed as every popup is: its button, a click beside it (the backdrop), Esc - which
+		     runs the backdrop's command (ItemPanels.CloseTopVeil). It had the button alone. -->
+		<Border IsVisible="{Binding WhatsNew.IsPresent}" Classes="veil" Classes.shown="{Binding WhatsNew.IsOpen}"
+				IsHitTestVisible="{Binding WhatsNew.IsOpen}"
+				Background="{DynamicResource [ABrush] Veil}">
+			<Panel>
+			<!-- A dialog's backdrop, not a picker's: the panel stands in the window's middle, no pickerframe (PD2UI009 is a picker's). -->
+			<Button Classes="backdrop dialog" Command="{Binding WhatsNew.CloseCommand}"/>
+			<Border MinWidth="480" MaxWidth="640"
+					HorizontalAlignment="Center" VerticalAlignment="Center"
+					Classes="pickerpanel"
+					Effect="drop-shadow(0 0 24 Black)">
+				<DockPanel Margin="10,10">
+					<TextBlock DockPanel.Dock="Top" Text="{Binding WhatsNew.Title}"
+							   FontFamily="{StaticResource DiabloFont}"
+							   FontSize="{StaticResource [Type] Title}" FontWeight="Bold"
+							   Foreground="{DynamicResource [Text] Heading}"/>
+
+					<!-- One answer, the popups' primary, at the bottom right. -->
+					<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+						<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+								HorizontalContentAlignment="Stretch"
+								Theme="{DynamicResource [CtrlThm] Button_Primary}"
+								Command="{Binding WhatsNew.CloseCommand}">
+							<Grid ColumnDefinitions="Auto,*">
+								<Path Classes="pin label" Data="{StaticResource [Glyph] Tick}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+								<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'OK'}"/>
+							</Grid>
+						</Button>
+					</StackPanel>
+
+					<ScrollViewer MaxHeight="440" Margin="0,12,0,0"
+								  HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+						<ItemsControl ItemsSource="{Binding WhatsNew.Releases}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Spacing="16"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<!-- A release: its number in the heading face and its date in plain type beside it (the
+								     heading face has no middle dot), the line about it, its groups of changes. -->
+								<DataTemplate x:DataType="core:ChangelogRelease">
+									<StackPanel Spacing="4" Margin="0,0,8,0">
+										<StackPanel Orientation="Horizontal" Spacing="10">
+											<TextBlock Classes="heading" Text="{Binding Version}" VerticalAlignment="Bottom"/>
+											<TextBlock Classes="dim" Text="{Binding Date}" VerticalAlignment="Bottom"/>
+										</StackPanel>
+										<TextBlock Classes="dim" Text="{Binding About}" IsVisible="{Binding HasAbout}" TextWrapping="Wrap"/>
+										<ItemsControl ItemsSource="{Binding Groups}">
+											<ItemsControl.ItemTemplate>
+												<DataTemplate x:DataType="core:ChangelogGroup">
+													<StackPanel Spacing="3" Margin="0,8,0,0">
+														<TextBlock Classes="dim" Text="{Binding Heading}"/>
+														<ItemsControl ItemsSource="{Binding Lines}">
+															<ItemsControl.ItemTemplate>
+																<DataTemplate x:DataType="x:String">
+																	<TextBlock TextWrapping="Wrap" Margin="0,0,0,3"
+																			   FontSize="{StaticResource [Type] Body}" Foreground="{DynamicResource [Text] Body}">
+																		<Run Text="•"/>
+																		<Run Text="{Binding}"/>
+																	</TextBlock>
+																</DataTemplate>
+															</ItemsControl.ItemTemplate>
+														</ItemsControl>
+													</StackPanel>
+												</DataTemplate>
+											</ItemsControl.ItemTemplate>
+										</ItemsControl>
+									</StackPanel>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</ScrollViewer>
+				</DockPanel>
+			</Border>
+			</Panel>
+		</Border>
+
+
+		<!-- The sheet of keys and gestures (KeySheetService): over everything, as
+		     What's new is - F1 from anywhere, and Settings' About card. Two columns of groups, each key a cap as
+		     the tooltips draw them (KeyHints). A veil (ItemPanels.IsVeiled), as What's new is: without the mark the
+		     page under it took the keys - Esc let its selection go and the sheet stayed. -->
+		<!-- Closed as every popup is: OK, a click beside it, Esc. -->
+		<Border IsVisible="{Binding Keys.IsPresent}" Classes="veil" Classes.shown="{Binding Keys.IsOpen}"
+				IsHitTestVisible="{Binding Keys.IsOpen}"
+				Background="{DynamicResource [ABrush] Veil}">
+			<Panel>
+			<!-- A dialog's backdrop, not a picker's: the panel stands in the window's middle, no pickerframe (PD2UI009 is a picker's). -->
+			<Button Classes="backdrop dialog" Command="{Binding Keys.CloseCommand}"/>
+			<Border HorizontalAlignment="Center" VerticalAlignment="Center"
+					Classes="pickerpanel"
+					Effect="drop-shadow(0 0 24 Black)">
+				<DockPanel Margin="10,10">
+					<TextBlock DockPanel.Dock="Top" Text="{L 'Keys and gestures'}"
+							   AutomationProperties.AutomationId="KeySheet_Title"
+							   FontFamily="{StaticResource DiabloFont}"
+							   FontSize="{StaticResource [Type] Title}" FontWeight="Bold"
+							   Foreground="{DynamicResource [Text] Heading}"/>
+
+					<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+						<Button Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+								HorizontalContentAlignment="Stretch"
+								Theme="{DynamicResource [CtrlThm] Button_Primary}"
+								AutomationProperties.AutomationId="KeySheet_Close"
+								Command="{Binding Keys.CloseCommand}">
+							<Grid ColumnDefinitions="Auto,*">
+								<Path Classes="pin label" Data="{StaticResource [Glyph] Tick}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+								<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'OK'}"/>
+							</Grid>
+						</Button>
+					</StackPanel>
+
+					<ScrollViewer MaxHeight="620" Margin="0,12,0,0"
+								  HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+						<Grid ColumnDefinitions="Auto,36,Auto" Margin="0,0,10,0">
+							<ItemsControl Grid.Column="0" ItemsSource="{Binding Keys.Left}" ItemTemplate="{StaticResource KeyGroup}"/>
+							<ItemsControl Grid.Column="2" ItemsSource="{Binding Keys.Right}" ItemTemplate="{StaticResource KeyGroup}"/>
+						</Grid>
+					</ScrollViewer>
+				</DockPanel>
+			</Border>
+			</Panel>
+		</Border>
+
+		<!-- What the inventory carries, drawn over both pages: dragged to the vault list on the
+		     right, it has to be seen there too.
+		     Never hit-testable, so what is under the pointer answers the release. One item, or a
+		     group in the shape it will land in (fanned, where it has none); a zero-sized panel
+		     whose pieces stand at their offsets, so nothing clips them. -->
+		<Canvas Name="GhostLayer" IsHitTestVisible="False">
+			<Canvas.Resources>
+				<!-- One carried item: its frame, quality wash and art, as the grids draw it. -->
+				<DataTemplate x:Key="GhostPiece" x:DataType="vm:GhostPart">
+					<Border Width="{Binding Tile.Width}"
+							Height="{Binding Tile.Height}"
+							BorderThickness="1"
+							BorderBrush="{Binding Tile.RarityBrush}"
+							Background="#B4000000"
+							Opacity="0.85">
+						<Panel>
+							<Border Background="{Binding Tile.WashBrush}"
+									Opacity="{Binding Tile.QualityWash}"/>
+							<Image Source="{Binding Tile.Sprite}" Stretch="None"
+								   Opacity="{Binding Tile.SpriteOpacity}"/>
+						</Panel>
+					</Border>
+				</DataTemplate>
+			</Canvas.Resources>
+			<Canvas.Styles>
+				<Style Selector="ItemsControl.ghost">
+					<Setter Property="ClipToBounds" Value="False"/>
+					<Setter Property="ItemTemplate" Value="{StaticResource GhostPiece}"/>
+					<Setter Property="ItemsPanel">
+						<ItemsPanelTemplate>
+							<Canvas ClipToBounds="False"/>
+						</ItemsPanelTemplate>
+					</Setter>
+				</Style>
+				<Style Selector="ItemsControl.ghost > ContentPresenter" x:DataType="vm:GhostPart">
+					<Setter Property="Canvas.Left" Value="{Binding Left}"/>
+					<Setter Property="Canvas.Top" Value="{Binding Top}"/>
+				</Style>
+			</Canvas.Styles>
+
+			<!-- The inventory's hold. -->
+			<ItemsControl Classes="ghost"
+						  Canvas.Left="{Binding GhostLeft}" Canvas.Top="{Binding GhostTop}"
+						  IsVisible="{Binding Inventory.Session.IsHolding, FallbackValue=False}"
+						  ItemsSource="{Binding Inventory.GhostParts}"/>
+			<!-- One of a material, carried out of the materials tab toward a cell. -->
+			<ItemsControl Classes="ghost"
+						  Canvas.Left="{Binding GhostLeft}" Canvas.Top="{Binding GhostTop}"
+						  IsVisible="{Binding Inventory.IsTabCarrying, FallbackValue=False}"
+						  ItemsSource="{Binding Inventory.TabGhostParts}"/>
+			<!-- The vault's cards, carried toward a cell or a folder - from either vault page (IsVaultCarrying:
+			     asked of the left page alone, a drag from the right page was drawn at the window's corner). -->
+			<!-- A gem, a rune or a jewel dragged out of the Edit page's row of sockets (SocketCarry). -->
+			<ItemsControl Classes="ghost"
+						  AutomationProperties.AutomationId="Socket_Ghost"
+						  Canvas.Left="{Binding GhostLeft}" Canvas.Top="{Binding GhostTop}"
+						  IsVisible="{Binding SocketCarry.IsCarrying}"
+						  ItemsSource="{Binding SocketCarry.Parts}"/>
+			<ItemsControl Classes="ghost"
+						  AutomationProperties.AutomationId="Vault_Ghost"
+						  Canvas.Left="{Binding GhostLeft}" Canvas.Top="{Binding GhostTop}"
+						  IsVisible="{Binding IsVaultCarrying}"
+						  ItemsSource="{Binding VaultGhostParts}"/>
+			<!-- The vault's folders carried, with its cards or alone (a folder is a tile of its folder's sheet):
+			     a small folder each, under its name. -->
+			<ItemsControl Classes="folderghost" ClipToBounds="False"
+						  AutomationProperties.AutomationId="Vault_GhostFolders"
+						  Canvas.Left="{Binding GhostLeft}" Canvas.Top="{Binding GhostTop}"
+						  IsVisible="{Binding IsVaultCarrying}"
+						  ItemsSource="{Binding VaultGhostFolders}">
+				<ItemsControl.Styles>
+					<Style Selector="ItemsControl.folderghost > ContentPresenter" x:DataType="vm:FolderGhost">
+						<Setter Property="Canvas.Left" Value="{Binding Left}"/>
+						<Setter Property="Canvas.Top" Value="{Binding Top}"/>
+					</Style>
+				</ItemsControl.Styles>
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Canvas ClipToBounds="False"/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="vm:FolderGhost">
+						<Border Width="56" Height="56" BorderThickness="1" CornerRadius="2"
+								BorderBrush="{DynamicResource [Brush] Frame - Golden Dim}"
+								Background="#B4000000" Opacity="0.85">
+							<StackPanel VerticalAlignment="Center">
+								<Panel Width="26" Height="26" HorizontalAlignment="Center">
+									<Path Classes="pin large filled" Data="{StaticResource [Glyph] Folder}"/>
+								</Panel>
+								<TextBlock Text="{Binding Name}" Margin="2,2,2,0" TextAlignment="Center"
+										   FontSize="{StaticResource [Type] Small}" TextTrimming="CharacterEllipsis"
+										   Foreground="{DynamicResource [Text] Body}"/>
+							</StackPanel>
+						</Border>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</Canvas>
+
+		<!-- The right-click menu: one for the window, filled by the page clicked
+		     (ActMenuService). It draws nothing here - it opens in a popup. -->
+		<base:ActMenuHost/>
+	  </Panel>
+	</Border>
+</UserControl>

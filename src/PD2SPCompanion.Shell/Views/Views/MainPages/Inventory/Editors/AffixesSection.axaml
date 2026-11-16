@@ -1,0 +1,226 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:data="using:PD2SPCompanion.Core.Items"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+			 xmlns:controls="using:PD2SPCompanion.Shell.CustomControls.Base"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="300"
+             x:Class="PD2SPCompanion.Shell.Views.AffixesSection"
+             x:DataType="vm:AffixEditor">
+
+	<!-- What the item names. A magic item carries one prefix and one suffix; a
+	rare carries its own two-part name and up to three of each beneath it.
+	Read-only: the numbers are worth seeing, and changing one has to wait
+	until a property can be added to match it. -->
+	<Border Classes="section" Margin="0,0,0,10" Padding="10,8"
+			IsVisible="{Binding ShowsAffixes}">
+		<StackPanel>
+			<Grid ColumnDefinitions="*,Auto,Auto">
+				<Button Grid.Column="0" Classes="fold"
+						Command="{Binding ToggleAffixesCommand}">
+					<Grid ColumnDefinitions="Auto,*">
+						<Path Grid.Column="0" Classes="chevron"
+							  Classes.open="{Binding AffixesOpen}"
+							  Data="{StaticResource [Glyph] Chevron}"/>
+						<TextBlock Grid.Column="1" Classes="section"
+								   Text="{Binding AffixesHeader}"/>
+					</Grid>
+				</Button>
+
+				<!-- The Perfect Skull: every affix rolled again, which ones as well as their
+				     numbers, as the skull recipe rerolls a rare. Staged, as any change. -->
+				<Panel Grid.Column="1" IsVisible="{Binding Rules.EditsAffixes}">
+					<base:RollButton Kind="Perfect"
+							IsVisible="{Binding CanRerollAffixes}"
+							Command="{Binding RerollAllAffixesNowCommand}"
+							ToolTip.Tip="{L 'Reroll all affixes'}"/>
+				</Panel>
+
+				<!-- The cube. A craft is made *from* the item rather than out of it: the
+				     recipe goes onto a duplicate and this one keeps what it rolled. -->
+				<!-- The gap goes on this side: with no cube the skull sits flush right, over
+				     the other sections' buttons. -->
+				<Panel Grid.Column="2" IsVisible="{Binding Rules.Crafts}">
+					<Button Classes="spend" Margin="6,0,0,0"
+							IsVisible="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Crafting.CanCraftFrom}"
+							Command="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Crafting.CraftFromItemCommand}"
+							ToolTip.Tip="{L 'Craft'}">
+						<Image Source="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).HoradricCubeIcon}"
+								   Width="18" Height="18"
+								   Stretch="Uniform"/>
+					</Button>
+				</Panel>
+			</Grid>
+
+			<ItemsControl ItemsSource="{Binding Names}"
+						  IsVisible="{Binding AffixesOpen}"
+						  Margin="0,8,0,2">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="data:AffixName">
+						<Grid ColumnDefinitions="76,*" Margin="0,0,0,4"
+							  ToolTip.Tip="{Binding Tooltip}">
+							<StackPanel Grid.Column="0">
+								<TextBlock Classes="fieldname" Margin="0"
+										   Text="{Binding Kind}"/>
+							</StackPanel>
+							<TextBlock Grid.Column="1" Classes="affix"
+									   IsVisible="{Binding !IsRareName}"
+									   Text="{Binding Name}"/>
+
+							<!-- A rare names itself from two lists, and either half can be
+							     changed, so the name is a button rather than a line. -->
+							<Button Grid.Column="1" Classes="pickfield"
+									HorizontalContentAlignment="Center"
+									IsVisible="{Binding IsRareName}"
+									Command="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).RareName.OpenPickerCommand}"
+									IsHitTestVisible="{Binding $parent[UserControl].((vm:AffixEditor)DataContext).Rules.EditsAffixes}"
+									Focusable="{Binding $parent[UserControl].((vm:AffixEditor)DataContext).Rules.EditsAffixes}">
+								<TextBlock Classes="affix rarename" Margin="0"
+										   VerticalAlignment="Center"
+										   Classes.crafted="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Crafting.IsCraft}"
+										   Text="{Binding Name}"/>
+							</Button>
+						</Grid>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+
+			<!-- The affixes, as the file holds them: one row per slot, prefix
+			     beside the suffix it was stored with. One button for the lot,
+			     as tall as the item has slots - two on one rare, three on
+			     another - because they are picked together. -->
+			<Grid ColumnDefinitions="76,*" Margin="0,0,0,4"
+				  IsVisible="{Binding ShowAffixPairs}">
+				<StackPanel Grid.Column="0" VerticalAlignment="Center">
+					<TextBlock Classes="fieldname" Margin="0" Text="{L 'Affix'}"/>
+				</StackPanel>
+
+				<Button Grid.Column="1" Classes="pickfield tall"
+						HorizontalContentAlignment="Stretch"
+						Command="{Binding OpenAffixPickerCommand}"
+						IsHitTestVisible="{Binding Rules.EditsAffixes}"
+						Focusable="{Binding Rules.EditsAffixes}">
+					<ItemsControl ItemsSource="{Binding AffixPairs}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate x:DataType="data:MagicAffixes+AffixPair">
+								<!-- Prefix, dash, suffix: the pair reads as a pair
+								     when the two halves lean on the mark between
+								     them, and an empty side leaves a gap that says
+								     the slot is half filled. -->
+								<Grid ColumnDefinitions="*,Auto,*" Margin="0,1">
+									<TextBlock Grid.Column="0" Classes="affix magic"
+											   HorizontalAlignment="Right"
+											   Text="{Binding PrefixName}"/>
+									<TextBlock Grid.Column="1" Classes="affix dash"
+											   Margin="8,0"
+											   Text="-"/>
+									<TextBlock Grid.Column="2" Classes="affix magic"
+											   HorizontalAlignment="Left"
+											   Text="{Binding SuffixName}"/>
+								</Grid>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</Button>
+			</Grid>
+
+			<!-- Which recipe made it. No recipe id is stored, so the family is read
+			     back from what the item carries - see CraftFamily. A button like the
+			     affixes', because what it opens is the next thing to build here. -->
+			<Grid ColumnDefinitions="76,*" Margin="0,0,0,4">
+				<!-- Folds with its section, as the three rows under it do (else it stood on, the section folded). -->
+				<Grid.IsVisible>
+					<MultiBinding Converter="{x:Static BoolConverters.And}">
+						<Binding Path="$parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Crafting.IsCraft"/>
+						<Binding Path="AffixesOpen"/>
+					</MultiBinding>
+				</Grid.IsVisible>
+				<TextBlock Grid.Column="0" Classes="fieldname" Margin="0"
+						   VerticalAlignment="Center" Text="{L 'Crafting'}"/>
+
+				<Button Grid.Column="1" Classes="pickfield"
+						    HorizontalContentAlignment="Center"
+						    Command="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Crafting.OpenPickerCommand}"
+						    IsHitTestVisible="{Binding Rules.Crafts}"
+						    Focusable="{Binding Rules.Crafts}">
+					<TextBlock Classes="affix crafted" Margin="0"
+							   VerticalAlignment="Center"
+							   Text="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Crafting.Family}"/>
+				</Button>
+			</Grid>
+
+			<!-- A superior item's bonus: one row of the superior table - one bonus, or two - or none. Read off what the
+			     item carries; the button opens every row its base can have. -->
+			<Grid ColumnDefinitions="76,*" Margin="0,8,0,4">
+				<Grid.IsVisible>
+					<MultiBinding Converter="{x:Static BoolConverters.And}">
+						<Binding Path="$parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Superior.Shows"/>
+						<Binding Path="AffixesOpen"/>
+					</MultiBinding>
+				</Grid.IsVisible>
+				<TextBlock Grid.Column="0" Classes="fieldname" Margin="0"
+						   VerticalAlignment="Center" Text="{L 'Superior'}"/>
+
+				<Button Grid.Column="1" Classes="pickfield tall"
+						HorizontalContentAlignment="Center"
+						AutomationProperties.AutomationId="Superior_Bonus"
+						Command="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Superior.OpenPickerCommand}"
+						IsHitTestVisible="{Binding Rules.EditsAffixes}"
+						Focusable="{Binding Rules.EditsAffixes}">
+					<TextBlock Classes="affix" Margin="0"
+							   VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
+							   Text="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Superior.Now}"/>
+				</Button>
+			</Grid>
+
+			<!-- Automod (PD2's word; automagic.txt): the base's own, chosen as the superior bonus is. -->
+			<Grid ColumnDefinitions="76,*" Margin="0,8,0,4">
+				<Grid.IsVisible>
+					<MultiBinding Converter="{x:Static BoolConverters.And}">
+						<Binding Path="$parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Automagic.Shows"/>
+						<Binding Path="AffixesOpen"/>
+					</MultiBinding>
+				</Grid.IsVisible>
+				<TextBlock Grid.Column="0" Classes="fieldname" Margin="0"
+						   VerticalAlignment="Center" Text="{L 'Automod'}"/>
+
+				<Button Grid.Column="1" Classes="pickfield tall"
+						HorizontalContentAlignment="Center"
+						AutomationProperties.AutomationId="Automagic_Line"
+						Command="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Automagic.OpenPickerCommand}"
+						IsHitTestVisible="{Binding Rules.EditsAffixes}"
+						Focusable="{Binding Rules.EditsAffixes}">
+					<TextBlock Classes="affix" Margin="0"
+							   VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
+							   Text="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).Automagic.Now}"/>
+				</Button>
+			</Grid>
+
+			<!-- Staffmods (PD2's word, also pointmods): the base's own, chosen as the superior bonus is. -->
+			<Grid ColumnDefinitions="76,*" Margin="0,8,0,4">
+				<Grid.IsVisible>
+					<MultiBinding Converter="{x:Static BoolConverters.And}">
+						<Binding Path="$parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).StaffSkills.Shows"/>
+						<Binding Path="AffixesOpen"/>
+					</MultiBinding>
+				</Grid.IsVisible>
+				<TextBlock Grid.Column="0" Classes="fieldname" Margin="0"
+						   VerticalAlignment="Center" Text="{L 'Staffmods'}"/>
+
+				<Button Grid.Column="1" Classes="pickfield tall"
+						HorizontalContentAlignment="Center"
+						AutomationProperties.AutomationId="StaffMods_Line"
+						Command="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).StaffSkills.OpenPickerCommand}"
+						IsHitTestVisible="{Binding Rules.EditsAffixes}"
+						Focusable="{Binding Rules.EditsAffixes}">
+					<TextBlock Classes="affix" Margin="0"
+							   VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
+							   Text="{Binding $parent[views:VP_View_Inv_R].((vm:VP_ViewModel_Inv_R)DataContext).StaffSkills.Now}"/>
+				</Button>
+			</Grid>
+		</StackPanel>
+	</Border>
+</UserControl>

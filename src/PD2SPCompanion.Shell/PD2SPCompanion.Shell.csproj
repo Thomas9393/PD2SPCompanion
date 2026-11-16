@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!-- SpriteBitmap copies decoded DC6 pixels into a locked framebuffer. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>PD2SPCompanion.Shell</AssemblyName>
+    <RootNamespace>PD2SPCompanion.Shell</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+    <!-- The class animations are optional; the carousel copes with any of them missing. -->
+    <None Remove="Assets\Images\Classes\README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.2" />
+    <!-- Avalonia.Diagnostics stopped at 11.x; AvaloniaUI.DiagnosticsSupport is its
+         Avalonia 12 replacement. -->
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <!-- Windows-only, which this app already is: it edits an installed Diablo II. -->
+    <PackageReference Include="NAudio" Version="2.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\_vendor\HyperText.Avalonia\HyperText.Avalonia.csproj" />
+    <ProjectReference Include="..\PD2SPCompanion.Core\PD2SPCompanion.Core.csproj" />
+  </ItemGroup>
+
+
+  <Import Project="$(MSBuildThisFileDirectory)../../build/InputHandlerGuard.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)../../build/ReuseGuard.targets" />
+
+</Project>

@@ -1,0 +1,243 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:helper="using:PD2SPCompanion.Shell.Helper"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+			 xmlns:views="using:PD2SPCompanion.Shell.Views"
+
+             mc:Ignorable="d"
+			 d:DesignWidth="{DynamicResource [UI] Page PreviewWidth}"
+			 d:DesignHeight="{DynamicResource [UI] Page PreviewHeight}"
+
+             x:Class="PD2SPCompanion.Shell.Views.VP_View_Experimental_R"
+			 x:DataType="vm:VP_ViewModel_Experimental_R"
+
+			 Background="{DynamicResource [UI] ImageBrush - Background#2}"
+			 CornerRadius="{DynamicResource [UI] MainViewPage_R CornerSize}">
+	<Design.DataContext>
+		<vm:VP_ViewModel_Experimental_R/>
+	</Design.DataContext>
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SettingRow.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ComboBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ValueBox.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/BareIcon.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Tick.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Choice.axaml"/>
+		<Style Selector="TextBox.value">
+			<Setter Property="Height" Value="28"/>
+			<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+			<Setter Property="CaretBrush" Value="White"/>
+			<Setter Property="HorizontalContentAlignment" Value="Left"/>
+			<Setter Property="TextAlignment" Value="Left"/>
+			<Setter Property="Padding" Value="6,0"/>
+		</Style>
+	</UserControl.Styles>
+
+	<!-- The character files the page makes: a new one, or one from the armory (they
+	     were under Modded Single Player on the left). -->
+	<ScrollViewer HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+		<StackPanel Margin="16">
+			<!-- The left page's title, unseen: it holds the cards level with Modded Single Player's, whatever the title's
+			     font makes its height. -->
+			<TextBlock Classes="title" Text="{L 'Experimental'}" Margin="0,0,0,12" Opacity="0" IsHitTestVisible="False"/>
+
+			<!-- Character Creation, first on the right page. Casual and Free, as the import. -->
+			<Border Classes="section"
+					DataContext="{Binding Creation}" x:DataType="vm:CharacterCreationViewModel"
+					IsVisible="{Binding CanCreate}">
+				<!-- One row per choice, what it is on the left and what sets it on the right, as Modded Single
+				     Player's; CREATE under them. -->
+				<StackPanel Margin="16,14">
+					<TextBlock Classes="heading" Text="{L 'Character creation'}" Margin="0,0,0,12"/>
+
+					<Grid Classes="settingrow" ColumnDefinitions="*,Auto">
+						<TextBlock Grid.Column="0" Classes="body" VerticalAlignment="Center" Text="{L 'Name'}"/>
+						<!-- The hint is the game's rule, not the label again (CharacterRename.Problem). As wide as the class's
+						     box under it, the two edges in line. -->
+						<TextBox Grid.Column="1" Classes="value" Width="{StaticResource [UI] Drop Wide}" MaxLength="15"
+								 helper:CharacterNameInput.IsOn="True"
+								 PlaceholderText="{L '2-15 letters'}"
+								 Classes.invalid="{Binding NameMissing}"
+								 Text="{Binding NewName}">
+							<TextBox.KeyBindings>
+								<KeyBinding Gesture="Enter" Command="{Binding CreateCommand}"/>
+							</TextBox.KeyBindings>
+						</TextBox>
+					</Grid>
+					<!-- Said when CREATE is pressed without one, rather than a CREATE that will not press (Fluent 2 and
+					     GOV.UK's advice). -->
+					<TextBlock HorizontalAlignment="Right" Margin="0,4,0,0" IsVisible="{Binding NameMissing}"
+							   Foreground="{DynamicResource [Text] Warning}" Text="{L 'Require name.'}"/>
+
+					<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+						<TextBlock Grid.Column="0" Classes="body" VerticalAlignment="Center" Text="{L 'Class'}"/>
+						<ComboBox Grid.Column="1" Classes="slots" Width="{StaticResource [UI] Drop Wide}"
+								  ItemsSource="{Binding Classes}"
+								  SelectedIndex="{Binding ClassIndex}"/>
+					</Grid>
+
+					<!-- The Character page's level stepper, and its keys: Ctrl five levels, Shift twenty, both to the end, 1 or 99.
+					     (The two pages' steppers alike.) -->
+					<Grid Classes="settingrow" ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,10,0,0">
+						<TextBlock Grid.Column="0" Classes="body" VerticalAlignment="Center" Text="{L 'Level'}"/>
+						<Button Grid.Column="1" Classes="spend" VerticalAlignment="Center"
+								Tag="level down" Command="{Binding LowerLevelCommand}"
+								ToolTip.Tip="{L 'Lower level&#x0a;Ctrl + LMB: 5 levels&#x0a;Shift + LMB: 20 levels&#x0a;Ctrl + Shift + LMB: level 1'}">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Minus}"/>
+						</Button>
+						<base:NumericTextBox Grid.Column="2" Classes="value" Width="{StaticResource [UI] Box Small}" Margin="6,0"
+											 MinWidth="0" Minimum="1" Maximum="99"
+											 HorizontalContentAlignment="Center" TextAlignment="Center"
+											 Text="{Binding LevelText}"/>
+						<Button Grid.Column="3" Classes="spend" VerticalAlignment="Center"
+								Tag="level up" Command="{Binding RaiseLevelCommand}"
+								ToolTip.Tip="{L 'Raise level&#x0a;Ctrl + LMB: 5 levels&#x0a;Shift + LMB: 20 levels&#x0a;Ctrl + Shift + LMB: level 99'}">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Plus}"/>
+						</Button>
+					</Grid>
+
+					<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0" Background="Transparent"
+						  ToolTip.Tip="{L 'Imbue, socket and personalize left waiting&#x0a;Horadric Cube in the inventory'}">
+						<TextBlock Grid.Column="0" Classes="body" VerticalAlignment="Center" Text="{L 'All quests'}"/>
+						<ToggleButton Grid.Column="1" Classes="tick"
+									  IsChecked="{Binding QuestsDone, Mode=TwoWay}">
+							<Path Data="{StaticResource [Glyph] Tick}"
+								  IsVisible="{Binding QuestsDone}"/>
+						</ToggleButton>
+					</Grid>
+
+					<Grid Classes="settingrow" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+						<TextBlock Grid.Column="0" Classes="body" VerticalAlignment="Center" Text="{L 'Mode'}"/>
+						<!-- Two choices: a pair, as on Extra and in Settings (it was a drop-down). -->
+						<UniformGrid Grid.Column="1" Columns="2" Width="{StaticResource [UI] Pair Width}" Margin="-3,0">
+							<Button Classes="choice" Classes.current="{Binding !IsHardcore}" Margin="3,0"
+									AutomationProperties.AutomationId="Create_Softcore"
+									Command="{Binding ChooseModeCommand}" CommandParameter="0" Content="{L 'SOFTCORE'}"/>
+							<Button Classes="choice" Classes.current="{Binding IsHardcore}" Margin="3,0"
+									AutomationProperties.AutomationId="Create_Hardcore"
+									Command="{Binding ChooseModeCommand}" CommandParameter="1" Content="{L 'HARDCORE'}"/>
+						</UniformGrid>
+					</Grid>
+
+					<!-- The card's one action, labelled with its verb and at its end (Fluent 2's
+					     one primary per view). No Clear: a short form with plain defaults, and a reset beside the
+					     primary loses choices to a slip (NN/g). The choices stay after a create; the name goes. -->
+					<Button HorizontalAlignment="Right" Margin="0,14,0,0" Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+							HorizontalContentAlignment="Stretch"
+							Theme="{DynamicResource [CtrlThm] Button_Primary}"
+							Command="{Binding CreateCommand}">
+						<!-- The icon at the left edge, the label centred in the space it leaves. -->
+							<Grid ColumnDefinitions="Auto,*">
+							<Path Classes="pin label" Data="{StaticResource [Glyph] Person plus}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+							<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'CREATE'}" FontSize="{StaticResource [Type] Small}"/>
+						</Grid>
+					</Button>
+				</StackPanel>
+			</Border>
+
+			<!-- Armory Import, under Character Creation, in a frame of its own on the right
+			     page.
+			     Casual and Free: gone in Legit, which edits no character. -->
+			<Border Classes="section" Margin="0,12,0,0"
+					DataContext="{Binding Armory}" x:DataType="vm:ArmoryImportViewModel"
+					IsVisible="{Binding CanImport}">
+				<StackPanel Margin="16,14" Spacing="8">
+						<TextBlock Classes="heading" Text="{L 'Armory import'}" Margin="0,0,0,4"/>
+
+						<!-- Who: the armory page's link, fetched as soon as it is pasted - links only. -->
+						<Grid ColumnDefinitions="*,6,Auto">
+							<TextBox Grid.Column="0" Classes="value"
+									 x:Name="ArmoryLookup"
+									 PlaceholderText="{L 'Armory link'}"
+									 Text="{Binding Lookup}">
+								<!-- The field's own clear, while it holds something: the link, the card and the name
+								     go (Fluent's search box). -->
+								<TextBox.InnerRightContent>
+									<Button Classes="bareicon" Margin="0,0,4,0"
+											IsVisible="{Binding HasLookup}"
+											Command="{Binding ClearCommand}"
+											ToolTip.Tip="{L 'Clear'}">
+										<Path Classes="pin" Data="{StaticResource [Glyph] Close}"/>
+									</Button>
+								</TextBox.InnerRightContent>
+							</TextBox>
+							<!-- The armory's ladder, in the browser, to find someone - the trade page's button
+							     -->
+							<Button Grid.Column="2" Classes="spend" VerticalAlignment="Center"
+									Command="{Binding OpenArmoryCommand}"
+									ToolTip.Tip="{L 'Armory ladder'}">
+								<Path Classes="pin" Data="{StaticResource [Glyph] Globe}"/>
+							</Button>
+						</Grid>
+
+						<!-- What is wrong with what was typed or with the armory's answer: a link not the PD2
+						     site's, no character in it, a name it does not know, no answer. -->
+						<StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding HasWarning}">
+							<Path Classes="pin" Data="{StaticResource [Glyph] Alert}" Stroke="{DynamicResource [Text] Warning}"/>
+							<TextBlock Text="{Binding Warning}" Foreground="{DynamicResource [Text] Warning}"
+									   VerticalAlignment="Center" TextWrapping="Wrap"/>
+						</StackPanel>
+
+						<!-- What came back, on the Character page's card. -->
+						<StackPanel Spacing="8" IsVisible="{Binding HasFetched}">
+							<views:CharacterCardPanel Card="{Binding FetchedCard}"
+													  Description="{Binding FetchedDescription}"
+													  Life="{Binding FetchedLife}" Mana="{Binding FetchedMana}" Stamina="{Binding FetchedStamina}">
+								<views:CharacterCardPanel.Footer>
+									<!-- Read, as the Character page reads them outside Free mode. -->
+									<Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+										<TextBlock Grid.Column="0" Classes="dim" Text="{L 'Level'}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+										<TextBlock Grid.Column="1" Text="{Binding FetchedLevel}" VerticalAlignment="Center"
+												   FontFamily="{StaticResource DiabloFont}" FontSize="{StaticResource [Type] Title}" FontWeight="Bold"
+												   Foreground="{DynamicResource [Text] Heading}"/>
+										<TextBlock Grid.Column="3" Classes="dim" Text="{L 'Experience'}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+										<TextBlock Grid.Column="4" Text="{Binding FetchedExperience}" VerticalAlignment="Center"
+												   Foreground="{DynamicResource [Text] Body}"/>
+									</Grid>
+								</views:CharacterCardPanel.Footer>
+							</views:CharacterCardPanel>
+
+
+						</StackPanel>
+
+						<!-- Once a character is fetched: the name it will be saved under, and IMPORT - the card's one
+						     action, labelled. -->
+						<Grid ColumnDefinitions="*,6,Auto" IsVisible="{Binding HasFetched}">
+							<TextBox Grid.Column="0" Classes="value" MaxLength="15"
+									 helper:CharacterNameInput.IsOn="True"
+									 PlaceholderText="{L 'New name'}"
+									 Text="{Binding NewName}">
+								<TextBox.KeyBindings>
+									<KeyBinding Gesture="Enter" Command="{Binding ImportCommand}"/>
+								</TextBox.KeyBindings>
+							</TextBox>
+							<Button Grid.Column="2" Height="{StaticResource [UI] Button Height}" MinWidth="{StaticResource [UI] Button Width}"
+									HorizontalContentAlignment="Stretch"
+									Theme="{DynamicResource [CtrlThm] Button_Primary}"
+									Command="{Binding ImportCommand}">
+								<!-- The icon at the left edge, the label centred in the space it leaves. -->
+							<Grid ColumnDefinitions="Auto,*">
+									<Path Classes="pin label" Data="{StaticResource [Glyph] Download}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+									<TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,0,0" Text="{L 'IMPORT'}" FontSize="{StaticResource [Type] Small}"/>
+								</Grid>
+							</Button>
+						</Grid>
+
+						<!-- What comes with it, and the one thing worth knowing before it is done. -->
+						<TextBlock Classes="dim" FontSize="{StaticResource [Type] Small}" TextWrapping="Wrap"
+								   IsVisible="{Binding HasFetched}"
+								   Text="{Binding FetchedDetail}"/>
+					</StackPanel>
+			</Border>
+		</StackPanel>
+	</ScrollViewer>
+
+</UserControl>

@@ -1,0 +1,89 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The small square button used wherever a page offers an action beside a value: spend a
+	  stat point, fold a section, move a stash page, arm a delete.
+
+	  It was written out three times - the character page, and both inventory panels - and
+	  had already drifted: the same button, the same chrome, three copies to keep in step.
+	  This is the chrome only. What a page does with the glyph inside stays with the page,
+	  because those genuinely differ (the character page draws its arrows a pixel larger, and
+	  the inventory panel has lit, binned and diced variants nobody else wants).
+	-->
+	<Style Selector="Button.spend">
+		<Setter Property="Width" Value="26"/>
+		<Setter Property="Height" Value="26"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<!-- Fluent's corners, as the flat buttons' (the small icon buttons were not all square, nor their glyphs centred). -->
+		<Setter Property="CornerRadius" Value="4"/>
+	</Style>
+
+	<!-- The glyph's colour; its size and stroke are every icon's (Glyph.axaml). -->
+	<Style Selector="Button.spend Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+
+	<!--
+	  Off, and saying so. There was no disabled state at all: a button that cannot act looked
+	  exactly like one that can, and only the missing hover gave it away. It went unnoticed
+	  because the pages that use these mostly hide a stepper they cannot use rather than
+	  disabling it - the vault's page chevrons are the first that stay put and go dead.
+
+	  The whole button dimmed, frame and glyph together, by the one number every dead button takes
+	  ([UI] Disabled Opacity) - 0.25 read as a gap.
+	-->
+	<Style Selector="Button.spend:disabled">
+		<Setter Property="Opacity" Value="{StaticResource [UI] Disabled Opacity}"/>
+		<Setter Property="Cursor" Value="Arrow"/>
+	</Style>
+	<!-- Its frame too, as the tool squares keep theirs (Button.lock): the theme's own dead button has none, and a
+	     glyph alone where a button stood read as a mark, not as a button that is off. -->
+	<Style Selector="Button.spend:disabled /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+	</Style>
+
+	<!-- Lit under the pointer, and kept lit while the panel it opens is showing - the
+	     statistics and sort buttons - so it is plain which button the panel belongs to. -->
+	<Style Selector="Button.spend:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.spend:flyout-open /template/ ContentPresenter#PART_ContentPresenter, Button.spend:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+	</Style>
+
+	<!-- A toggle that is on, read the way the inventory panel's toggles are: lit and framed
+	     rather than merely a different stroke, so it says which way it is set to someone
+	     looking at one of them. Shared, as the inventory lock wants it too. -->
+	<!-- On is filled in the primary gold, the glyph dark on it (it was a red wash). -->
+	<Style Selector="Button.spend.on /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Button - Primary}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary}"/>
+	</Style>
+	<Style Selector="Button.spend.on:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.spend.on:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Button - Primary Hover}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary Hover Edge}"/>
+	</Style>
+	<Style Selector="Button.spend.on Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Text] On Primary}"/>
+	</Style>
+	<!-- A glyph that is filled, not stroked, turns dark the same way: gold on the gold fill, the Iron Golem's
+	     button was a blank square while lit. -->
+	<Style Selector="Button.spend.on Path.filled, Button.spend.on Path.art">
+		<Setter Property="Fill" Value="{DynamicResource [Text] On Primary}"/>
+	</Style>
+
+	<!-- A bin: gold at rest, as the squares beside it, and red under the pointer (a bin is drawn as the icons beside it and turns red under the pointer; red at rest is kept for the moment it is meant - armed, or the confirm's DELETE). -->
+	<Style Selector="Button.spend.bin:pointerover Path, Button.spend.bin.armed Path, Button.spend.bin:focus-visible Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Broken items}"/>
+	</Style>
+	<!-- Asked once and waiting (BinButton, compact): framed red, as the tool bin is. -->
+	<Style Selector="Button.spend.bin.armed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Broken items}"/>
+	</Style>
+</Styles>

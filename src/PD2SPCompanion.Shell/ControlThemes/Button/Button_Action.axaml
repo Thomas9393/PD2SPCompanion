@@ -1,0 +1,91 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Design.PreviewWith>
+		<Border Padding="20" Background="#0A0101">
+			<Border.Styles>
+				<Style Selector="Button">
+					<Setter Property="Theme" Value="{DynamicResource [CtrlThm] Diablo2 Button_Action}"/>
+				</Style>
+			</Border.Styles>
+			<StackPanel Spacing="10" Width="150">
+				<Button Content="LOAD"/>
+				<Button Content="SAVE" IsEnabled="False"/>
+			</StackPanel>
+		</Border>
+	</Design.PreviewWith>
+
+	<!--
+		The sidebar button, squared off: same black base, gold frame, face and press-scale,
+		but rectangular and wide enough for an icon beside a label. The face is the one the
+		sidebar buttons and the bookmarks wear ([Brush] Button - Face).
+	-->
+	<ControlTheme x:Key="[CtrlThm] Diablo2 Button_Action" TargetType="Button">
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+		<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="CornerRadius" Value="2"/>
+		<Setter Property="Padding" Value="10,7"/>
+		<!-- Stretched so the content can put its icon at one edge and centre its label. -->
+		<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="RenderTransform" Value="none"/>
+		<Setter Property="Transitions">
+			<Transitions>
+				<TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075"/>
+			</Transitions>
+		</Setter>
+
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Border Name="PART_Frame"
+						BorderThickness="1.5"
+						Background="Black"
+						BorderBrush="{DynamicResource [UI] GradBrush - Frame - Golden#02}"
+						CornerRadius="{TemplateBinding CornerRadius}">
+					<Grid Name="PART_Container">
+						<Border CornerRadius="{TemplateBinding CornerRadius}" ClipToBounds="True">
+							<Rectangle Fill="{DynamicResource [Brush] Button - Face}"/>
+						</Border>
+
+						<ContentPresenter x:Name="PART_ContentPresenter"
+										  Content="{TemplateBinding Content}"
+										  ContentTemplate="{TemplateBinding ContentTemplate}"
+										  Foreground="{TemplateBinding Foreground}"
+										  Padding="{TemplateBinding Padding}"
+										  RecognizesAccessKey="True"
+										  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+										  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+					</Grid>
+				</Border>
+			</ControlTemplate>
+		</Setter>
+
+		<!--
+			Icon styling is not here: a ControlTheme may only select the control itself or
+			its /template/ parts, and the icon arrives as content. Whoever uses this theme
+			styles its Path - see the "action" class in VP_View_Default_L.
+		-->
+		<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Selection - Highlight}"/>
+			<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		</Style>
+
+		<Style Selector="^:pressed /template/ Grid#PART_Container">
+			<Setter Property="RenderTransform" Value="scale(0.98)"/>
+		</Style>
+		<Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Selection - Highlight Pressed}"/>
+		</Style>
+
+		<!-- Unavailable: the muted gold, as on a disabled nav button. -->
+		<Style Selector="^:disabled /template/ Border#PART_Frame">
+			<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+		</Style>
+		<Style Selector="^:disabled /template/ Grid#PART_Container">
+			<Setter Property="Opacity" Value="0.35"/>
+		</Style>
+	</ControlTheme>
+</ResourceDictionary>

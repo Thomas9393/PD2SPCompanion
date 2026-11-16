@@ -1,0 +1,138 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+             xmlns:views="using:PD2SPCompanion.Shell.Views"
+             xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             x:Class="PD2SPCompanion.Shell.Views.SearchWindow"
+             x:DataType="vm:SearchWindowViewModel"
+             Focusable="True" IsTabStop="False" Classes="ownkeys">
+
+	<!-- The item search, on the Items page's right page under its Search bookmark (the
+	     view model says the rest). From the top: the tools for the finds together; the conditions, the search's
+	     form, under a heading that folds them; and - once there are finds to list - the results, under a heading
+	     that folds them too. With no finds the conditions have the whole page; with finds they are as tall as
+	     their fields and never more than 40% of the page, the form scrolling inside that, and the results have
+	     the rest - 60% or more (the code-behind's Lay: 40% conditions vs 60% results,
+	     and the player can decide which to fold); either folded,
+	     the other has the page. A grip between the two sized them for a day and was taken out as redundant.
+	     It was a panel over the whole
+	     window, then one floating over the pages, then a dock at the window's right: each a third thing in a
+	     window of two pages. -->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/SpendButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Fold.axaml"/>
+		<StyleInclude Source="/Styles/CommonControls/Chevron.axaml"/>
+	</UserControl.Styles>
+
+	<!-- The rows are the code-behind's to size (Lay): the conditions' row has the page until there are results. -->
+	<Grid Name="Rows" RowDefinitions="*,Auto,Auto">
+
+		<!-- The conditions, under a heading that folds them as a page's section is folded. After its name the
+		     heading says what is asked, in a line - "fortune", Rare, 2 sockets - so the page says what its
+		     results are of while the conditions are folded (not under the presets'
+		     header, folded away with them). The brush beside it empties them; it keeps its room while there is
+		     nothing to empty. -->
+		<Border Grid.Row="0" Name="Conditions" Classes="section" Padding="10,8">
+			<Grid RowDefinitions="Auto,*">
+				<Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+					<Button Grid.Column="0" Classes="fold" HorizontalContentAlignment="Stretch"
+							AutomationProperties.AutomationId="Found_Conditions"
+							Command="{Binding ToggleConditionsCommand}">
+						<Grid ColumnDefinitions="Auto,Auto,*">
+							<Path Grid.Column="0" Classes="chevron"
+								  Classes.open="{Binding ShowsConditions}"
+								  Data="{StaticResource [Glyph] Chevron}"/>
+							<TextBlock Grid.Column="1" Classes="section" Text="{L 'Conditions'}"/>
+							<TextBlock base:TrimmedTip.Tip="{Binding Panel.Asked}" Grid.Column="2" Classes="dim" Margin="10,0,8,0" VerticalAlignment="Center"
+									   AutomationProperties.AutomationId="Search_Summary"
+									   TextTrimming="CharacterEllipsis"
+									   Text="{Binding Panel.Asked}"/>
+						</Grid>
+					</Button>
+					<Button Grid.Column="1" Classes="spend" Cursor="Hand"
+							AutomationProperties.AutomationId="Search_Clear"
+							IsEnabled="{Binding Asks}"
+							Command="{Binding Panel.ClearSearchCommand}"
+							ToolTip.Tip="{L 'Clear conditions'}"
+							ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Clean}"/>
+					</Button>
+				</Grid>
+				<!-- The form. It scrolls inside its own height: the rest of the page with no results or with the
+				     results folded; beside results, its fields' own, up to the conditions' share. -->
+				<views:SearchPanel Grid.Row="1" Name="Form" Margin="0,8,0,0"
+								   DataContext="{Binding Panel}"
+								   IsVisible="{Binding $parent[UserControl].((vm:SearchWindowViewModel)DataContext).ShowsConditions}"/>
+			</Grid>
+		</Border>
+
+		<!-- The gap between the conditions and the results; with no results it is not there, nor are they. -->
+		<Border Grid.Row="1" Height="8" IsVisible="{Binding HasResults}"/>
+
+		<!-- The results: what the conditions find, a row clicked gone to (FoundRows.axaml) - under a heading that
+		     folds them, as the conditions' does, and as wide as its row, as theirs is. At its end the finds acted on
+		     together: those in sight selected -
+		     the Selection menu's glyph - and the vault's moved to a folder, the vault's own Move button. They
+		     are not in a row of their own under the page's title: they act on the results, and
+		     are with them, as the brush is with the conditions. -->
+		<Border Grid.Row="2" Name="Results" Classes="section" Padding="10,8"
+				IsVisible="{Binding HasResults}">
+			<Grid RowDefinitions="Auto,*">
+				<Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto">
+					<Button Grid.Column="0" Classes="fold"
+							AutomationProperties.AutomationId="Found_Results"
+							Command="{Binding ToggleResultsCommand}">
+						<Grid ColumnDefinitions="Auto,Auto">
+							<Path Grid.Column="0" Classes="chevron"
+								  Classes.open="{Binding ShowsResults}"
+								  Data="{StaticResource [Glyph] Chevron}"/>
+							<TextBlock Grid.Column="1" Classes="section" Text="{L 'Results'}"/>
+						</Grid>
+					</Button>
+					<Button Grid.Column="1" Classes="spend" Cursor="Hand" Margin="0,0,4,0"
+							AutomationProperties.AutomationId="Found_Select"
+							IsEnabled="{Binding Results.CanSelectFound}"
+							Command="{Binding Results.SelectFoundCommand}"
+							ToolTip.Tip="{L 'Select found'}"
+							ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Select all}"/>
+					</Button>
+					<Button Grid.Column="2" Classes="spend" Cursor="Hand"
+							AutomationProperties.AutomationId="Found_Move"
+							IsEnabled="{Binding Results.HasVaultFinds}"
+							Command="{Binding Results.MoveFoundCommand}"
+							ToolTip.Tip="{L 'Move found to folder'}"
+							ToolTip.ShowOnDisabled="True">
+						<Path Classes="pin" Data="{StaticResource [Glyph] Move to folder}"/>
+					</Button>
+				</Grid>
+				<!-- The id is the scroll's: a Border is nothing UI Automation finds. -->
+				<ScrollViewer Grid.Row="1" Margin="-2,8,-6,-2"
+							  HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False"
+							  AutomationProperties.AutomationId="Search_Found"
+							  IsVisible="{Binding ShowsResults}">
+					<!-- Down or Enter from the keyword box steps into the finds, Up and Down walk them (ListKeys). -->
+					<ItemsControl Name="Found" ItemsSource="{Binding Finds.Rows}" Margin="0,0,4,0" Tag="{Binding Finds.ChooseCommand}"
+								  base:ListKeys.IsList="True">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<VirtualizingStackPanel/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.DataTemplates>
+							<StaticResource ResourceKey="FoundGroupRow"/>
+							<StaticResource ResourceKey="FoundPlaceRow"/>
+							<StaticResource ResourceKey="FoundItemRow"/>
+							<StaticResource ResourceKey="FoundTargetRow"/>
+							<StaticResource ResourceKey="FoundMoreRow"/>
+						</ItemsControl.DataTemplates>
+					</ItemsControl>
+				</ScrollViewer>
+			</Grid>
+		</Border>
+	</Grid>
+</UserControl>

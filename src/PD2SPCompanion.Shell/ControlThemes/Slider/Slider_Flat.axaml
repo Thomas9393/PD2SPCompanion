@@ -1,0 +1,96 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Design.PreviewWith>
+		<Border Padding="20" Background="#1E1E1E" Width="300">
+			<StackPanel Spacing="16">
+				<Slider Theme="{DynamicResource [CtrlThm] Slider_Flat}" Maximum="99" Value="37"/>
+				<Slider Theme="{DynamicResource [CtrlThm] Slider_Flat}" Maximum="99" Value="37" IsEnabled="False"/>
+			</StackPanel>
+		</Border>
+	</Design.PreviewWith>
+
+	<!--
+		The flat slider (the level's progress), in the flat buttons' colours: the part
+		behind the thumb filled in the primary gold, the rest a dim track, the thumb a gold disc. Steps of 1
+		- dragged, clicked on the track, or by the arrow keys.
+
+		Disabled, it is a gauge: the fill stays, the thumb goes. Where a value is shown but not changed, the
+		same control reads it, so the one reading looks the same either way.
+	-->
+
+	<!-- A track's halves: a plain bar, no button look. -->
+	<ControlTheme x:Key="[CtrlThm] Slider_Flat Bar" TargetType="RepeatButton">
+		<Setter Property="Focusable" Value="False"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="Template">
+			<ControlTemplate>
+				<!-- The pointer's whole height takes the click; the bar drawn is thin. -->
+				<Panel Background="Transparent">
+					<Border Height="4" CornerRadius="2" VerticalAlignment="Center"
+							Background="{TemplateBinding Background}"/>
+				</Panel>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+
+	<ControlTheme x:Key="[CtrlThm] Slider_Flat" TargetType="Slider">
+		<Setter Property="Minimum" Value="0"/>
+		<Setter Property="SmallChange" Value="1"/>
+		<Setter Property="LargeChange" Value="1"/>
+		<Setter Property="TickFrequency" Value="1"/>
+		<Setter Property="IsSnapToTickEnabled" Value="True"/>
+		<Setter Property="Height" Value="28"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Track Name="PART_Track" Orientation="Horizontal"
+					   Minimum="{TemplateBinding Minimum}"
+					   Maximum="{TemplateBinding Maximum}"
+					   Value="{TemplateBinding Value, Mode=TwoWay}"
+					   IsDirectionReversed="{TemplateBinding IsDirectionReversed}">
+					<Track.DecreaseButton>
+						<RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource [CtrlThm] Slider_Flat Bar}"
+									  Background="{DynamicResource [Brush] Button - Primary}"/>
+					</Track.DecreaseButton>
+					<Track.IncreaseButton>
+						<RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource [CtrlThm] Slider_Flat Bar}"
+									  Background="{DynamicResource [Brush] Button - Disabled Edge}"/>
+					</Track.IncreaseButton>
+					<Thumb Name="thumb" Height="14">
+						<Thumb.Template>
+							<ControlTemplate>
+								<Ellipse Name="disc" Width="14" Height="14"
+										 Fill="{DynamicResource [Brush] Button - Primary}"
+										 Stroke="{DynamicResource [Brush] Button - Secondary}" StrokeThickness="2"/>
+							</ControlTemplate>
+						</Thumb.Template>
+					</Thumb>
+				</Track>
+			</ControlTemplate>
+		</Setter>
+
+		<!-- Its width a style, not in the template, so the gauge can take it away. -->
+		<Style Selector="^ /template/ Thumb#thumb">
+			<Setter Property="Width" Value="14"/>
+		</Style>
+		<Style Selector="^:pointerover /template/ Thumb#thumb, ^:focus-visible /template/ Thumb#thumb">
+			<Setter Property="RenderTransform" Value="scale(1.15)"/>
+		</Style>
+		<Style Selector="^:pointerover /template/ RepeatButton#PART_DecreaseButton, ^:focus-visible /template/ RepeatButton#PART_DecreaseButton">
+			<Setter Property="Background" Value="{DynamicResource [Brush] Button - Primary Hover}"/>
+		</Style>
+		<Style Selector="^:focus-visible /template/ Thumb#thumb">
+			<Setter Property="RenderTransform" Value="scale(1.15)"/>
+		</Style>
+
+		<!-- The gauge: the reading without the thumb. -->
+		<Style Selector="^:disabled">
+			<Setter Property="Cursor" Value="Arrow"/>
+		</Style>
+		<!-- No room kept for it either, so the bar runs edge to edge and the fill ends where the value is. -->
+		<Style Selector="^:disabled /template/ Thumb#thumb">
+			<Setter Property="Opacity" Value="0"/>
+			<Setter Property="Width" Value="0"/>
+		</Style>
+	</ControlTheme>
+</ResourceDictionary>

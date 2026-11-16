@@ -1,0 +1,64 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:helper="using:PD2SPCompanion.Shell.Helper"
+        xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base">
+	<!--
+		Every tooltip in the app, in one place.
+
+		This began scoped to the sidebar, which meant each new control that wanted the same
+		tooltip either copied the setters or silently fell back to Fluent's white popup.
+		Placement stays with the control - the sidebar puts its tooltips to the right of the
+		rail, the action buttons below - but the look is shared.
+	-->
+	<!-- An item's tooltip where the item can be acted on draws two boxes of its own - the item, and what is worn
+	     in its place (ItemActionTip, which puts this class on) - so the tooltip around them is no box at all,
+	     and wide enough for the pair. After the rule below, which it overrides. -->
+	<Style Selector="ToolTip.actions">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="MaxWidth" Value="1300"/>
+	</Style>
+	<Style Selector="ToolTip">
+		<!-- The menus' and the pickers' own panel, the right-click menu's before them, the tooltip following the rest -
+		     it was the window's near-black, [Brush] Template -
+		     Background, and a tooltip beside a menu was two darks. A try, still to be judged. -->
+		<Setter Property="Background" Value="{DynamicResource [Brush] Popup}"/>
+		<!-- Fluent's thin stroke and rounded corners, in the popup panels' dim gold (the 1.5 gradient frame was too thick). -->
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="4"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Body}"/>
+		<Setter Property="Padding" Value="9,5"/>
+		<!-- Fluent stops every tooltip at 320, which wrapped an item's long lines and put their green
+		     bracket on a line of its own. Wide enough for an item's longest
+		     line; the app's own hints are short and never come near it. -->
+		<Setter Property="MaxWidth" Value="{StaticResource [UI] Tip Wide}"/>
+		<!-- The pointer passes through, as the game's tooltips: an item's tip opens just under it, where the
+		     pointer goes next, and took the click meant for the item beneath (ClickThroughTips). -->
+		<Setter Property="helper:ClickThroughTips.Enabled" Value="True"/>
+		<!-- A text that lists what keys do - "Ctrl + LMB: 5 points", a line each - is drawn as an item's tooltip
+		     draws its strip: the key as a cap, what it does beside it (KeyedTips). A text
+		     alone: a tooltip showing a control or an item is not touched. -->
+		<Setter Property="helper:KeyedTips.Enabled" Value="True"/>
+	</Style>
+
+	<!-- What shows an item's stats, on its host, as the game shows an item:
+	     - at once, with no wait before the first and none between one and the next, so a grid, a vault
+	       page or a list of listings can be swept fast. Every other tooltip keeps Avalonia's 400 ms, and
+	       100 ms between;
+	     - under the item, not at the pointer, a gap below it - and above it, the same gap, where the
+	       screen has no room below (ItemTipPlacement: the popup's own flip kept the gap's sign and
+	       covered the item's top). The stash's tiles did this first; every host now does.
+	     Hosts: a grid's tile, a worn or mercenary slot, a vault icon card, a trade listing. A host sets
+	     no placement of its own. -->
+	<!-- By the types that wear it, not ":is(Control)": that put a class watch on every control of the app, the
+	     Edit page's thousand built at each select among them. -->
+	<Style Selector="Button.itemtip, Grid.itemtip, base|TileAnchor.itemtip">
+		<Setter Property="ToolTip.ShowDelay" Value="0"/>
+		<Setter Property="ToolTip.BetweenShowDelay" Value="0"/>
+		<Setter Property="ToolTip.Placement" Value="Custom"/>
+		<Setter Property="ToolTip.CustomPopupPlacementCallback" Value="{x:Static helper:ItemTipPlacement.Callback}"/>
+	</Style>
+</Styles>

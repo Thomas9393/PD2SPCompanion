@@ -1,0 +1,112 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The page-level action button: the row at the top of a page - the inventory's lock, the
+	  socket toggle, copy and the bin; the vault's tools. Drawn with the Diablo2 Button_Action
+	  theme, which the button names itself, and an 18-unit icon whose shape sits in the middle
+	  eleven (3.5 to 14.5).
+
+	  Lifted out of the inventory page, where it was written and where it works, when the vault
+	  page wanted the same buttons - so both use the one definition. Smaller, panel-level
+	  buttons are SpendButton.axaml's.
+	-->
+	<!-- The small flat square every icon button is (one look for the small icon
+	     buttons; ornament on the chrome only) - SpendButton.axaml's, with this row's larger drawn glyphs.
+	     The lock reads as its state rather than as a command: what it says is what is true now. -->
+	<Style Selector="Button.lock">
+		<Setter Property="Width" Value="26"/>
+		<Setter Property="Height" Value="26"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="4"/>
+	</Style>
+	<Style Selector="Button.lock:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.lock:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+	</Style>
+	<Style Selector="Button.lock:pressed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Pressed Wash}"/>
+	</Style>
+	<!-- Dead: the whole square dimmed, frame and glyph together, as the small squares are. -->
+	<Style Selector="Button.lock:disabled">
+		<Setter Property="Opacity" Value="{StaticResource [UI] Disabled Opacity}"/>
+		<Setter Property="Cursor" Value="Arrow"/>
+	</Style>
+	<Style Selector="Button.lock:disabled /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+	</Style>
+	<!-- The glyph's colour; its size and stroke are every icon's (Glyph.axaml). -->
+	<Style Selector="Button.lock Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+	<!-- Text set directly in the button, and only that: a tooltip belongs to its button's logical
+	     tree, and a descendant selector here made every lock button's tooltip small and bold. -->
+	<Style Selector="Button.lock > TextBlock">
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Muted}"/>
+	</Style>
+	<!-- The bin as the buttons beside it at rest; red under the pointer and while it asks (a bin is drawn as the icons beside it and turns red under the pointer; red at rest is kept for the moment it is meant - armed, or the confirm's DELETE). -->
+	<Style Selector="Button.lock.bin:pointerover Path, Button.lock.bin.armed Path, Button.lock.bin:focus-visible Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Broken items}"/>
+	</Style>
+	<!-- Asked once and waiting. Framed as well as coloured, so the button reads as
+	     holding a question rather than as one that happens to be red. -->
+	<Style Selector="Button.lock.bin.armed Path">
+		<!-- 2px once scaled: heavier than every icon at rest (Glyphs.axaml). -->
+		<Setter Property="StrokeThickness" Value="{DynamicResource [Glyph] Stroke Armed}"/>
+	</Style>
+	<Style Selector="Button.lock.bin.armed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Broken items}"/>
+	</Style>
+	<!-- The same, green, where asking twice guards against a slip rather than a loss: Store all (BinButton.Positive).
+	     Green only while it asks - the second press's tick; under the pointer it stays as the buttons beside it
+	     (the highlight is not green; only the second confirm uses the green tick). -->
+	<Style Selector="Button.lock.bin.go:pointerover Path, Button.lock.bin.go:focus-visible Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+	<Style Selector="Button.lock.bin.go.armed Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+	</Style>
+	<!-- A filled glyph on it (Store all's chest, the armed tick) turns green by its fill, while it asks. -->
+	<Style Selector="Button.lock.bin.go.armed Path.filled">
+		<Setter Property="Fill" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+	</Style>
+	<Style Selector="Button.lock.bin.go.armed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Set items}"/>
+	</Style>
+	<!-- The rule between two groups of these buttons, as tall as the row. -->
+	<Style Selector="Border.toolrule">
+		<Setter Property="Width" Value="1"/>
+		<Setter Property="Margin" Value="4,4"/>
+		<Setter Property="VerticalAlignment" Value="Stretch"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+	</Style>
+	<!-- On: filled in the primary gold, the glyph dark on it - every toggle's on, and the selected choice's
+	     (it was a red wash). -->
+	<Style Selector="Button.lock.on /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Button - Primary}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary}"/>
+	</Style>
+	<Style Selector="Button.lock.on:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.lock.on:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Button - Primary Hover}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Button - Primary Hover Edge}"/>
+	</Style>
+	<Style Selector="Button.lock.on Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Text] On Primary}"/>
+	</Style>
+	<Style Selector="Button.lock.on Path.filled, Button.lock.on Path.art">
+		<Setter Property="Fill" Value="{DynamicResource [Text] On Primary}"/>
+	</Style>
+	<Style Selector="Button.lock.on > TextBlock">
+		<Setter Property="Foreground" Value="{DynamicResource [Text] On Primary}"/>
+	</Style>
+</Styles>

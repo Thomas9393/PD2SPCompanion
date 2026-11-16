@@ -1,0 +1,34 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  A character's tags - SC or HC, EXPANSION, DEAD - one boxed form wherever a character is shown
+	  (the homepage list drew them as bare text, the Character card boxed). The
+	  border and the text take the tag's own colour from the page:
+
+	      <Border Classes="badge" BorderBrush="{Binding ModeBrush}">
+	          <TextBlock Text="{Binding Mode}" Foreground="{Binding ModeBrush}"/>
+	      </Border>
+	-->
+	<Style Selector="Border.badge">
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="2"/>
+		<Setter Property="Padding" Value="5,1"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Field}"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
+	<Style Selector="Border.badge > TextBlock">
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+	</Style>
+
+	<!-- A badge that is news, not a tag: filled, in the gold of a unique, its text dark on it. The home page's
+	     "3 found" on a character's card (find across characters). -->
+	<Style Selector="Border.badge.found">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+	<Style Selector="Border.badge.found > TextBlock">
+		<Setter Property="Foreground" Value="{DynamicResource [Text] On Primary}"/>
+	</Style>
+</Styles>

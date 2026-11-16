@@ -1,0 +1,33 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  A section's fold: a bare button across the section's width, lit faintly under the pointer.
+	  Its chevron is Chevron.axaml's. Written out identically on the landing page and both
+	  inventory panels; the trading page wanted a fourth, and it is one file now.
+	-->
+	<Style Selector="Button.fold">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="Padding" Value="2"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+	</Style>
+	<Style Selector="Button.fold /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="Transparent"/>
+	</Style>
+	<Style Selector="Button.fold:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.fold:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="#14FFFFFF"/>
+	</Style>
+	<!-- A fold's title, beside its chevron: the heading tier (written twice, on the
+	     Items page and the Edit page). -->
+	<Style Selector="TextBlock.section">
+		<Setter Property="FontFamily" Value="{StaticResource DiabloFont}"/>
+		<Setter Property="FontSize" Value="{StaticResource [Type] Heading}"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Heading}"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="Margin" Value="8,0,0,0"/>
+	</Style>
+</Styles>

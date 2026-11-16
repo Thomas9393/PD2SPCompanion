@@ -1,0 +1,368 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!-- Preview -->
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<ThemeVariantScope RequestedThemeVariant="Light">
+				<DockPanel>
+					<!-- Common Styles -->
+					<DockPanel.Styles>
+						<Style Selector= "Label">
+							<Setter Property="FontFamily" Value="AvQest"/>
+							<Setter Property="FontWeight" Value="Normal"/>
+							<Setter Property="Foreground" Value="Black"/>
+							<Setter Property="FontSize" Value="18"/>
+						</Style>
+						<Style Selector = "StackPanel">
+							<Setter Property="DockPanel.Dock" Value="Top"/>
+							<Setter Property="Orientation" Value="Horizontal"/>
+							<Setter Property="Spacing" Value="0,0,1,0"/>
+							<Setter Property="Height" Value="25"/>
+						</Style>
+						<Style Selector = "Rectangle">
+							<Setter Property="Width" Value="40"/>
+							<Setter Property="Height" Value="20"/>
+							<Setter Property="Stroke" Value="{DynamicResource [Brush] Template - Border#2}"/>
+							<Setter Property="StrokeThickness" Value="1.5"/>
+						</Style>
+					</DockPanel.Styles>
+
+					<!-- Title -->
+					<Label DockPanel.Dock="Top" FontSize="24" Margin="0 0 0 10"
+						   FontWeight="Heavy">
+						App - Dark Theme
+					</Label>
+
+					<!-- Wikia Template Group -->
+					<Border BorderBrush="Gray" BorderThickness="1" CornerRadiusX="10" RadiusY="10" Padding="10">
+						<Grid RowDefinitions="Auto,*">
+							<TextBlock DockPanel.Dock="Top" Margin="10" Grid.Row="0"
+									   FontFamily="Arial" FontSize="14" FontWeight="ExtraLight">
+								<Run Text="Ref from Wikia Style Guide" FontSize="18"/>
+								<LineBreak/>
+								<Run Text="https://diablo-archive.fandom.com/wiki/Diablo_Wiki:Style_Guide"/>
+							</TextBlock>
+							<Grid ColumnDefinitions="*,*,*" Grid.Row="1">
+								<!-- Template -->
+								<Border Background="{DynamicResource [Brush] Template - Background}"
+										Padding="10" Margin="10"
+										CornerRadiusX="10" RadiusY="10"
+										Grid.Column="0">
+									<DockPanel VerticalAlignment="Top">
+										<Label DockPanel.Dock="Top" FontSize="22"
+											   HorizontalAlignment="Center" Foreground="White">
+											Template
+										</Label>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Template - Header}"/>
+											<Label Content="Header"
+												   Foreground="Gainsboro"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Template - Sub-header}"/>
+											<Label Content="Sub-header"
+												   Foreground="Gainsboro"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Template - Header Text}"/>
+											<Label Content="Header text"
+												   Foreground="{DynamicResource [Brush] Template - Header Text}"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Template - Border#1}"/>
+											<Label Content="Border #1"
+												   Foreground="Gainsboro"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Template - Border#2}"/>
+											<Label Content="Border #2"
+												   Foreground="Gainsboro"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Template - Header Background}"/>
+											<Label Content="Header BG"
+												   Foreground="Gainsboro"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Template - Background}"/>
+											<Label Content="Background"
+												   Foreground="Gainsboro"/>
+										</StackPanel>
+									</DockPanel>
+								</Border>
+								<!-- Rarity -->
+								<Border Background="{DynamicResource [Brush] Template - Background}"
+										Padding="10" Margin="10"
+										CornerRadiusX="10" RadiusY="10"
+										Grid.Column="1">
+									<DockPanel VerticalAlignment="Top">
+										<Label DockPanel.Dock="Top" FontSize="22"
+											   HorizontalAlignment="Center" Foreground="White">
+											Rarity
+										</Label>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Rarity - Crafted items}"/>
+											<Label Content="Crafted items"
+												   Foreground="{DynamicResource [Brush] Rarity - Crafted items}"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Rarity - Magic items}"/>
+											<Label Content="Magic items"
+												   Foreground="{DynamicResource [Brush] Rarity - Magic items}"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Rarity - Rare items}"/>
+											<Label Content="Rare items"
+												   Foreground="{DynamicResource [Brush] Rarity - Rare items}"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Rarity - Set items}"/>
+											<Label Content="Set items"
+												   Foreground="{DynamicResource [Brush] Rarity - Set items}"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Rarity - Unique items}"/>
+											<Label Content="Unique items"
+												   Foreground="{DynamicResource [Brush] Rarity - Unique items}"/>
+										</StackPanel>
+									</DockPanel>
+								</Border>
+								<!-- Wiki -->
+								<Border Background="{DynamicResource [Brush] Template - Background}"
+										Padding="10" Margin="10"
+										CornerRadiusX="10" RadiusY="10"
+										Grid.Column="2">
+									<DockPanel VerticalAlignment="Top">
+										<Label DockPanel.Dock="Top" FontSize="22"
+											   HorizontalAlignment="Center" Foreground="White">
+											Wiki
+										</Label>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Wiki - Broken link}"/>
+											<Label Content="Broken link"
+												   Foreground="{DynamicResource [Brush] Wiki - Broken link}"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Wiki - Link}"/>
+											<Label Content="Link"
+												   Foreground="{DynamicResource [Brush] Wiki - Link}"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Wiki - Clicked link}"/>
+											<Label Content="Clicked link"
+												   Foreground="{DynamicResource [Brush] Wiki - Clicked link}"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Wiki - Text color}"/>
+											<Label Content="Text color"
+												   Foreground="{DynamicResource [Brush] Wiki - Text color}"/>
+										</StackPanel>
+										<StackPanel>
+											<Rectangle Fill="{DynamicResource [Brush] Wiki - Background color}"/>
+											<Label Content="Background"
+												   Foreground="Gainsboro"/>
+										</StackPanel>
+									</DockPanel>
+								</Border>
+							</Grid>
+						</Grid>
+					</Border>
+				</DockPanel>
+			</ThemeVariantScope>
+		</Border>
+	</Design.PreviewWith>
+
+	<!-- Main Theme Dictionary. One look, always dark (no light mode is planned),
+	     so no theme variants: these sat in a "Light" dictionary, with an empty "Dark" one, and the app
+	     only drew because it ran as Light, following Windows. -->
+			<!-- Ref from Wikia -->
+			<!-- https://diablo-archive.fandom.com/wiki/Diablo_Wiki:Style_Guide -->
+			<!-- Template -->
+			<SolidColorBrush x:Key="[Brush] Template - Header"				>#2F0600</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Template - Sub-header"			>#1F0400</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Template - Header Text"			>#D49E43</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Template - Border#1"			>#5E0C00</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Template - Border#2"			>#333333</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Template - Header Background"	>#000000</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Template - Background"			>#0A0101</SolidColorBrush>
+			<!-- Text Colors - Rarity -->
+			<SolidColorBrush x:Key="[Brush] Rarity - Crafted items"			>#FFA500</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Rarity - Magic items"			>#4169E1</SolidColorBrush>
+			<!-- The magic blue lifted, for a name on a lit face - the affix slot the picker is aimed at, whose gold
+			     wash left the plain blue hard to read. -->
+			<SolidColorBrush x:Key="[Brush] Rarity - Magic items Lit"		>#9DB4FF</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Rarity - Rare items"			>#FFFF00</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Rarity - Set items"				>#00FF00</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Rarity - Unique items"			>#A59263</SolidColorBrush>
+			<!-- Normal and Broken are not in the 2023 palette; item tiles need them. -->
+			<SolidColorBrush x:Key="[Brush] Rarity - Normal items"			>#D8CCB4</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Rarity - Broken items"			>#CC2200</SolidColorBrush>
+
+			<!-- The red the game writes "Corrupted" in, and marks a corrupted property
+			     with. Lighter than the broken red, which has to read as a warning. -->
+			<SolidColorBrush x:Key="[Brush] Corrupted"						>#E4614A</SolidColorBrush>
+
+			<!-- Allowed, but worth knowing: an affix above the item's level, a value outside
+			     the range its source could roll, a property the engine no longer reads. Orange,
+			     the classic UI's colour for a warning (preferred to the
+			     lavender #B48CFF that stood in since orange was taken off for colliding with
+			     crafted). A deeper orange than crafted's #FFA500, so the two still differ. -->
+			<SolidColorBrush x:Key="[Brush] Caution"						>#FF8C1A</SolidColorBrush>
+
+			<!-- Text by role. The colour follows
+			     the type tier: gold for the Diablo tiers (headings, names, big figures), cream for body
+			     text, tan for small text. Each state colour means one thing. Item colours - the rarities,
+			     life, mana, stamina - stay for items and those stats. PD2UI008 refuses a colour written as
+			     a value on text anywhere but here. -->
+			<SolidColorBrush x:Key="[Text] Heading"		>#A59263</SolidColorBrush>
+			<SolidColorBrush x:Key="[Text] Body"		>#F2E9D2</SolidColorBrush>
+			<SolidColorBrush x:Key="[Text] Muted"		>#A18E73</SolidColorBrush>
+			<!-- Staged, pending, a reward waiting: the set items' bright green (after
+			     a softer #8FCB7A of its own was tried and turned down). Still its own role, so it can move
+			     again without touching the set items. -->
+			<SolidColorBrush x:Key="[Text] Pending"		>#00FF00</SolidColorBrush>
+			<SolidColorBrush x:Key="[Text] Warning"		>#FF8C1A</SolidColorBrush>
+			<SolidColorBrush x:Key="[Text] Danger"		>#CC2200</SolidColorBrush>
+			<SolidColorBrush x:Key="[Text] Corrupted"	>#E4614A</SolidColorBrush>
+
+			<!-- Fluent's disabled button paint, cleared. Under the dark variant it fills a disabled
+			     button with a grey box; this app says "disabled" by dimming the button itself
+			     (Button.spend:disabled and the like), as it did before it was always dark. -->
+			<SolidColorBrush x:Key="ButtonBackgroundDisabled"			>Transparent</SolidColorBrush>
+			<SolidColorBrush x:Key="ButtonBorderBrushDisabled"			>Transparent</SolidColorBrush>
+			<SolidColorBrush x:Key="RepeatButtonBackgroundDisabled"		>Transparent</SolidColorBrush>
+			<SolidColorBrush x:Key="RepeatButtonBorderBrushDisabled"	>Transparent</SolidColorBrush>
+			<SolidColorBrush x:Key="ToggleButtonBackgroundDisabled"		>Transparent</SolidColorBrush>
+			<SolidColorBrush x:Key="ToggleButtonBorderBrushDisabled"	>Transparent</SolidColorBrush>
+
+			<!-- Behind a tile rather than on top of one. The unique gold is a pale tan
+			     meant to be read as text; washed over a cell it came out near enough to
+			     the plain item's off-white to be unreadable at a glance. This is the same
+			     colour with the light taken out of it, which a cell can carry. -->
+			<SolidColorBrush x:Key="[Brush] Rarity Wash - Unique items"		>#B8860B</SolidColorBrush>
+
+			<!-- The craft orange is a light one, and a quarter of it over a dark cell came
+			     out olive. This is the same hue with the yellow taken out, which stays
+			     orange at a wash's opacity. -->
+			<SolidColorBrush x:Key="[Brush] Rarity Wash - Crafted items"	>#FF6A00</SolidColorBrush>
+
+			<!-- Selection: the rust red behind a chosen sidebar button or carousel card. -->
+			<!-- The frame gold, muted, for things behind the one in focus. -->
+			<SolidColorBrush x:Key="[Brush] Frame - Golden Dim"			>#6B5C38</SolidColorBrush>
+
+			<SolidColorBrush x:Key="[Brush] Selection - Highlight"			>#52940000</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Selection - Highlight Hover"	>#7F940000</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Selection - Highlight Pressed">#65940000</SolidColorBrush>
+			<!-- Fills written as literals in many places. -->
+			<SolidColorBrush x:Key="[Brush] Field"				>#33000000</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Popup"				>#F0242424</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Card"				>#14000000</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Hover Wash"			>#1AFFFFFF</SolidColorBrush>
+			<!-- Under the pointer and pressed, on every small control in a panel (it was
+			     the red wash; red is kept for danger - the bin's hover, an armed delete - and gold for current). -->
+			<SolidColorBrush x:Key="[Brush] Pressed Wash"		>#29FFFFFF</SolidColorBrush>
+			<!-- The one a list is already on (gold for current) - Button - Primary, faint. -->
+			<SolidColorBrush x:Key="[Brush] Selection - Current"			>#33A59263</SolidColorBrush>
+
+			<!-- The flat buttons of panels and popups (ControlThemes/Button/Button_Flat):
+			     the primary is the heading gold, filled, its label dark on it; a shade lighter under the
+			     pointer with a light edge, darker held down. The secondary is dark with a dim gold outline. -->
+			<SolidColorBrush x:Key="[Brush] Button - Primary"				>#A59263</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Button - Primary Hover"			>#D9C690</SolidColorBrush>
+			<!-- Hover's thin light edge: the change has a shape, not only a brightness (the first hover step was too
+			     subtle on the dark page). -->
+			<SolidColorBrush x:Key="[Brush] Button - Primary Hover Edge"	>#F2E6C2</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Button - Primary Pressed"		>#8C7B51</SolidColorBrush>
+			<SolidColorBrush x:Key="[Text] On Primary"						>#16110A</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Button - Secondary"				>#FF161616</SolidColorBrush>
+			<!-- Unavailable, primary or secondary alike: Fluent's neutral grey, not the colour faded (a faded gold read
+			     as muddy). -->
+			<SolidColorBrush x:Key="[Brush] Button - Disabled"				>#FF232323</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Button - Disabled Edge"			>#FF3A3A3A</SolidColorBrush>
+			<SolidColorBrush x:Key="[Text] Disabled"						>#FF6A6660</SolidColorBrush>
+			<!-- Wiki Colors -->
+			<SolidColorBrush x:Key="[Brush] Wiki - Broken link"				>#CC2200</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Wiki - Link"					>#E0B021</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Wiki - Clicked link"			>#AF833B</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Wiki - Text color"				>#A18E73</SolidColorBrush>
+			<SolidColorBrush x:Key="[Brush] Wiki - Background color"		>#100303</SolidColorBrush>
+			
+			<!-- Series of Standard Color, with Opacity -->
+			<SolidColorBrush x:Key="[ABrush] Black - A50%">#7f000000</SolidColorBrush>
+			<SolidColorBrush x:Key="[ABrush] Black - A25%">#40000000</SolidColorBrush>
+			<SolidColorBrush x:Key="[ABrush] R50 G50 B50 - A50%">#7f323232</SolidColorBrush>
+			<!-- What lies over the window behind a popup: the pickers' veil, the confirm question, What's new. -->
+			<SolidColorBrush x:Key="[ABrush] Veil">#B4000000</SolidColorBrush>
+			<!-- What lies between words and a picture they are read over (the opened character card's town):
+			     dark behind the words, clear at its rim, so it has no edge of its own. -->
+			<RadialGradientBrush x:Key="[ABrush] Veil - Soft"
+								 Center="50%, 50%" GradientOrigin="50%, 50%" RadiusX="50%" RadiusY="50%">
+				<RadialGradientBrush.GradientStops>
+					<GradientStops>
+						<GradientStop Color="#B8000000" Offset="0"/>
+						<GradientStop Color="#88000000" Offset="0.5"/>
+						<GradientStop Color="#00000000" Offset="1"/>
+					</GradientStops>
+				</RadialGradientBrush.GradientStops>
+			</RadialGradientBrush>
+			
+			<!-- UI Elements -->
+			<!-- Gradient Brushes -->
+			<RadialGradientBrush x:Key="[UI] GradBrush - Frame - Golden#01"
+								 Center="50%, 50%" GradientOrigin="50%, 50%" RadiusX="0.75" RadiusY="0.75"
+								 Transform="rotate(-30deg)">
+				<RadialGradientBrush.GradientStops>
+					<GradientStops>
+						<GradientStop Color="#a79066" Offset="0.5"/>
+						<GradientStop Color="#bfac69" Offset="0.75"/>
+						<GradientStop Color="#594c2c" Offset="1"/>
+					</GradientStops>
+				</RadialGradientBrush.GradientStops>
+			</RadialGradientBrush>
+			<LinearGradientBrush x:Key="[UI] GradBrush - Frame - Golden#02"
+								 EndPoint="0%,0%" StartPoint="50%,50%"
+								 Transform="rotate(-45deg)">
+				<GradientStop Color="#a79066" Offset="0"/>
+				<GradientStop Color="#bfac69" Offset="0.5"/>
+				<GradientStop Color="#594c2c" Offset="1"/>
+			</LinearGradientBrush>
+			<!-- The same, seen in a mirror: turned about the top right corner where the other turns about the top
+			     left, so it runs the other way across - bright at the left, dim at the right. For the left of the
+			     book's two pages (MainView, Border.MainContent.mirrored): the two frames then face each other, dim
+			     at the spine and bright at the book's outer edges. -->
+			<LinearGradientBrush x:Key="[UI] GradBrush - Frame - Golden#02 - Mirrored"
+								 EndPoint="100%,0%" StartPoint="50%,50%"
+								 TransformOrigin="100%,0%" Transform="rotate(45deg)">
+				<GradientStop Color="#a79066" Offset="0"/>
+				<GradientStop Color="#bfac69" Offset="0.5"/>
+				<GradientStop Color="#594c2c" Offset="1"/>
+			</LinearGradientBrush>
+			<!-- The frame's thin lining, round its borders and its bar: its brightest as bright as the corner
+			     piece's silver line (130,126,119 on screen), the rest in step - it was #d1c8b6 and read white
+			     beside the corner. -->
+			<RadialGradientBrush x:Key="[UI] GradBrush - Frame - Silver#01"
+								 Center="50%, 50%" GradientOrigin="50%, 50%" RadiusX="0.75" RadiusY="0.75"
+								 Transform="rotate(120deg)">
+				<RadialGradientBrush.GradientStops>
+					<GradientStops>
+						<GradientStop Color="#403b38" Offset="0.5"/>
+						<GradientStop Color="#665c4c" Offset="0.75"/>
+						<GradientStop Color="#827e77" Offset="1"/>
+					</GradientStops>
+				</RadialGradientBrush.GradientStops>
+			</RadialGradientBrush>
+			
+			<!-- Image Brushes -->
+				<!-- The backgrounds (Background#1, #2) are made at start-up from the game's stone - the
+				     resolution mod's for the window, the base game's blank menu panel for the pages - as the frame's
+				     brushes are (Imaging/FrontEndArt.CutFrame, Core FrameArt). -->
+				<!-- Button Face Group -->
+				<!-- The face of the sidebar buttons, the page buttons and the bookmarks, one colour: the bookmarks'.
+				     It replaced a rust texture (Button_Face_2.png) with no known source. -->
+				<SolidColorBrush x:Key="[Brush] Button - Face">#F0140E07</SolidColorBrush>
+				<!-- The face of the open bookmark: a warm dark, framed in gold. -->
+				<SolidColorBrush x:Key="[Brush] Button - Current Face">#FF2B1D0D</SolidColorBrush>
+				<!-- The window frame's brushes (SubFrame_Border#1 - T/B/L/R, SubFrame_Bar#1) are made at start-up from
+				     the resolution mod's pieces PD2 ships (Imaging/FrontEndArt.CutFrame, Core FrameArt); the editor
+				     ships no frame art. -->
+</ResourceDictionary>

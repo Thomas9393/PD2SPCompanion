@@ -1,0 +1,96 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  The right-click menu's dress (ActMenuHost): the pickers' panel and rows, the tooltips' key caps, and its own
+	  icons and rules, after Windows 11's. A file of its own because the menu is two popups - the menu, and the
+	  list a row of it opens beside it (Sort by) - and a popup takes the styles it is given.
+	-->
+	<StyleInclude Source="/Styles/CommonControls/Section.axaml"/>
+	<StyleInclude Source="/Styles/CommonControls/Picker.axaml"/>
+	<StyleInclude Source="/Styles/CommonControls/FolderWays.axaml"/>
+	<StyleInclude Source="/Styles/CommonControls/ActionButton.axaml"/>
+	<StyleInclude Source="/Styles/CommonControls/KeyCap.axaml"/>
+	<!-- A key at a row's end: no room after it, the row's own padding is its margin. -->
+	<Style Selector="Border.keycap">
+		<Setter Property="Margin" Value="18,0,0,0"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
+	<!-- A row is as tall with a key as without - and stands in from the panel's edges, which the rules
+	     between the groups reach. -->
+	<Style Selector="Button.toolrow">
+		<Setter Property="MinHeight" Value="28"/>
+		<Setter Property="Margin" Value="6,0"/>
+	</Style>
+	<!-- A rule between two groups (beside Windows 11's own menu, thinner and longer,
+	     to reach the section it divides instead of leaving a gap): from edge to edge of the
+	     panel, a hair thick and fainter than the frame. It stood in from both edges, as the tools' list's does. -->
+	<Style Selector="Border.menurule">
+		<Setter Property="Margin" Value="0,5"/>
+		<Setter Property="Height" Value="1"/>
+		<Setter Property="Opacity" Value="0.55"/>
+	</Style>
+
+	<!-- An icon at the menu's head, as Windows 11's: the glyph, larger, with its word under it; no square
+	     round it; the icons share the menu's width, a faint line between two of them. The tools' framed
+	     squares stood here first. -->
+	<Style Selector="Button.menuicon">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="CornerRadius" Value="4"/>
+		<Setter Property="Padding" Value="4,7,4,5"/>
+		<Setter Property="Margin" Value="3,0,2,0"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+	</Style>
+	<Style Selector="Button.menuicon:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.menuicon:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+	</Style>
+	<Style Selector="Button.menuicon:pressed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Pressed Wash}"/>
+	</Style>
+	<Style Selector="Button.menuicon:disabled">
+		<Setter Property="Opacity" Value="{StaticResource [UI] Disabled Opacity}"/>
+		<Setter Property="Cursor" Value="Arrow"/>
+	</Style>
+	<Style Selector="Button.menuicon:disabled /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+	</Style>
+	<!-- 18px, where a tool's glyph is 14: the stroke thinned by as much, so it is drawn as thick as theirs. -->
+	<Style Selector="Button.menuicon > StackPanel > Path.pin">
+		<Setter Property="RenderTransform" Value="scale(1.5)"/>
+		<Setter Property="StrokeThickness" Value="1.07"/>
+		<Setter Property="Margin" Value="3"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+	</Style>
+	<!-- The word, set directly in the button's own panel: a tooltip belongs to its button's logical tree,
+	     and a descendant selector would dress the tooltip's words too. -->
+	<Style Selector="Button.menuicon > StackPanel > Panel > TextBlock">
+		<Setter Property="FontSize" Value="{StaticResource [Type] Small}"/>
+		<Setter Property="Foreground" Value="{DynamicResource [Text] Body}"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="Margin" Value="0,7,0,0"/>
+	</Style>
+	<!-- The bin turns red under the pointer, as every bin does. -->
+	<Style Selector="Button.menuicon.bin:pointerover > StackPanel > Path, Button.menuicon.bin:focus-visible > StackPanel > Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Broken items}"/>
+	</Style>
+	<!-- And asks in the menu, pressed once: red, glyph and word, until it is pressed again or the menu goes. -->
+	<Style Selector="Button.menuicon.asking > StackPanel > Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Broken items}"/>
+	</Style>
+	<Style Selector="Button.menuicon.asking > StackPanel > Panel > TextBlock">
+		<Setter Property="Foreground" Value="{DynamicResource [Brush] Rarity - Broken items}"/>
+	</Style>
+	<!-- The word not said just now: laid out, not drawn. -->
+	<Style Selector="Button.menuicon > StackPanel > Panel > TextBlock.unsaid">
+		<Setter Property="Opacity" Value="0"/>
+	</Style>
+	<Style Selector="Border.iconrule">
+		<Setter Property="Width" Value="1"/>
+		<Setter Property="Margin" Value="0,8"/>
+		<Setter Property="HorizontalAlignment" Value="Left"/>
+		<Setter Property="Opacity" Value="0.55"/>
+		<Setter Property="Background" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+	</Style>
+</Styles>

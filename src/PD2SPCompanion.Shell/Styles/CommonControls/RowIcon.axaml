@@ -1,0 +1,43 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!--
+	  Small square icon buttons for a list row - a Button with class "rowicon" holding a Path:
+
+	      <Button Classes="rowicon" ToolTip.Tip="{L 'Open backup'}"><Path Data="..."/></Button>
+
+	  Shared, not a page's own: the start page's backup list and the settings page's collections
+	  want the same row. A row's bin is not one of these: it is a BinButton, Compact, which
+	  has the red of its own.
+	-->
+	<!-- The small square's size and corners (SpendButton.axaml): every icon-only button one square
+	     (the small icon buttons were not all square, nor their glyphs centred). -->
+	<Style Selector="Button.rowicon">
+		<Setter Property="Width" Value="26"/>
+		<Setter Property="Height" Value="26"/>
+		<Setter Property="Margin" Value="3,0,0,0"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="4"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+	</Style>
+	<!-- The glyph's colour; its size and stroke are every icon's (Glyph.axaml). -->
+	<Style Selector="Button.rowicon Path">
+		<Setter Property="Stroke" Value="{DynamicResource [Brush] Rarity - Unique items}"/>
+	</Style>
+	<Style Selector="Button.rowicon:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.rowicon:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource [Brush] Hover Wash}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [UI] GradBrush - Frame - Golden#02}"/>
+	</Style>
+	<Style Selector="Button.rowicon:disabled">
+		<Setter Property="Opacity" Value="{StaticResource [UI] Disabled Opacity}"/>
+	</Style>
+	<!-- Its frame too (SpendButton.axaml). -->
+	<Style Selector="Button.rowicon:disabled /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource [Brush] Frame - Golden Dim}"/>
+	</Style>
+</Styles>

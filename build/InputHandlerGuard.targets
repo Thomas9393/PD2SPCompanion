@@ -1,0 +1,88 @@
+<Project>
+
+  <!--
+    Fails the build on the two XAML input mistakes this project has made more than once.
+
+    Both are the same fault: Avalonia builds an event route with class handlers ahead of
+    instance handlers, so a control's own handling of an input event runs BEFORE anything
+    attached in XAML. A Button marks PointerPressed and PointerReleased handled in its
+    class handler; a TextBox inserts typed text in its. An attribute handler therefore runs
+    after the fact, or not at all, and the symptom is a control that silently does nothing.
+
+    Neither mistake produces a warning, a crash or a failing test - which is why it came
+    back after being written up. A build error is the only thing that catches it.
+
+    To allow a case that is genuinely fine, put input-guard-ok in a comment just above the
+    element and say why.
+  -->
+
+  <UsingTask TaskName="GuardXamlInputHandlers"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        var offenders = new (string Element, string[] Attributes, string Advice)[]
+        {
+            ("Button",
+             new[] { "PointerPressed", "PointerReleased", "Tapped", "DoubleTapped" },
+             "A Button handles these in its class handler, which runs first, so this never fires. " +
+             "For a plain click use Command. To read modifier keys, add a tunnelling handler on the " +
+             "page - see ModifierClick.OnModifiedPress."),
+
+            ("TextBox",
+             new[] { "TextInput", "KeyDown" },
+             "A TextBox inserts typed text in its class handler, which runs first, so this cannot " +
+             "refuse a keystroke. Subclass and override OnTextInput - see NumericTextBox."),
+        };
+
+        foreach (var file in Files)
+        {
+            string path = file.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+            string text = File.ReadAllText(path);
+
+            foreach (var offender in offenders)
+            {
+                foreach (Match tag in Regex.Matches(text, "<" + offender.Element + @"\b[^>]*>"))
+                {
+                    int look = Math.Max(0, tag.Index - 300);
+                    if (text.Substring(look, tag.Index - look).Contains("input-guard-ok"))
+                        continue;
+
+                    foreach (string attribute in offender.Attributes)
+                    {
+                        if (!Regex.IsMatch(tag.Value, @"\b" + attribute + @"\s*="))
+                            continue;
+
+                        int line = 1;
+                        for (int n = 0; n < tag.Index; n++)
+                            if (text[n] == '\n') line++;
+
+                        Log.LogError(null, "PD2UI001", null, path, line, 1, 0, 0,
+                            offender.Element + "." + attribute + " attached in XAML will not run. " +
+                            offender.Advice);
+                    }
+                }
+            }
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GuardInputHandlers" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <GuardedXaml Include="$(MSBuildProjectDirectory)\**\*.axaml"
+                   Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**" />
+    </ItemGroup>
+    <GuardXamlInputHandlers Files="@(GuardedXaml)" />
+  </Target>
+
+</Project>

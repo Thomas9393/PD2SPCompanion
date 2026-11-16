@@ -1,0 +1,82 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:vm="using:PD2SPCompanion.Shell.ViewModels"
+			 xmlns:base="using:PD2SPCompanion.Shell.CustomControls.Base"
+             x:Class="PD2SPCompanion.Shell.CustomControls.Base.MaterialsTab"
+			 x:DataType="vm:MaterialSheet">
+	<!--
+	  The shared stash's materials tab, laid out as the game lays it out. Nothing is drawn here
+	  that a container does not already draw: every block is a ContainerGrid, placed where the
+	  game puts it, and handed the same four things a stash pane hands its own grid.
+
+	      <base:MaterialsTab DataContext="{Binding SelectedPage.Sheet}"
+	                         ClickTileCommand="..." PlaceAtCommand="..."
+	                         IsHolding="..." SocketOpacity="..."/>
+
+	  Season 14's tab is the game's tabs one under another, each under its name, shown at a full
+	  stash page's size and scrolling (the sheet's ViewWidth / ViewHeight); Season 13's and the rune
+	  wizard's take the size of their blocks, with nothing to scroll.
+	-->
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/CommonControls/PageText.axaml"/>
+	</UserControl.Styles>
+
+	<ScrollViewer Width="{Binding ViewWidth}" Height="{Binding ViewHeight}"
+				  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" AllowAutoHide="False">
+		<Panel HorizontalAlignment="Left" VerticalAlignment="Top">
+			<ItemsControl x:Name="Panels" ItemsSource="{Binding Panels}">
+				<!-- A plain panel with each block at its offset, not a canvas: a canvas has no size of
+				     its own, and sized by hand to 9 x 14 cells it cut off the right-hand blocks, whose
+				     frames reach past their cells. A panel takes the size of what is in it. -->
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Panel/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+
+				<ItemsControl.Styles>
+					<Style Selector="ItemsControl#Panels > ContentPresenter" x:DataType="vm:MaterialPanel">
+						<Setter Property="Margin" Value="{Binding Offset}"/>
+						<Setter Property="HorizontalAlignment" Value="Left"/>
+						<Setter Property="VerticalAlignment" Value="Top"/>
+					</Style>
+				</ItemsControl.Styles>
+
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="vm:MaterialPanel">
+						<base:ContainerGrid
+							Source="{Binding Grid}"
+							IsJoinedAbove="{Binding JoinsAbove}"
+							IsHolding="{Binding $parent[base:MaterialsTab].IsHolding}"
+							SocketOpacity="{Binding $parent[base:MaterialsTab].SocketOpacity}"
+							ClickTileCommand="{Binding $parent[base:MaterialsTab].ClickTileCommand}"
+							PlaceAtCommand="{Binding $parent[base:MaterialsTab].PlaceAtCommand}"/>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+
+			<!-- Each part's name over it, where the game's tab button names it. -->
+			<ItemsControl x:Name="Captions" ItemsSource="{Binding Captions}" IsHitTestVisible="False">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Panel/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+
+				<ItemsControl.Styles>
+					<Style Selector="ItemsControl#Captions > ContentPresenter" x:DataType="vm:MaterialCaption">
+						<Setter Property="Margin" Value="{Binding Offset}"/>
+						<Setter Property="HorizontalAlignment" Value="Left"/>
+						<Setter Property="VerticalAlignment" Value="Top"/>
+					</Style>
+				</ItemsControl.Styles>
+
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="vm:MaterialCaption">
+						<TextBlock Classes="heading" Text="{Binding Text}"/>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</Panel>
+	</ScrollViewer>
+</UserControl>
